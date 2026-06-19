@@ -464,8 +464,8 @@ function renderCards(){
   }
   box.innerHTML=items.map(s=>{
     const r=RARITY[s.rarity];
-    const tag = s.rarity==="very_rare"?`<span class="mega">MEGA</span>`
-             : s.rarity==="rare"?`<span class="rar">ZELDZAAM</span>`:"";
+    const tag = s.rarity==="very_rare"?`<span class="mega">Zeer zeldzaam</span>`
+             : s.rarity==="rare"?`<span class="rar">Zeldzaam</span>`:"";
     const ph = s.photo?`<span class="ph">📷</span>`:"";
     const cnt = s.count>1?`· ×${s.count}`:"";
     const near = s._d<=10?`<span class="near">dichtbij</span>`:"";
@@ -579,7 +579,7 @@ async function loadData(){
     const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
     state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
     checkWensvogels(state.data);
-  }catch(e){ loadDemo(); }
+  }catch(e){ if(!state.data.length) loadDemo(); }
   $("#refresh").classList.remove("spin"); render();
 }
 
