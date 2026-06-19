@@ -5,7 +5,7 @@ import json
 import math
 from pathlib import Path
 
-from database import get_push_subscribers
+from database import get_push_subscribers, delete_push_subscriber
 
 _SERVICE_ACCOUNT = Path(__file__).parent / "firebase-service-account.json"
 _RARITY_NUM = {
@@ -75,3 +75,6 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                 messaging.send(msg)
             except Exception as exc:
                 print(f"[fcm] send error: {exc}", flush=True)
+                err = str(exc).lower()
+                if "not found" in err or "unregistered" in err:
+                    delete_push_subscriber(sub["fcm_token"])
