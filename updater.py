@@ -15,7 +15,7 @@ from typing import Callable
 
 from database import (
     init_db, insert_sightings, is_empty,
-    get_all_urls, prune_old_sightings,
+    get_all_urls, prune_old_sightings, prune_empty_subscribers,
 )
 from scraper import fetch_rare_birds
 
@@ -50,6 +50,7 @@ def run_update(
         progress_callback=progress_callback,
     )
     prune_old_sightings()
+    prune_empty_subscribers()
 
     if new_sightings:
         try:

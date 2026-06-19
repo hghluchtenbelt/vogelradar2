@@ -163,9 +163,19 @@ def delete_push_subscriber(token: str) -> None:
 def get_push_subscribers() -> list[dict]:
     with _connect() as conn:
         rows = conn.execute(
-            "SELECT fcm_token, lat, lng, wishlist, max_dist FROM push_subscribers"
+            """
+            SELECT fcm_token, lat, lng, wishlist, max_dist
+            FROM push_subscribers
+            WHERE wishlist != '[]'
+            """
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def prune_empty_subscribers() -> None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM push_subscribers WHERE wishlist = '[]'")
+        conn.commit()
 
 
 def prune_old_sightings(keep_days: int = 15) -> int:
