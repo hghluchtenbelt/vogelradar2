@@ -276,46 +276,9 @@ const state = {
   active: new Set(["rare","very_rare"]),
   win: 3, maxDist: 0,
   user: { ...CONFIG.DEFAULT_LOC, precise:false },
-  data: [], lastUpdated: null, isDemo: false, selected: null
+  data: [], lastUpdated: null, selected: null
 };
 
-/* ===== DEMO DATA (daysAgo -> real date at load) ===== */
-const DEMO = [
-  {id:"284913201",nl:"Roze Spreeuw",en:"Rosy Starling",sci:"Pastor roseus",rarity:"very_rare",count:1,lat:51.954,lng:5.628,loc:"Blauwe Kamer, Wageningen",daysAgo:1,time:"08:32",photo:true},
-  {id:"284701882",nl:"Visarend",en:"Osprey",sci:"Pandion haliaetus",rarity:"rare",count:1,lat:51.965,lng:5.715,loc:"Renkumse Benedenwaard",daysAgo:0,time:"07:14",photo:true},
-  {id:"284655017",nl:"Rode Wouw",en:"Red Kite",sci:"Milvus milvus",rarity:"rare",count:2,lat:52.045,lng:5.717,loc:"Ginkelse Heide, Ede",daysAgo:2,time:"11:05",photo:false},
-  {id:"284120443",nl:"Grauwe Klauwier",en:"Red-backed Shrike",sci:"Lanius collurio",rarity:"rare",count:1,lat:52.103,lng:5.722,loc:"Wekeromse Zand",daysAgo:5,time:"09:40",photo:true},
-  {id:"284233910",nl:"Bijeneter",en:"European Bee-eater",sci:"Merops apiaster",rarity:"rare",count:3,lat:51.975,lng:5.502,loc:"Amerongse Bovenpolder",daysAgo:4,time:"10:22",photo:true},
-  {id:"284889120",nl:"IJsvogel",en:"Common Kingfisher",sci:"Alcedo atthis",rarity:"uncommon",count:1,lat:51.961,lng:5.652,loc:"Bovenste Polder, Wageningen",daysAgo:1,time:"06:55",photo:true},
-  {id:"284902277",nl:"Roodborsttapuit",en:"European Stonechat",sci:"Saxicola rubicola",rarity:"uncommon",count:2,lat:52.050,lng:5.720,loc:"Ginkelse Heide",daysAgo:0,time:"08:10",photo:false},
-  {id:"284670044",nl:"Grote Bonte Specht",en:"Great Spotted Woodpecker",sci:"Dendrocopos major",rarity:"uncommon",count:1,lat:51.985,lng:5.681,loc:"Wageningen Hoog",daysAgo:2,time:"09:02",photo:false},
-  {id:"284910001",nl:"Buizerd",en:"Common Buzzard",sci:"Buteo buteo",rarity:"common",count:1,lat:51.962,lng:5.681,loc:"Wageningse Berg",daysAgo:0,time:"12:18",photo:false},
-  {id:"284910044",nl:"Merel",en:"Common Blackbird",sci:"Turdus merula",rarity:"common",count:1,lat:51.965,lng:5.663,loc:"Wageningen centrum",daysAgo:1,time:"07:30",photo:false},
-  {id:"284955600",nl:"Steppekiekendief",en:"Pallid Harrier",sci:"Circus macrourus",rarity:"very_rare",count:1,lat:53.372,lng:6.213,loc:"Lauwersmeer",daysAgo:0,time:"09:48",photo:true},
-  {id:"284511233",nl:"Ralreiger",en:"Squacco Heron",sci:"Ardeola ralloides",rarity:"very_rare",count:1,lat:52.452,lng:5.362,loc:"Oostvaardersplassen",daysAgo:3,time:"08:05",photo:true},
-  {id:"284100789",nl:"Amerikaanse Goudplevier",en:"American Golden Plover",sci:"Pluvialis dominica",rarity:"very_rare",count:1,lat:53.052,lng:4.792,loc:"De Cocksdorp, Texel",daysAgo:5,time:"16:20",photo:true},
-  {id:"283998120",nl:"Vale Gier",en:"Griffon Vulture",sci:"Gyps fulvus",rarity:"very_rare",count:4,lat:51.960,lng:4.052,loc:"Maasvlakte",daysAgo:6,time:"13:11",photo:true},
-  {id:"284812339",nl:"Roze Spreeuw",en:"Rosy Starling",sci:"Pastor roseus",rarity:"very_rare",count:1,lat:53.291,lng:5.072,loc:"Oost-Vlieland",daysAgo:2,time:"11:33",photo:false},
-  {id:"284744120",nl:"Zwarte Ooievaar",en:"Black Stork",sci:"Ciconia nigra",rarity:"rare",count:1,lat:51.762,lng:4.803,loc:"Biesbosch",daysAgo:1,time:"07:50",photo:true},
-  {id:"284900012",nl:"Roodpootvalk",en:"Red-footed Falcon",sci:"Falco vespertinus",rarity:"rare",count:1,lat:52.271,lng:5.501,loc:"Arkemheen",daysAgo:0,time:"10:40",photo:true},
-  {id:"284620018",nl:"Steltkluut",en:"Black-winged Stilt",sci:"Himantopus himantopus",rarity:"rare",count:2,lat:51.501,lng:4.302,loc:"Markiezaat",daysAgo:2,time:"08:28",photo:false},
-  {id:"284188877",nl:"Velduil",en:"Short-eared Owl",sci:"Asio flammeus",rarity:"rare",count:1,lat:52.851,lng:4.701,loc:"Zwanenwater",daysAgo:4,time:"18:05",photo:true},
-  {id:"284055510",nl:"Witwangstern",en:"Whiskered Tern",sci:"Chlidonias hybrida",rarity:"rare",count:3,lat:52.131,lng:4.782,loc:"Nieuwkoopse Plassen",daysAgo:6,time:"09:15",photo:true},
-  {id:"284733201",nl:"Draaihals",en:"Eurasian Wryneck",sci:"Jynx torquilla",rarity:"rare",count:1,lat:52.181,lng:5.781,loc:"Kootwijk, Veluwe",daysAgo:3,time:"08:44",photo:false},
-  {id:"284901188",nl:"Grauwe Franjepoot",en:"Red-necked Phalarope",sci:"Phalaropus lobatus",rarity:"rare",count:1,lat:53.441,lng:6.832,loc:"Eemshaven",daysAgo:1,time:"07:22",photo:true},
-  {id:"284099001",nl:"Morinelplevier",en:"Eurasian Dotterel",sci:"Charadrius morinellus",rarity:"rare",count:5,lat:53.432,lng:6.842,loc:"Eemshaven",daysAgo:4,time:"10:50",photo:false},
-  {id:"284050022",nl:"Visarend",en:"Osprey",sci:"Pandion haliaetus",rarity:"rare",count:1,lat:52.181,lng:5.072,loc:"Loosdrechtse Plassen",daysAgo:5,time:"09:00",photo:false},
-  {id:"284903301",nl:"Lepelaar",en:"Eurasian Spoonbill",sci:"Platalea leucorodia",rarity:"uncommon",count:6,lat:52.451,lng:5.342,loc:"Oostvaardersplassen",daysAgo:0,time:"08:33",photo:true},
-  {id:"284903355",nl:"Grutto",en:"Black-tailed Godwit",sci:"Limosa limosa",rarity:"uncommon",count:12,lat:52.271,lng:5.491,loc:"Arkemheen",daysAgo:1,time:"07:11",photo:false},
-  {id:"284780190",nl:"Steenuil",en:"Little Owl",sci:"Athene noctua",rarity:"uncommon",count:1,lat:51.951,lng:5.501,loc:"Lienden, Betuwe",daysAgo:2,time:"21:14",photo:false},
-  {id:"284512290",nl:"Tapuit",en:"Northern Wheatear",sci:"Oenanthe oenanthe",rarity:"uncommon",count:3,lat:53.061,lng:4.772,loc:"Texel",daysAgo:1,time:"09:25",photo:true},
-  {id:"284603310",nl:"Geelgors",en:"Yellowhammer",sci:"Emberiza citrinella",rarity:"uncommon",count:2,lat:52.052,lng:5.781,loc:"Planken Wambuis",daysAgo:0,time:"08:00",photo:false},
-  {id:"284600121",nl:"Grote Zilverreiger",en:"Great Egret",sci:"Ardea alba",rarity:"uncommon",count:4,lat:51.861,lng:5.931,loc:"Ooijpolder, Nijmegen",daysAgo:0,time:"07:58",photo:false},
-  {id:"284910201",nl:"Aalscholver",en:"Great Cormorant",sci:"Phalacrocorax carbo",rarity:"common",count:20,lat:52.501,lng:5.451,loc:"Lelystad",daysAgo:0,time:"08:40",photo:false},
-  {id:"284910230",nl:"Grauwe Gans",en:"Greylag Goose",sci:"Anser anser",rarity:"common",count:45,lat:52.451,lng:5.371,loc:"Oostvaardersplassen",daysAgo:1,time:"09:05",photo:false},
-  {id:"284910255",nl:"Kievit",en:"Northern Lapwing",sci:"Vanellus vanellus",rarity:"common",count:30,lat:52.271,lng:5.511,loc:"Arkemheen",daysAgo:0,time:"08:20",photo:false},
-  {id:"284910288",nl:"Houtduif",en:"Common Wood Pigeon",sci:"Columba palumbus",rarity:"common",count:8,lat:52.091,lng:5.121,loc:"Utrecht",daysAgo:1,time:"07:45",photo:false}
-];
 
 /* ===== HELPERS ===== */
 const $ = s => document.querySelector(s);
@@ -485,7 +448,6 @@ function renderStatus(){
   let txt = "zeldzame vogels bij jou";
   if(state.lastUpdated){ const m=Math.round((Date.now()-state.lastUpdated)/6e4);
     txt = m<1?"zojuist bijgewerkt":m<60?`${m} min geleden bijgewerkt`:`${Math.round(m/60)} uur geleden bijgewerkt`; }
-  if(state.isDemo) txt += " · demodata";
   $("#sub").textContent = txt;
 }
 
@@ -565,7 +527,6 @@ handleEl.addEventListener("pointerup",e=>{ if(!drag)return; if(drag.moved<6) tog
 function render(){ renderChips(); renderStatus(); renderCards(); drawMarkers(); }
 
 /* ===== DATA ===== */
-function loadDemo(){ state.data=DEMO.map(s=>({...s,date:dateFromDaysAgo(s.daysAgo)})); state.isDemo=true; state.lastUpdated=Date.now(); }
 function buildUrl(){
   return CONFIG.DATA_URL
     .replaceAll("{lat}", state.user.lat.toFixed(5))
@@ -573,13 +534,13 @@ function buildUrl(){
     .replaceAll("{radius}", String(CONFIG.FETCH_RADIUS_KM));
 }
 async function loadData(){
-  if(!CONFIG.DATA_URL){ loadDemo(); render(); return; }
+  if(!CONFIG.DATA_URL){ render(); return; }
   $("#refresh").classList.add("spin");
   try{ const res=await fetch(buildUrl(),{cache:"no-store"}); if(!res.ok) throw 0;
     const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
     state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
     checkWensvogels(state.data);
-  }catch(e){ if(!state.data.length) loadDemo(); }
+  }catch(e){}
   $("#refresh").classList.remove("spin"); render();
 }
 
