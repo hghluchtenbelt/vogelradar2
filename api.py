@@ -73,7 +73,8 @@ def birds_json():
     rows = get_sightings()
     last = get_latest_update()
     return {
-        "lastUpdated": last or "",
+        "lastUpdated": (last + "Z") if last and not last.endswith("Z")
+        else (last or ""),
         "sightings": [_to_sighting(r) for r in rows],
     }
 
