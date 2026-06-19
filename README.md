@@ -2,8 +2,6 @@
 
 Mobiele, kaart-first weergave van recente zeldzame vogelwaarnemingen in Nederland, met data van [waarneming.nl](https://waarneming.nl).
 
-![Vogelradar](https://vogel-radar.nl)
-
 ## Wat doet het
 
 - Toont zeldzame vogelwaarnemingen op een interactieve kaart
