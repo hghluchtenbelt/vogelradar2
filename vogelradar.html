@@ -133,9 +133,49 @@
   .empty{text-align:center;color:var(--muted);padding:40px 20px}
   .empty .e{font-size:32px;margin-bottom:6px}
   .empty p{font-size:13px;margin:3px 0}
+
+  /* ── Splash ── */
+  #splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,var(--brand),var(--brand-d));
+    display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s ease-in}
+  #splash.out{opacity:0;pointer-events:none}
+  .sl{font-size:72px;margin-bottom:14px}
+  .sn{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.4px}
+  .ss{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:5px}
+
+  /* ── Wensvogel modal ── */
+  .wmod{position:fixed;inset:0;z-index:2000;background:rgba(2,6,23,.45);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center}
+  .wmod-box{width:min(100vw,600px);max-height:80vh;background:#fff;border-radius:20px 20px 0 0;
+    box-shadow:0 -10px 34px rgba(2,6,23,.18);display:flex;flex-direction:column}
+  .wmod-head{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 10px;
+    border-bottom:1px solid var(--line);flex:0 0 auto}
+  .wmod-head h2{font-size:16px;font-weight:740;margin:0}
+  .wmod-x{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:2px 6px;line-height:1}
+  .wmod-hint{font-size:12px;color:var(--muted);padding:10px 16px 4px;margin:0;flex:0 0 auto}
+  #wens-search{display:block;margin:6px 16px 8px;padding:8px 12px;border:1.5px solid var(--line);
+    border-radius:9px;font-size:14px;font-family:inherit;width:calc(100% - 32px);
+    outline:none;flex:0 0 auto;box-sizing:border-box}
+  #wens-search:focus{border-color:var(--brand)}
+  #wens-list{overflow-y:auto;flex:1;padding:0 16px 20px;-webkit-overflow-scrolling:touch}
+  .wi{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+  .wi:last-child{border-bottom:none}
+  .wi:active{opacity:.7}
+  .wcb{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;transition:all .12s}
+  .wcb.on{background:var(--brand);border-color:var(--brand)}
+  .wcb.on::after{content:'✓';color:#fff;font-size:12px;font-weight:800}
+  .wdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .wname{font-size:14px;font-weight:600;flex:1}
+  .wrar{font-size:10.5px;color:var(--muted);font-weight:600}
+  .wmod-notif{padding:10px 16px;background:#f0fdfa;border-top:1px solid #ccfbf1;
+    display:flex;align-items:center;gap:10px;flex:0 0 auto}
+  .wmod-notif p{font-size:12px;color:var(--brand-d);margin:0;flex:1}
+  .wmod-notif button{border:1.5px solid var(--brand);background:#fff;color:var(--brand-d);
+    font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap}
 </style>
 </head>
 <body>
+<div id="splash"><div class="sl">🦅</div><div class="sn">Vogelradar</div><div class="ss">zeldzame vogels bij jou</div></div>
 <div id="map"></div>
 
 <div class="topbar">
@@ -144,6 +184,7 @@
     <div class="bt"><b>Vogelradar</b><span id="sub">zeldzame vogels bij jou</span></div>
     <div class="grow"></div>
     <button class="loc" id="loc">📍 <span id="locname">locatie bepalen…</span></button>
+    <button class="rf" id="wens-btn" title="Wensvogels">🔔</button>
     <button class="rf" id="refresh" title="Verversen">⟳</button>
   </div>
   <div class="chips" id="chips"></div>
@@ -171,6 +212,22 @@
     </div>
   </div>
   <div class="cards" id="cards"></div>
+</div>
+
+<div class="wmod" id="wmod" hidden>
+  <div class="wmod-box">
+    <div class="wmod-head">
+      <h2>🔔 Wensvogels</h2>
+      <button class="wmod-x" id="wmod-close">✕</button>
+    </div>
+    <p class="wmod-hint">Ontvang een melding als één van jouw wensvogels in de buurt wordt gezien.</p>
+    <input id="wens-search" type="search" placeholder="Zoek soort…" autocomplete="off">
+    <div id="wens-list"></div>
+    <div class="wmod-notif" id="wmod-notif" hidden>
+      <p>Sta meldingen toe om een notificatie te ontvangen.</p>
+      <button id="wmod-allow">Toestaan</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -254,6 +311,73 @@ function visible(){ return state.data.map(s=>({...s,_d:haversine(state.user,s)})
 function counts(){ const c={common:0,uncommon:0,rare:0,very_rare:0};
   state.data.forEach(s=>{ const d=haversine(state.user,s);
     if(timePass(s)&&(state.maxDist===0||d<=state.maxDist)) c[s.rarity]++; }); return c; }
+
+/* ===== WENSVOGELS ===== */
+const _WK='vr_wens', _NK='vr_notified';
+function getWishlist(){ try{return new Set(JSON.parse(localStorage.getItem(_WK)||'[]'));}catch{return new Set();} }
+function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); }
+function getNotified(){ try{return new Set(JSON.parse(localStorage.getItem(_NK)||'[]'));}catch{return new Set();} }
+function saveNotified(s){ localStorage.setItem(_NK,JSON.stringify([...s].slice(-500))); }
+
+function openWensModal(){
+  $('#wmod').hidden=false;
+  if('Notification' in window && Notification.permission==='default') $('#wmod-notif').hidden=false;
+  renderWensList();
+}
+function closeWensModal(){ $('#wmod').hidden=true; }
+
+function renderWensList(){
+  const wish=getWishlist(), q=($('#wens-search').value||'').toLowerCase();
+  const species=[...new Map(
+    [...state.data]
+      .filter(s=>!q||s.nl.toLowerCase().includes(q))
+      .sort((a,b)=>RARITY[b.rarity].o-RARITY[a.rarity].o)
+      .map(s=>[s.nl,s])
+  ).values()];
+  if(!species.length){
+    $('#wens-list').innerHTML=`<p style="color:var(--muted);font-size:13px;padding:12px 0">${state.data.length?'Geen resultaten.':'Laad eerst vogeldata.'}</p>`;
+    return;
+  }
+  $('#wens-list').innerHTML=species.map(s=>{
+    const on=wish.has(s.nl), r=RARITY[s.rarity];
+    return `<div class="wi" data-nl="${s.nl.replace(/"/g,'&quot;')}">
+      <div class="wcb${on?' on':''}"></div>
+      <span class="wdot" style="background:${r.hex}"></span>
+      <span class="wname">${s.nl}</span>
+      <span class="wrar">${r.label}</span>
+    </div>`;
+  }).join('');
+  // Update bell badge
+  $('#wens-btn').textContent = wish.size ? '🔔' : '🔕';
+}
+
+$('#wens-list').addEventListener('click',e=>{
+  const item=e.target.closest('.wi'); if(!item) return;
+  const wish=getWishlist();
+  wish.has(item.dataset.nl)?wish.delete(item.dataset.nl):wish.add(item.dataset.nl);
+  saveWishlist(wish); renderWensList();
+});
+$('#wens-search').addEventListener('input',renderWensList);
+$('#wens-btn').addEventListener('click',openWensModal);
+$('#wmod-close').addEventListener('click',closeWensModal);
+$('#wmod').addEventListener('click',e=>{ if(e.target===$('#wmod')) closeWensModal(); });
+$('#wmod-allow').addEventListener('click',async()=>{
+  if(await Notification.requestPermission()==='granted') $('#wmod-notif').hidden=true;
+});
+
+function checkWensvogels(sightings){
+  const wish=getWishlist(); if(!wish.size) return;
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  const notified=getNotified(); let changed=false;
+  for(const s of sightings){
+    if(notified.has(s.id)||!wish.has(s.nl)) continue;
+    const dist=haversine(state.user,s);
+    if(dist>150) continue;
+    new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
+    notified.add(s.id); changed=true;
+  }
+  if(changed) saveNotified(notified);
+}
 
 /* ===== CHIPS ===== */
 function renderChips(){
@@ -397,6 +521,7 @@ async function loadData(){
   try{ const res=await fetch(buildUrl(),{cache:"no-store"}); if(!res.ok) throw 0;
     const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
     state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
+    checkWensvogels(state.data);
   }catch(e){ loadDemo(); }
   $("#refresh").classList.remove("spin"); render();
 }
@@ -421,6 +546,7 @@ $("#loc").addEventListener("click",locate);
 $("#cards").addEventListener("click",e=>{ const c=e.target.closest(".card"); if(c) selectFromCard(c.dataset.id); });
 
 /* ===== GO ===== */
+setTimeout(()=>{ const sp=$('#splash'); if(sp){sp.classList.add('out');setTimeout(()=>sp.remove(),450);} },1400);
 initMap();
 loadData();
 locate();

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d9488"/>
+      <stop offset="100%" stop-color="#0a5f5a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="114" fill="url(#bg)"/>
+
+  <!-- Radar rings (centered slightly low to give space for the bird) -->
+  <circle cx="256" cy="290" r="190" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="2"/>
+  <circle cx="256" cy="290" r="130" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <circle cx="256" cy="290" r="70"  fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+
+  <!-- Bird: soaring raptor silhouette viewed from slightly above -->
+  <g fill="white">
+    <!-- Left wing -->
+    <path d="M256,240 C240,228 210,218 168,222 C148,224 130,230 115,240
+             C140,242 175,248 220,258 Z"/>
+    <!-- Right wing -->
+    <path d="M256,240 C272,228 302,218 344,222 C364,224 382,230 397,240
+             C372,242 337,248 292,258 Z"/>
+    <!-- Body -->
+    <ellipse cx="256" cy="255" rx="16" ry="36"/>
+    <!-- Forked tail -->
+    <path d="M247,282 Q238,316 228,328 Q242,318 256,322 Q270,318 284,328 Q274,316 265,282 Z"/>
+    <!-- Head -->
+    <ellipse cx="256" cy="220" rx="11" ry="13"/>
+  </g>
+</svg>
