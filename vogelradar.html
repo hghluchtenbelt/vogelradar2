@@ -43,6 +43,7 @@
     --c-common:#94a3b8; --c-uncommon:#0ea5e9; --c-rare:#f59e0b; --c-very_rare:#ef4444;
   }
   *{box-sizing:border-box}
+  [hidden]{display:none!important}
   html,body{margin:0;padding:0;height:100%;overflow:hidden;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);-webkit-font-smoothing:antialiased}
@@ -175,7 +176,7 @@
 </style>
 </head>
 <body>
-<div id="splash"><div class="sl">🦅</div><div class="sn">Vogelradar</div><div class="ss">zeldzame vogels bij jou</div></div>
+<div id="splash"><div class="sl">🦅</div><div class="sn">Vogelradar</div><div class="ss">vogels bij jou in de buurt!</div></div>
 <div id="map"></div>
 
 <div class="topbar">
@@ -224,7 +225,8 @@
     <input id="wens-search" type="search" placeholder="Zoek soort…" autocomplete="off">
     <div id="wens-list"></div>
     <div class="wmod-notif" id="wmod-notif" hidden>
-      <p>Sta meldingen toe om een notificatie te ontvangen.</p>
+      <p>Sta meldingen toe om een notificatie te ontvangen als een wensvogel gespot wordt.</p>
+      <button id="wmod-later" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px;white-space:nowrap">Later</button>
       <button id="wmod-allow">Toestaan</button>
     </div>
   </div>
@@ -364,6 +366,7 @@ $('#wmod').addEventListener('click',e=>{ if(e.target===$('#wmod')) closeWensModa
 $('#wmod-allow').addEventListener('click',async()=>{
   if(await Notification.requestPermission()==='granted') $('#wmod-notif').hidden=true;
 });
+$('#wmod-later').addEventListener('click',()=>{ $('#wmod-notif').hidden=true; });
 
 function checkWensvogels(sightings){
   const wish=getWishlist(); if(!wish.size) return;
