@@ -1,0 +1,13 @@
+[Unit]
+Description=Vogelradar API
+After=network.target
+
+[Service]
+User=hghluchtenbelt
+WorkingDirectory=/home/hghluchtenbelt/vogelradar
+ExecStart=/home/hghluchtenbelt/vogelradar/.venv/bin/uvicorn api:app --host 127.0.0.1 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

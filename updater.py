@@ -33,11 +33,15 @@ def run_update(
 
     total_new = 0
     total_scraped = 0
+    new_sightings: list[dict] = []
 
     def _flush(batch: list[dict]) -> None:
         nonlocal total_new, total_scraped
         total_scraped += len(batch)
+        inserted = [s for s in batch if s["url"] not in known_urls]
         total_new += insert_sightings(batch)
+        if not first_run:
+            new_sightings.extend(inserted)
 
     fetch_rare_birds(
         days_back_by_rarity=days_back_by_rarity,
@@ -46,6 +50,14 @@ def run_update(
         progress_callback=progress_callback,
     )
     prune_old_sightings()
+
+    if new_sightings:
+        try:
+            from notifications import send_push_notifications
+            send_push_notifications(new_sightings)
+        except Exception as exc:
+            print(f"[fcm] notification error: {exc}", flush=True)
+
     return total_new, total_scraped
 
 

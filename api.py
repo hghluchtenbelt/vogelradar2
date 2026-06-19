@@ -6,11 +6,15 @@ import threading
 import time
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
-from database import get_sightings, get_latest_update, init_db
+from database import (
+    get_sightings, get_latest_update, init_db,
+    upsert_push_subscriber, delete_push_subscriber,
+)
 
 # How often to re-scrape waarneming.nl in the background (seconds).
 SCRAPE_INTERVAL = 60 * 60   # 1 hour — change to e.g. 30*60 for 30 min
@@ -81,15 +85,44 @@ def birds_json():
 
 @app.get("/species_data.js")
 def species_data():
-    return FileResponse(_HERE / "species_data.js", media_type="application/javascript")
+    return FileResponse(
+        _HERE / "species_data.js", media_type="application/javascript"
+    )
+
 
 @app.get("/privacy")
 def privacy():
     return FileResponse(_HERE / "privacy.html", media_type="text/html")
 
+
 @app.get("/icon.png")
 def icon():
     return FileResponse(_HERE / "icon.png", media_type="image/png")
+
+
+class PushSubscriber(BaseModel):
+    token: str
+    lat: float
+    lng: float
+    wishlist: list[str] = []
+    max_dist: int = 50
+
+
+@app.post("/register-token")
+def register_token(body: PushSubscriber):
+    import json
+    upsert_push_subscriber(
+        body.token, body.lat, body.lng,
+        json.dumps(body.wishlist), body.max_dist,
+    )
+    return {"ok": True}
+
+
+@app.delete("/register-token/{token}")
+def unregister_token(token: str):
+    delete_push_subscriber(token)
+    return {"ok": True}
+
 
 @app.get("/")
 def index():

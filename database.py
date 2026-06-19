@@ -15,6 +15,18 @@ def init_db() -> None:
     with _connect() as conn:
         conn.execute(
             """
+            CREATE TABLE IF NOT EXISTS push_subscribers (
+                fcm_token  TEXT PRIMARY KEY,
+                lat        REAL,
+                lng        REAL,
+                wishlist   TEXT DEFAULT '[]',
+                max_dist   INTEGER DEFAULT 50,
+                updated_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS sightings (
                 url        TEXT PRIMARY KEY,
                 bird_name  TEXT NOT NULL,
@@ -116,6 +128,44 @@ def get_latest_update() -> str | None:
     with _connect() as conn:
         row = conn.execute("SELECT MAX(scraped_at) FROM sightings").fetchone()
     return row[0] if row else None
+
+
+def upsert_push_subscriber(
+    token: str, lat: float, lng: float,
+    wishlist: str, max_dist: int,
+) -> None:
+    now = datetime.utcnow().isoformat(timespec="seconds")
+    with _connect() as conn:
+        conn.execute(
+            """
+            INSERT INTO push_subscribers
+                (fcm_token, lat, lng, wishlist, max_dist, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(fcm_token) DO UPDATE SET
+                lat=excluded.lat, lng=excluded.lng,
+                wishlist=excluded.wishlist,
+                max_dist=excluded.max_dist,
+                updated_at=excluded.updated_at
+            """,
+            (token, lat, lng, wishlist, max_dist, now),
+        )
+        conn.commit()
+
+
+def delete_push_subscriber(token: str) -> None:
+    with _connect() as conn:
+        conn.execute(
+            "DELETE FROM push_subscribers WHERE fcm_token = ?", (token,)
+        )
+        conn.commit()
+
+
+def get_push_subscribers() -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT fcm_token, lat, lng, wishlist, max_dist FROM push_subscribers"
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def prune_old_sightings(keep_days: int = 15) -> int:

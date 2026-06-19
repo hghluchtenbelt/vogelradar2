@@ -20,8 +20,14 @@
   <h2>Locatiegegevens</h2>
   <p>De app vraagt toegang tot je locatie (GPS) om vogels bij jou in de buurt te kunnen tonen en om de afstand tot waarnemingen te berekenen. Je locatie wordt <strong>uitsluitend op je eigen apparaat verwerkt</strong> en wordt nooit naar een server gestuurd of opgeslagen.</p>
 
-  <h2>Meldingen</h2>
-  <p>Als je wensvogels of zeldzaamheidsmeldingen instelt, worden er pushmeldingen verstuurd via de browser op je apparaat. Er wordt geen gebruik gemaakt van externe meldingsdiensten. Je keuzes worden lokaal opgeslagen op je apparaat en niet gedeeld.</p>
+  <h2>Pushmeldingen</h2>
+  <p>Als je pushmeldingen inschakelt in de app, worden de volgende gegevens op onze server opgeslagen om je meldingen te kunnen sturen:</p>
+  <ul>
+    <li><strong>Apparaat-token</strong> — een anonieme identificatiecode van je apparaat, aangemaakt door Google Firebase. Bevat geen naam of e-mailadres.</li>
+    <li><strong>Locatie</strong> — je GPS-coördinaten, zodat we alleen meldingen sturen voor vogels binnen jouw gekozen afstand.</li>
+    <li><strong>Vogelvoorkeuren</strong> — de vogelsoorten of zeldzaamheidscategorieën die je hebt geselecteerd.</li>
+  </ul>
+  <p>Deze gegevens worden uitsluitend gebruikt om pushmeldingen te sturen en worden niet verkocht of gedeeld met derden. Meldingen worden verzorgd via <strong>Google Firebase Cloud Messaging (FCM)</strong>. Door meldingen in te schakelen ga je akkoord met de <a href="https://firebase.google.com/support/privacy">privacyvoorwaarden van Google Firebase</a>. Je kunt je afmelden door meldingen uit te schakelen in de app-instellingen van je telefoon; je gegevens worden dan automatisch verwijderd.</p>
 
   <h2>Gegevens van derden</h2>
   <p>Waarnemingsdata is afkomstig van <a href="https://waarneming.nl">waarneming.nl</a>. Vogelradar slaat geen persoonsgegevens op van waarnemers.</p>
