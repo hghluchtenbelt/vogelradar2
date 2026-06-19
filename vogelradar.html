@@ -173,6 +173,8 @@
   .wmod-notif p{font-size:12px;color:var(--brand-d);margin:0;flex:1}
   .wmod-notif button{border:1.5px solid var(--brand);background:#fff;color:var(--brand-d);
     font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .wmod-distrow{display:flex;align-items:center;gap:8px;padding:10px 16px 4px;font-size:13px;color:var(--ink);flex:0 0 auto}
+  .wmod-distrow select{border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;font-size:13px;font-family:inherit;background:#fff;color:var(--ink);cursor:pointer}
   .wmod-quick{display:flex;gap:8px;padding:8px 16px 2px;flex:0 0 auto;flex-wrap:wrap}
   .wqbtn{flex:1;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:#fff;
     font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .12s;white-space:nowrap}
@@ -226,7 +228,17 @@
       <h2>🔔 Wensvogels</h2>
       <button class="wmod-x" id="wmod-close">✕</button>
     </div>
-    <p class="wmod-hint">Ontvang een melding als één van jouw wensvogels in de buurt wordt gezien.</p>
+    <div class="wmod-distrow">
+      <span>Melding binnen</span>
+      <select id="wens-dist">
+        <option value="10">10 km</option>
+        <option value="25">25 km</option>
+        <option value="50" selected>50 km</option>
+        <option value="100">100 km</option>
+        <option value="0">heel Nederland</option>
+      </select>
+      <span>van jou</span>
+    </div>
     <div class="wmod-quick">
       <button class="wqbtn" data-key="__very_rare__" style="--qc:#ef4444">🔴 Alle zeer zeldzame vogels</button>
       <button class="wqbtn" data-key="__rare__" style="--qc:#f59e0b">🟡 Alle zeldzame vogels</button>
@@ -325,7 +337,7 @@ function counts(){ const c={common:0,uncommon:0,rare:0,very_rare:0};
     if(timePass(s)&&(state.maxDist===0||d<=state.maxDist)) c[s.rarity]++; }); return c; }
 
 /* ===== WENSVOGELS ===== */
-const _WK='vr_wens', _NK='vr_notified';
+const _WK='vr_wens', _NK='vr_notified', _DK='vr_dist';
 // Rarity code (from SPECIES list) → RARITY key
 const _RC={'v':'very_rare','r':'rare','u':'uncommon','c':'common'};
 const _RH={'v':'#ef4444','r':'#f59e0b','u':'#0ea5e9','c':'#94a3b8'};
@@ -341,8 +353,11 @@ function updateWensBell(){
   $('#wens-btn').title=n?`Wensvogels (${n} gekozen)`:'Wensvogels instellen';
 }
 
+function getWensDist(){ return parseInt(localStorage.getItem(_DK)||'50'); }
+
 function openWensModal(){
   $('#wmod').hidden=false;
+  $('#wens-dist').value=String(getWensDist());
   if('Notification' in window && Notification.permission==='default') $('#wmod-notif').hidden=false;
   renderWensList();
 }
@@ -393,6 +408,7 @@ document.querySelectorAll('.wqbtn').forEach(b=>{
   });
 });
 $('#wens-search').addEventListener('input',renderWensList);
+$('#wens-dist').addEventListener('change',e=>localStorage.setItem(_DK, e.target.value));
 $('#wens-btn').addEventListener('click',openWensModal);
 $('#wmod-close').addEventListener('click',closeWensModal);
 $('#wmod').addEventListener('click',e=>{ if(e.target===$('#wmod')) closeWensModal(); });
@@ -404,11 +420,11 @@ $('#wmod-later').addEventListener('click',()=>{ $('#wmod-notif').hidden=true; })
 function checkWensvogels(sightings){
   const wish=getWishlist(); if(!wish.size) return;
   if(!('Notification' in window)||Notification.permission!=='granted') return;
-  const notified=getNotified(); let changed=false;
+  const notified=getNotified(), maxDist=getWensDist(); let changed=false;
   for(const s of sightings){
     if(notified.has(s.id)) continue;
     const dist=haversine(state.user,s);
-    if(dist>150) continue;
+    if(maxDist>0 && dist>maxDist) continue;
     // Match by name OR by rarity subscription
     const match = wish.has(s.nl)
       || (s.rarity==='very_rare' && wish.has('__very_rare__'))
