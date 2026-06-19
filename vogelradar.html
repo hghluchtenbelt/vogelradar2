@@ -203,7 +203,7 @@
   <div class="sheethead">
     <div class="summary">
       <span class="big" id="sumbig">…</span>
-      <span class="sm">dichtste eerst</span>
+
     </div>
     <div class="filters">
       <div class="seg" id="win">
@@ -216,7 +216,7 @@
         <option value="25">≤ 25 km</option>
         <option value="50">≤ 50 km</option>
       </select>
-      <span class="hint" id="hint"></span>
+
     </div>
   </div>
   <div class="cards" id="cards"></div>
@@ -418,7 +418,7 @@ function renderChips(){
 function renderCards(){
   const items=visible(), box=$("#cards");
   $("#sumbig").textContent = items.length+" vogel"+(items.length===1?"":"s")+" in de buurt";
-  $("#hint").textContent = state.win===7 ? "incl. zeldzaam t/m 7 dagen" : "";
+  
   if(!items.length){
     box.innerHTML=`<div class="empty"><div class="e">🪹</div>
       <p><b>Niets gevonden.</b></p>
