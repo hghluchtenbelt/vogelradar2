@@ -31,14 +31,6 @@ cd vogelradar2
 
 `dev.sh` maakt automatisch een virtualenv aan, installeert dependencies, doet een eerste scrape en start de server op `http://localhost:8000`.
 
-## Deployment
-
-De backend draait als een systemd service en nginx proxied het verkeer. Bij updates:
-
-```bash
-cd ~/vogelradar && git pull && sudo systemctl restart vogelradar-api.service
-```
-
 ## Projectstructuur
 
 ```
