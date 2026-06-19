@@ -19,7 +19,6 @@ Mobiele, kaart-first weergave van recente zeldzame vogelwaarnemingen in Nederlan
 | Frontend | Single-file HTML (Leaflet, CartoDB Voyager tiles) |
 | Backend | FastAPI + SQLite |
 | Scraper | curl-cffi (Anubis PoW solver) + BeautifulSoup |
-| Hosting | TransIP VPS + nginx + systemd |
 
 ## Lokaal draaien
 
