@@ -383,12 +383,17 @@ $('#wmod-later').addEventListener('click',()=>{ $('#wmod-notif').hidden=true; })
 function checkWensvogels(sightings){
   const wish=getWishlist(); if(!wish.size) return;
   if(!('Notification' in window)||Notification.permission!=='granted') return;
-  const notified=getNotified(), maxDist=getWensDist(); let changed=false;
+  const notified=getNotified(), maxDist=getWensDist();
+  // First run: silently mark all current sightings as seen, no notifications
+  if(!notified.size){
+    sightings.forEach(s=>notified.add(s.id));
+    saveNotified(notified); return;
+  }
+  let changed=false;
   for(const s of sightings){
     if(notified.has(s.id)) continue;
     const dist=haversine(state.user,s);
     if(maxDist>0 && dist>maxDist) continue;
-    // Match by name OR by rarity subscription
     const match = wish.has(s.nl)
       || (s.rarity==='very_rare' && wish.has('__very_rare__'))
       || ((s.rarity==='rare'||s.rarity==='very_rare') && wish.has('__rare__'));
