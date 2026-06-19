@@ -575,22 +575,11 @@ function buildUrl(){
 async function loadData(){
   if(!CONFIG.DATA_URL){ loadDemo(); render(); return; }
   $("#refresh").classList.add("spin");
-  let ok=false;
-  for(let attempt=0;attempt<3;attempt++){
-    try{
-      const res=await fetch(buildUrl(),{cache:"no-store"});
-      if(!res.ok) throw 0;
-      const j=await res.json();
-      state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
-      state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now();
-      state.isDemo=false; ok=true;
-      checkWensvogels(state.data);
-      break;
-    }catch(e){
-      if(attempt<2) await new Promise(r=>setTimeout(r,3000));
-    }
-  }
-  if(!ok && !state.data.length) loadDemo();
+  try{ const res=await fetch(buildUrl(),{cache:"no-store"}); if(!res.ok) throw 0;
+    const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
+    state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
+    checkWensvogels(state.data);
+  }catch(e){ if(!state.data.length) loadDemo(); }
   $("#refresh").classList.remove("spin"); render();
 }
 
