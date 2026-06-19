@@ -87,6 +87,10 @@ def species_data():
 def privacy():
     return FileResponse(_HERE / "privacy.html", media_type="text/html")
 
+@app.get("/icon.png")
+def icon():
+    return FileResponse(_HERE / "icon.png", media_type="image/png")
+
 @app.get("/")
 def index():
     return FileResponse(_HERE / "vogelradar.html")
