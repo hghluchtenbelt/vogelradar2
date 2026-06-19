@@ -173,6 +173,11 @@
   .wmod-notif p{font-size:12px;color:var(--brand-d);margin:0;flex:1}
   .wmod-notif button{border:1.5px solid var(--brand);background:#fff;color:var(--brand-d);
     font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .wmod-quick{display:flex;gap:8px;padding:8px 16px 2px;flex:0 0 auto;flex-wrap:wrap}
+  .wqbtn{flex:1;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:#fff;
+    font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .12s;white-space:nowrap}
+  .wqbtn.on{background:var(--qc);border-color:var(--qc);color:#fff}
+  .wqbtn:active{transform:scale(.96)}
 </style>
 </head>
 <body>
@@ -222,6 +227,10 @@
       <button class="wmod-x" id="wmod-close">✕</button>
     </div>
     <p class="wmod-hint">Ontvang een melding als één van jouw wensvogels in de buurt wordt gezien.</p>
+    <div class="wmod-quick">
+      <button class="wqbtn" data-key="__very_rare__" style="--qc:#ef4444">🔴 Alle zeer zeldzame vogels</button>
+      <button class="wqbtn" data-key="__rare__" style="--qc:#f59e0b">🟡 Alle zeldzame vogels</button>
+    </div>
     <input id="wens-search" type="search" placeholder="Zoek soort…" autocomplete="off">
     <div id="wens-list"></div>
     <div class="wmod-notif" id="wmod-notif" hidden>
@@ -232,6 +241,7 @@
   </div>
 </div>
 
+<script src="/species_data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ===== CONFIG ===== */
@@ -316,10 +326,20 @@ function counts(){ const c={common:0,uncommon:0,rare:0,very_rare:0};
 
 /* ===== WENSVOGELS ===== */
 const _WK='vr_wens', _NK='vr_notified';
+// Rarity code (from SPECIES list) → RARITY key
+const _RC={'v':'very_rare','r':'rare','u':'uncommon','c':'common'};
+const _RH={'v':'#ef4444','r':'#f59e0b','u':'#0ea5e9','c':'#94a3b8'};
+
 function getWishlist(){ try{return new Set(JSON.parse(localStorage.getItem(_WK)||'[]'));}catch{return new Set();} }
-function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); }
+function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); updateWensBell(); }
 function getNotified(){ try{return new Set(JSON.parse(localStorage.getItem(_NK)||'[]'));}catch{return new Set();} }
 function saveNotified(s){ localStorage.setItem(_NK,JSON.stringify([...s].slice(-500))); }
+
+function updateWensBell(){
+  const n=getWishlist().size;
+  $('#wens-btn').textContent=n?'🔔':'🔕';
+  $('#wens-btn').title=n?`Wensvogels (${n} gekozen)`:'Wensvogels instellen';
+}
 
 function openWensModal(){
   $('#wmod').hidden=false;
@@ -329,28 +349,34 @@ function openWensModal(){
 function closeWensModal(){ $('#wmod').hidden=true; }
 
 function renderWensList(){
-  const wish=getWishlist(), q=($('#wens-search').value||'').toLowerCase();
-  const species=[...new Map(
-    [...state.data]
-      .filter(s=>!q||s.nl.toLowerCase().includes(q))
-      .sort((a,b)=>RARITY[b.rarity].o-RARITY[a.rarity].o)
-      .map(s=>[s.nl,s])
-  ).values()];
-  if(!species.length){
-    $('#wens-list').innerHTML=`<p style="color:var(--muted);font-size:13px;padding:12px 0">${state.data.length?'Geen resultaten.':'Laad eerst vogeldata.'}</p>`;
+  const wish=getWishlist();
+  const q=($('#wens-search').value||'').toLowerCase();
+
+  // Update quick-subscribe buttons
+  document.querySelectorAll('.wqbtn').forEach(b=>{
+    b.classList.toggle('on', wish.has(b.dataset.key));
+  });
+
+  // Filter full species list (from CSV data embedded as SPECIES)
+  const filtered = typeof SPECIES!=='undefined'
+    ? SPECIES.filter(s=>!q||s[0].toLowerCase().includes(q)||s[1].toLowerCase().includes(q))
+    : [];
+
+  if(!filtered.length){
+    $('#wens-list').innerHTML=`<p style="color:var(--muted);font-size:13px;padding:12px 0">Geen resultaten.</p>`;
     return;
   }
-  $('#wens-list').innerHTML=species.map(s=>{
-    const on=wish.has(s.nl), r=RARITY[s.rarity];
-    return `<div class="wi" data-nl="${s.nl.replace(/"/g,'&quot;')}">
+  $('#wens-list').innerHTML=filtered.map(([nl,sci,rc])=>{
+    const on=wish.has(nl);
+    return `<div class="wi" data-nl="${nl.replace(/"/g,'&quot;')}">
       <div class="wcb${on?' on':''}"></div>
-      <span class="wdot" style="background:${r.hex}"></span>
-      <span class="wname">${s.nl}</span>
-      <span class="wrar">${r.label}</span>
+      <span class="wdot" style="background:${_RH[rc]}"></span>
+      <div style="flex:1;min-width:0">
+        <div class="wname">${nl}</div>
+        <div style="font-size:10.5px;color:var(--muted);font-style:italic">${sci}</div>
+      </div>
     </div>`;
   }).join('');
-  // Update bell badge
-  $('#wens-btn').textContent = wish.size ? '🔔' : '🔕';
 }
 
 $('#wens-list').addEventListener('click',e=>{
@@ -358,6 +384,13 @@ $('#wens-list').addEventListener('click',e=>{
   const wish=getWishlist();
   wish.has(item.dataset.nl)?wish.delete(item.dataset.nl):wish.add(item.dataset.nl);
   saveWishlist(wish); renderWensList();
+});
+document.querySelectorAll('.wqbtn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const wish=getWishlist();
+    wish.has(b.dataset.key)?wish.delete(b.dataset.key):wish.add(b.dataset.key);
+    saveWishlist(wish); renderWensList();
+  });
 });
 $('#wens-search').addEventListener('input',renderWensList);
 $('#wens-btn').addEventListener('click',openWensModal);
@@ -373,9 +406,14 @@ function checkWensvogels(sightings){
   if(!('Notification' in window)||Notification.permission!=='granted') return;
   const notified=getNotified(); let changed=false;
   for(const s of sightings){
-    if(notified.has(s.id)||!wish.has(s.nl)) continue;
+    if(notified.has(s.id)) continue;
     const dist=haversine(state.user,s);
     if(dist>150) continue;
+    // Match by name OR by rarity subscription
+    const match = wish.has(s.nl)
+      || (s.rarity==='very_rare' && wish.has('__very_rare__'))
+      || ((s.rarity==='rare'||s.rarity==='very_rare') && wish.has('__rare__'));
+    if(!match) continue;
     new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
     notified.add(s.id); changed=true;
   }
@@ -550,6 +588,7 @@ $("#cards").addEventListener("click",e=>{ const c=e.target.closest(".card"); if(
 
 /* ===== GO ===== */
 setTimeout(()=>{ const sp=$('#splash'); if(sp){sp.classList.add('out');setTimeout(()=>sp.remove(),450);} },1400);
+updateWensBell();
 initMap();
 loadData();
 locate();
