@@ -83,6 +83,10 @@ def birds_json():
 def species_data():
     return FileResponse(_HERE / "species_data.js", media_type="application/javascript")
 
+@app.get("/privacy")
+def privacy():
+    return FileResponse(_HERE / "privacy.html", media_type="text/html")
+
 @app.get("/")
 def index():
     return FileResponse(_HERE / "vogelradar.html")
