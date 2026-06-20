@@ -61,6 +61,21 @@ def init_db() -> None:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_rarity_date ON sightings(rarity, date)"
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sent_notifications (
+                id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                token     TEXT NOT NULL,
+                bird_name TEXT NOT NULL,
+                lat       REAL NOT NULL,
+                lng       REAL NOT NULL,
+                sent_at   TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_sent_at ON sent_notifications(sent_at)"
+        )
         conn.commit()
 
 
@@ -191,3 +206,33 @@ def prune_old_sightings(keep_days: int = 15) -> int:
         cur = conn.execute("DELETE FROM sightings WHERE scraped_at < ?", (cutoff,))
         conn.commit()
         return cur.rowcount
+
+
+def already_notified(token: str, bird_name: str, lat: float, lng: float,
+                     radius_km: float = 5.0, window_hours: float = 1.0) -> bool:
+    import math
+    cutoff = (datetime.utcnow() - timedelta(hours=window_hours)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT lat, lng FROM sent_notifications WHERE token=? AND bird_name=? AND sent_at>=?",
+            (token, bird_name, cutoff),
+        ).fetchall()
+    for r in rows:
+        dlat = math.radians(r["lat"] - lat)
+        dlng = math.radians(r["lng"] - lng)
+        a = math.sin(dlat/2)**2 + math.cos(math.radians(lat))*math.cos(math.radians(r["lat"]))*math.sin(dlng/2)**2
+        if 6371 * 2 * math.asin(math.sqrt(a)) <= radius_km:
+            return True
+    return False
+
+
+def record_notification(token: str, bird_name: str, lat: float, lng: float) -> None:
+    now = datetime.utcnow().isoformat(timespec="seconds")
+    cutoff = (datetime.utcnow() - timedelta(hours=2)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        conn.execute(
+            "INSERT INTO sent_notifications (token, bird_name, lat, lng, sent_at) VALUES (?,?,?,?,?)",
+            (token, bird_name, lat, lng, now),
+        )
+        conn.execute("DELETE FROM sent_notifications WHERE sent_at < ?", (cutoff,))
+        conn.commit()

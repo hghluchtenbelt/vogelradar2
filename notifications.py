@@ -5,7 +5,10 @@ import json
 import math
 from pathlib import Path
 
-from database import get_push_subscribers, delete_push_subscriber
+from database import (
+    get_push_subscribers, delete_push_subscriber,
+    already_notified, record_notification,
+)
 
 _SERVICE_ACCOUNT = Path(__file__).parent / "firebase-service-account.json"
 _RARITY_NUM = {
@@ -63,11 +66,17 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
             if max_dist > 0 and dist > max_dist:
                 continue
 
+            if already_notified(sub["fcm_token"], s["bird_name"],
+                                 s["latitude"], s["longitude"]):
+                continue
+
             dist_str = f"{round(dist)} km van jou · " if max_dist > 0 else ""
+            body = (f"📍 {s.get('location', '')} · "
+                    f"{dist_str}{s.get('date', '')}")
             msg = messaging.Message(
                 notification=messaging.Notification(
                     title=f"🦅 {s['bird_name']} gespot!",
-                    body=f"📍 {s.get('location', '')} · {dist_str}{s.get('date', '')}",
+                    body=body,
                 ),
                 data={
                     "url": s.get("url", ""),
@@ -78,6 +87,8 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
             )
             try:
                 messaging.send(msg)
+                record_notification(sub["fcm_token"], s["bird_name"],
+                                    s["latitude"], s["longitude"])
             except Exception as exc:
                 print(f"[fcm] send error: {exc}", flush=True)
                 err = str(exc).lower()

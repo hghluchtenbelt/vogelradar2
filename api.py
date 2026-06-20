@@ -4,12 +4,25 @@ from __future__ import annotations
 import re
 import threading
 import time
+from collections import defaultdict
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+
+_rate_limit: dict[str, list[float]] = defaultdict(list)
+_RATE_WINDOW = 3600
+_RATE_MAX = 120
+
+def _allow_rate(ip: str) -> bool:
+    now = time.time()
+    _rate_limit[ip] = [t for t in _rate_limit[ip] if now - t < _RATE_WINDOW]
+    if len(_rate_limit[ip]) >= _RATE_MAX:
+        return False
+    _rate_limit[ip].append(now)
+    return True
 
 from database import (
     get_sightings, get_latest_update, init_db,
@@ -22,9 +35,15 @@ SCRAPE_INTERVAL = 60 * 60   # 1 hour — change to e.g. 30*60 for 30 min
 app = FastAPI(title="Vogelradar")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=[
+        "https://vogel-radar.nl",
+        "http://vogel-radar.nl",
+        "https://localhost",
+        "http://localhost",
+        "capacitor://localhost",
+    ],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type"],
 )
 init_db()
 
@@ -109,8 +128,11 @@ class PushSubscriber(BaseModel):
 
 
 @app.post("/register-token")
-def register_token(body: PushSubscriber):
+def register_token(body: PushSubscriber, request: Request):
     import json
+    ip = request.client.host if request.client else "unknown"
+    if not _allow_rate(ip):
+        raise HTTPException(status_code=429, detail="Too many requests")
     upsert_push_subscriber(
         body.token, body.lat, body.lng,
         json.dumps(body.wishlist), body.max_dist,
