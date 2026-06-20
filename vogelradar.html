@@ -257,7 +257,6 @@
 
 <script src="/species_data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script>
 /* ===== CONFIG ===== */
@@ -507,7 +506,7 @@ function drawMarkers(){
   markers["__user"]=L.marker([state.user.lat,state.user.lng],{
     icon:L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],html:'<span class="me"></span>'}),
     zIndexOffset:1000}).addTo(map);
-  _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,
+  _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,spiderfyOnMaxZoom:false,showCoverageOnHover:false,
     iconCreateFunction:c=>L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
       html:`<span class="mk-cluster">${c.getChildCount()}</span>`})});
   visible().forEach(s=>{
