@@ -64,6 +64,7 @@
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
   .mk-sel{box-shadow:0 0 0 4px rgba(13,148,136,.9),0 2px 8px rgba(2,6,23,.45);border-width:3px}
   .me{display:block;width:14px;height:14px;border-radius:50%;background:#2563eb;border:3px solid #fff;box-shadow:0 0 0 6px rgba(37,99,235,.2)}
+  .mk-cluster{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#64748b;color:#fff;font-size:11px;font-weight:700;border:2px solid #fff;box-shadow:0 1px 5px rgba(2,6,23,.4)}
 
   /* Floating top bar */
   .topbar{position:fixed;top:8px;left:50%;transform:translateX(-50%);width:min(100vw - 16px,600px);z-index:1000;
@@ -256,6 +257,8 @@
 
 <script src="/species_data.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
 <script>
 /* ===== CONFIG ===== */
 const CONFIG = {
@@ -477,7 +480,7 @@ function renderStatus(){
 }
 
 /* ===== MAP ===== */
-let map=null, markers={}, NL_BOUNDS=null;
+let map=null, markers={}, NL_BOUNDS=null, _clusterLayer=null;
 function initMap(){
   map=L.map("map",{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:16,
     maxBounds:[[49.5,1.5],[55.0,9.5]],maxBoundsViscosity:0.7}).setView([52.1,5.3],7);
@@ -498,12 +501,17 @@ function makeIcon(s,sel){
 }
 function drawMarkers(){
   if(!map) return;
-  Object.values(markers).forEach(m=>map.removeLayer(m)); markers={};
+  Object.values(markers).forEach(m=>map.removeLayer(m));
+  if(_clusterLayer){ map.removeLayer(_clusterLayer); _clusterLayer=null; }
+  markers={};
   markers["__user"]=L.marker([state.user.lat,state.user.lng],{
     icon:L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],html:'<span class="me"></span>'}),
     zIndexOffset:1000}).addTo(map);
+  _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,
+    iconCreateFunction:c=>L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
+      html:`<span class="mk-cluster">${c.getChildCount()}</span>`})});
   visible().forEach(s=>{
-    const m=L.marker([s.lat,s.lng],{icon:makeIcon(s,state.selected===s.id)}).addTo(map);
+    const m=L.marker([s.lat,s.lng],{icon:makeIcon(s,state.selected===s.id)});
     m.bindPopup(`<div class="pop">
       <div class="pnl">${s.nl} ${s.count>1?`<small>×${s.count}</small>`:""}</div>
       <div class="pen">${s.en||s.sci||""}</div>
@@ -512,7 +520,10 @@ function drawMarkers(){
       <a href="${obsUrl(s)}" target="_blank" rel="noopener">waarneming.nl ↗</a></div></div>`);
     m.on("click",()=>{ state.selected=s.id; updateSel(); });
     markers[s.id]=m;
+    if(s.rarity==="rare"||s.rarity==="very_rare") m.addTo(map);
+    else _clusterLayer.addLayer(m);
   });
+  _clusterLayer.addTo(map);
 }
 function updateSel(){
   visible().forEach(s=>{ if(markers[s.id]) markers[s.id].setIcon(makeIcon(s,state.selected===s.id)); });
