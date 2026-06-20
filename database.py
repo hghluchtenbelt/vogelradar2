@@ -89,13 +89,11 @@ def get_sightings(days_back: int = 7) -> list[dict]:
     """
     Tiered time window per rarity:
       rarity 4+3 → last 7 days
-      rarity 2   → last 3 days
-      rarity 1   → last 1 day
+      rarity 1+2 → last 24 hours
     """
     now = datetime.utcnow()
     cut7  = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-    cut1  = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-    cut12 = (now - timedelta(hours=12)).isoformat(timespec="seconds")
+    cut24 = (now - timedelta(hours=24)).isoformat(timespec="seconds")
     with _connect() as conn:
         rows = conn.execute(
             """
@@ -114,21 +112,10 @@ def get_sightings(days_back: int = 7) -> list[dict]:
                    count, photo, latitude, longitude, scraped_at,
                    COALESCE(rarity, 3) AS rarity
             FROM   sightings
-            WHERE  COALESCE(rarity,3) = 2 AND date >= ?
-            ORDER  BY scraped_at DESC LIMIT 1000
+            WHERE  COALESCE(rarity,3) IN (1,2) AND scraped_at >= ?
+            ORDER  BY scraped_at DESC
             """,
-            (cut1,),
-        ).fetchall()
-        rows += conn.execute(
-            """
-            SELECT url, bird_name, location, date, obs_time,
-                   count, photo, latitude, longitude, scraped_at,
-                   COALESCE(rarity, 3) AS rarity
-            FROM   sightings
-            WHERE  COALESCE(rarity,3) = 1 AND scraped_at >= ?
-            ORDER  BY scraped_at DESC LIMIT 1000
-            """,
-            (cut12,),
+            (cut24,),
         ).fetchall()
     return [dict(r) for r in rows]
 
