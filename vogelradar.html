@@ -506,7 +506,7 @@ function drawMarkers(){
   markers["__user"]=L.marker([state.user.lat,state.user.lng],{
     icon:L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],html:'<span class="me"></span>'}),
     zIndexOffset:1000}).addTo(map);
-  _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,spiderfyOnMaxZoom:false,showCoverageOnHover:false,
+  _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,disableClusteringAtZoom:13,showCoverageOnHover:false,spiderfyOnMaxZoom:false,
     iconCreateFunction:c=>L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
       html:`<span class="mk-cluster">${c.getChildCount()}</span>`})});
   visible().forEach(s=>{
