@@ -93,9 +93,9 @@ def get_sightings(days_back: int = 7) -> list[dict]:
       rarity 1   → last 1 day
     """
     now = datetime.utcnow()
-    cut7 = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-    cut3 = (now - timedelta(days=3)).strftime("%Y-%m-%d")
-    cut1 = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+    cut7  = (now - timedelta(days=7)).strftime("%Y-%m-%d")
+    cut1  = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+    cut12 = (now - timedelta(hours=12)).isoformat(timespec="seconds")
     with _connect() as conn:
         rows = conn.execute(
             """
@@ -105,10 +105,10 @@ def get_sightings(days_back: int = 7) -> list[dict]:
             FROM   sightings
             WHERE  (COALESCE(rarity,3) >= 3 AND date >= ?)
                OR  (COALESCE(rarity,3) = 2  AND date >= ?)
-               OR  (COALESCE(rarity,3) = 1  AND date >= ?)
+               OR  (COALESCE(rarity,3) = 1  AND scraped_at >= ?)
             ORDER  BY scraped_at DESC
             """,
-            (cut7, cut3, cut1),
+            (cut7, cut1, cut12),
         ).fetchall()
     return [dict(r) for r in rows]
 
