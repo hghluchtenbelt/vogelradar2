@@ -35,15 +35,9 @@ SCRAPE_INTERVAL = 60 * 60   # 1 hour — change to e.g. 30*60 for 30 min
 app = FastAPI(title="Vogelradar")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://vogel-radar.nl",
-        "http://vogel-radar.nl",
-        "https://localhost",
-        "http://localhost",
-        "capacitor://localhost",
-    ],
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 init_db()
 
