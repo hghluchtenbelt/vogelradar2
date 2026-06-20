@@ -211,6 +211,10 @@
         <button data-w="3" class="on">3 dagen</button>
         <button data-w="7">7 dagen</button>
       </div>
+      <div class="seg" id="sort-seg">
+        <button data-s="dist" class="on">Afstand</button>
+        <button data-s="time">Nieuwste</button>
+      </div>
       <select id="dist">
         <option value="0">Alle afstanden</option>
         <option value="10">≤ 10 km</option>
@@ -277,7 +281,7 @@ const RARITY = {
 /* ===== STATE ===== */
 const state = {
   active: new Set(["rare","very_rare"]),
-  win: 3, maxDist: 0,
+  win: 3, maxDist: 0, sortBy: 'dist',
   user: { ...CONFIG.DEFAULT_LOC, precise:false },
   data: [], lastUpdated: null, selected: null
 };
@@ -295,9 +299,14 @@ function obsUrl(s){ return s.url||("https://waarneming.nl/observation/"+s.id+"/"
 function mapsUrl(s){ return "https://www.google.com/maps?q="+s.lat+","+s.lng; }
 function timePass(s){ const d=daysAgo(s); if(d<=3)return true;
   return state.win===7 && (s.rarity==="rare"||s.rarity==="very_rare") && d<=7; }
-function visible(){ return state.data.map(s=>({...s,_d:haversine(state.user,s)}))
-  .filter(timePass).filter(s=>state.maxDist===0||s._d<=state.maxDist)
-  .filter(s=>state.active.has(s.rarity)).sort((a,b)=>a._d-b._d); }
+function visible(){
+  const items = state.data.map(s=>({...s,_d:haversine(state.user,s)}))
+    .filter(timePass).filter(s=>state.maxDist===0||s._d<=state.maxDist)
+    .filter(s=>state.active.has(s.rarity));
+  return state.sortBy==='time'
+    ? items.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time))
+    : items.sort((a,b)=>a._d-b._d);
+}
 function counts(){ const c={common:0,uncommon:0,rare:0,very_rare:0};
   state.data.forEach(s=>{ const d=haversine(state.user,s);
     if(timePass(s)&&(state.maxDist===0||d<=state.maxDist)) c[s.rarity]++; }); return c; }
@@ -576,6 +585,8 @@ function locate(){
 /* ===== WIRE UP ===== */
 $("#win").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
   state.win=+b.dataset.w; $("#win").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); render(); }));
+$("#sort-seg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+  state.sortBy=b.dataset.s; $("#sort-seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); render(); }));
 $("#dist").addEventListener("change",e=>{ state.maxDist=+e.target.value; render(); });
 $("#refresh").addEventListener("click",loadData);
 $("#loc").addEventListener("click",locate);
