@@ -82,6 +82,8 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                     "url": s.get("url", ""),
                     "lat": str(s.get("latitude", "")),
                     "lng": str(s.get("longitude", "")),
+                    "bird_name": s["bird_name"],
+                    "body": body,
                 },
                 token=sub["fcm_token"],
             )
