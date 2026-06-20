@@ -104,11 +104,31 @@ def get_sightings(days_back: int = 7) -> list[dict]:
                    COALESCE(rarity, 3) AS rarity
             FROM   sightings
             WHERE  (COALESCE(rarity,3) >= 3 AND date >= ?)
-               OR  (COALESCE(rarity,3) = 2  AND date >= ?)
-               OR  (COALESCE(rarity,3) = 1  AND scraped_at >= ?)
             ORDER  BY scraped_at DESC
             """,
-            (cut7, cut1, cut12),
+            (cut7,),
+        ).fetchall()
+        rows += conn.execute(
+            """
+            SELECT url, bird_name, location, date, obs_time,
+                   count, photo, latitude, longitude, scraped_at,
+                   COALESCE(rarity, 3) AS rarity
+            FROM   sightings
+            WHERE  COALESCE(rarity,3) = 2 AND date >= ?
+            ORDER  BY scraped_at DESC LIMIT 1000
+            """,
+            (cut1,),
+        ).fetchall()
+        rows += conn.execute(
+            """
+            SELECT url, bird_name, location, date, obs_time,
+                   count, photo, latitude, longitude, scraped_at,
+                   COALESCE(rarity, 3) AS rarity
+            FROM   sightings
+            WHERE  COALESCE(rarity,3) = 1 AND scraped_at >= ?
+            ORDER  BY scraped_at DESC LIMIT 1000
+            """,
+            (cut12,),
         ).fetchall()
     return [dict(r) for r in rows]
 
