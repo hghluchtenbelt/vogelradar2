@@ -346,7 +346,7 @@ function renderWensList(){
   const allSpecies = typeof SPECIES!=='undefined' ? SPECIES : [];
   const coveredByRare = wish.has('__rare__');
   const coveredByVeryRare = wish.has('__very_rare__');
-  const isCovered = s => (coveredByRare && (s[2]==='r'||s[2]==='v')) || (coveredByVeryRare && s[2]==='v');
+  const isCovered = s => (coveredByRare && s[2]==='r') || (coveredByVeryRare && s[2]==='v');
   const filtered = allSpecies.filter(s=>!isCovered(s)&&(!q||s[0].toLowerCase().includes(q)||s[1].toLowerCase().includes(q)));
 
   const mkRow = ([nl,sci,rc], on) =>
