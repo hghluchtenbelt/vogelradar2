@@ -425,7 +425,7 @@ function checkWensvogels(sightings){
   // A big batch of "new" matches means the memory got out of sync, not real spots → stay silent
   if(fresh.length && fresh.length<=8){
     for(const {s,dist} of fresh)
-      new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
+      new Notification(`${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
   }
   saveNotified(notified,currentIds);
 }

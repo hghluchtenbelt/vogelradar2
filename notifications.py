@@ -67,7 +67,7 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                 continue
 
             if already_notified(sub["fcm_token"], s["bird_name"],
-                               s["latitude"], s["longitude"]):
+                                s["latitude"], s["longitude"]):
                 continue
 
             dist_str = f"{round(dist)} km van jou · " if max_dist > 0 else ""
@@ -75,7 +75,7 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                     f"{dist_str}{s.get('date', '')}")
             msg = messaging.Message(
                 data={
-                    "title": f"🦅 {s['bird_name']} gespot!",
+                    "title": f"{s['bird_name']} gespot!",
                     "body": body,
                     "bird_name": s["bird_name"],
                     "url": s.get("url", ""),
