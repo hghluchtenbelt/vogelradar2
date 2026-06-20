@@ -481,7 +481,7 @@ function renderStatus(){
 /* ===== MAP ===== */
 let map=null, markers={}, NL_BOUNDS=null, _clusterLayer=null;
 function initMap(){
-  map=L.map("map",{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:16,
+  map=L.map("map",{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:18,
     maxBounds:[[49.5,1.5],[55.0,9.5]],maxBoundsViscosity:0.7}).setView([52.1,5.3],7);
   NL_BOUNDS=L.latLngBounds([[50.72,3.35],[53.55,7.24]]);
   map.fitBounds(NL_BOUNDS,{padding:[16,16]});
