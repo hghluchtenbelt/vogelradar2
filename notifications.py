@@ -94,3 +94,4 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                 err = str(exc).lower()
                 if "not found" in err or "unregistered" in err:
                     delete_push_subscriber(sub["fcm_token"])
+                    break
