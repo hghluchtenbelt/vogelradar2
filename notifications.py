@@ -69,6 +69,11 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                     title=f"🦅 {s['bird_name']} gespot!",
                     body=f"📍 {s.get('location', '')} · {dist_str}{s.get('date', '')}",
                 ),
+                data={
+                    "url": s.get("url", ""),
+                    "lat": str(s.get("latitude", "")),
+                    "lng": str(s.get("longitude", "")),
+                },
                 token=sub["fcm_token"],
             )
             try:
