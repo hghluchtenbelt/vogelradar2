@@ -316,7 +316,7 @@ const _RH={'v':'#ef4444','r':'#f59e0b','u':'#0ea5e9','c':'#94a3b8'};
 function getWishlist(){ try{return new Set(JSON.parse(localStorage.getItem(_WK)||'[]'));}catch{return new Set();} }
 function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); updateWensBell(); }
 function getNotified(){ try{return new Set(JSON.parse(localStorage.getItem(_NK)||'[]'));}catch{return new Set();} }
-function saveNotified(s){ localStorage.setItem(_NK,JSON.stringify([...s].slice(-5000))); }
+function saveNotified(s,validIds){ const arr=validIds?[...s].filter(id=>validIds.has(id)):[...s]; localStorage.setItem(_NK,JSON.stringify(arr)); }
 
 function updateWensBell(){
   const n=getWishlist().size;
@@ -405,25 +405,29 @@ function checkWensvogels(sightings){
   const wish=getWishlist(); if(!wish.size) return;
   if(!('Notification' in window)||Notification.permission!=='granted') return;
   const notified=getNotified(), maxDist=getWensDist();
+  const currentIds=new Set(sightings.map(s=>s.id));
+  // First run / empty memory: silently mark everything as seen, no notifications
   if(!notified.size){
     sightings.forEach(s=>notified.add(s.id));
-    saveNotified(notified); return;
+    saveNotified(notified,currentIds); return;
   }
-  let changed=false, sent=0;
+  const fresh=[];
   for(const s of sightings){
-    if(notified.has(s.id)){ continue; }
+    if(notified.has(s.id)) continue;
+    notified.add(s.id);
     const dist=haversine(state.user,s);
     const match = (!maxDist||dist<=maxDist)
       && (wish.has(s.nl)
         || (s.rarity==='very_rare' && wish.has('__very_rare__'))
         || ((s.rarity==='rare'||s.rarity==='very_rare') && wish.has('__rare__')));
-    if(match && sent<3){
-      new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
-      sent++;
-    }
-    notified.add(s.id); changed=true;
+    if(match) fresh.push({s,dist});
   }
-  if(changed) saveNotified(notified);
+  // A big batch of "new" matches means the memory got out of sync, not real spots → stay silent
+  if(fresh.length && fresh.length<=8){
+    for(const {s,dist} of fresh)
+      new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
+  }
+  saveNotified(notified,currentIds);
 }
 
 /* ===== CHIPS ===== */
