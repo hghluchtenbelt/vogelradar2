@@ -316,7 +316,7 @@ const _RH={'v':'#ef4444','r':'#f59e0b','u':'#0ea5e9','c':'#94a3b8'};
 function getWishlist(){ try{return new Set(JSON.parse(localStorage.getItem(_WK)||'[]'));}catch{return new Set();} }
 function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); updateWensBell(); }
 function getNotified(){ try{return new Set(JSON.parse(localStorage.getItem(_NK)||'[]'));}catch{return new Set();} }
-function saveNotified(s){ localStorage.setItem(_NK,JSON.stringify([...s].slice(-500))); }
+function saveNotified(s){ localStorage.setItem(_NK,JSON.stringify([...s].slice(-5000))); }
 
 function updateWensBell(){
   const n=getWishlist().size;
