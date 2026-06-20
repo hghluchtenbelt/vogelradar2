@@ -412,14 +412,13 @@ function checkWensvogels(sightings){
   }
   let changed=false;
   for(const s of sightings){
-    if(notified.has(s.id)) continue;
+    if(notified.has(s.id)){ continue; }
     const dist=haversine(state.user,s);
-    if(maxDist>0 && dist>maxDist) continue;
-    const match = wish.has(s.nl)
-      || (s.rarity==='very_rare' && wish.has('__very_rare__'))
-      || ((s.rarity==='rare'||s.rarity==='very_rare') && wish.has('__rare__'));
-    if(!match) continue;
-    new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
+    const match = (!maxDist||dist<=maxDist)
+      && (wish.has(s.nl)
+        || (s.rarity==='very_rare' && wish.has('__very_rare__'))
+        || ((s.rarity==='rare'||s.rarity==='very_rare') && wish.has('__rare__')));
+    if(match) new Notification(`🦅 ${s.nl} gespot!`,{body:`📍 ${s.loc} · ${fmtDist(dist)} van jou · ${ago(s)}`,tag:s.id});
     notified.add(s.id); changed=true;
   }
   if(changed) saveNotified(notified);
