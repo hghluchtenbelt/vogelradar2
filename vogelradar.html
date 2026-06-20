@@ -227,7 +227,10 @@
   <div class="wmod-box">
     <div class="wmod-head">
       <h2>🔔 Wensvogels</h2>
-      <button class="wmod-x" id="wmod-close">✕</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="wens-clear" style="display:none;font-size:12px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:20px;padding:3px 10px;cursor:pointer">Wis alles</button>
+        <button class="wmod-x" id="wmod-close">✕</button>
+      </div>
     </div>
     <div class="wmod-distrow">
       <span>Meldingen binnen</span>
@@ -330,23 +333,16 @@ function renderWensList(){
   const wish=getWishlist();
   const q=($('#wens-search').value||'').toLowerCase();
 
-  // Update quick-subscribe buttons
   document.querySelectorAll('.wqbtn').forEach(b=>{
     b.classList.toggle('on', wish.has(b.dataset.key));
   });
+  $('#wens-clear').style.display = wish.size ? 'inline-block' : 'none';
 
-  // Filter full species list (from CSV data embedded as SPECIES)
-  const filtered = typeof SPECIES!=='undefined'
-    ? SPECIES.filter(s=>!q||s[0].toLowerCase().includes(q)||s[1].toLowerCase().includes(q))
-    : [];
+  const allSpecies = typeof SPECIES!=='undefined' ? SPECIES : [];
+  const filtered = allSpecies.filter(s=>!q||s[0].toLowerCase().includes(q)||s[1].toLowerCase().includes(q));
 
-  if(!filtered.length){
-    $('#wens-list').innerHTML=`<p style="color:var(--muted);font-size:13px;padding:12px 0">Geen resultaten.</p>`;
-    return;
-  }
-  $('#wens-list').innerHTML=filtered.map(([nl,sci,rc])=>{
-    const on=wish.has(nl);
-    return `<div class="wi" data-nl="${nl.replace(/"/g,'&quot;')}">
+  const mkRow = ([nl,sci,rc], on) =>
+    `<div class="wi" data-nl="${nl.replace(/"/g,'&quot;')}">
       <div class="wcb${on?' on':''}"></div>
       <span class="wdot" style="background:${_RH[rc]}"></span>
       <div style="flex:1;min-width:0">
@@ -354,7 +350,23 @@ function renderWensList(){
         <div style="font-size:10.5px;color:var(--muted);font-style:italic">${sci}</div>
       </div>
     </div>`;
-  }).join('');
+
+  let html = '';
+  if(!q && wish.size){
+    const selected = allSpecies.filter(s=>wish.has(s[0]));
+    if(selected.length){
+      html += `<p style="font-size:11px;font-weight:700;color:var(--muted);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.5px">Geselecteerd (${selected.length})</p>`;
+      html += selected.map(s=>mkRow(s,true)).join('');
+      html += `<p style="font-size:11px;font-weight:700;color:var(--muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.5px">Alle soorten</p>`;
+    }
+  }
+
+  if(!filtered.length){
+    html += `<p style="color:var(--muted);font-size:13px;padding:12px 0">Geen resultaten.</p>`;
+  } else {
+    html += filtered.map(s=>mkRow(s,wish.has(s[0]))).join('');
+  }
+  $('#wens-list').innerHTML = html;
 }
 
 $('#wens-list').addEventListener('click',e=>{
@@ -373,6 +385,7 @@ document.querySelectorAll('.wqbtn').forEach(b=>{
 $('#wens-search').addEventListener('input',renderWensList);
 $('#wens-dist').addEventListener('change',e=>localStorage.setItem(_DK, e.target.value));
 $('#wens-btn').addEventListener('click',openWensModal);
+$('#wens-clear').addEventListener('click',()=>{ saveWishlist(new Set()); renderWensList(); });
 $('#wmod-close').addEventListener('click',closeWensModal);
 $('#wmod').addEventListener('click',e=>{ if(e.target===$('#wmod')) closeWensModal(); });
 $('#wmod-allow').addEventListener('click',async()=>{
@@ -422,7 +435,7 @@ function renderChips(){
 /* ===== CARDS ===== */
 function renderCards(){
   const items=visible(), box=$("#cards");
-  $("#sumbig").textContent = items.length+" vogel"+(items.length===1?"":"s")+" in de buurt";
+  $("#sumbig").textContent = items.length+" zeldzame vogel"+(items.length===1?"":"s")+" in de buurt";
   
   if(!items.length){
     box.innerHTML=`<div class="empty"><div class="e">🪹</div>
