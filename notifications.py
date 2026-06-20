@@ -36,7 +36,7 @@ def _init_firebase():
 
 
 def _send(messaging, msg, token: str) -> str:
-    """Send one FCM message. Returns 'ok', 'dead' (token removed) or 'error'."""
+    """Send one FCM message. Returns 'ok', 'dead' (token gone) or 'error'."""
     try:
         messaging.send(msg)
         return "ok"
@@ -84,8 +84,11 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
                 continue
 
             dist_str = f"{round(dist)} km van jou · " if max_dist > 0 else ""
-            body = (f"📍 {s.get('location', '')} · "
-                    f"{dist_str}{s.get('date', '')}")
+            when = s.get("date", "")
+            obs_time = s.get("obs_time", "")
+            if obs_time:
+                when = f"{when} · {obs_time}" if when else obs_time
+            body = f"📍 {s.get('location', '')} · {dist_str}{when}"
             msg = messaging.Message(
                 data={
                     "title": f"{s['bird_name']} gespot!",
