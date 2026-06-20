@@ -35,6 +35,25 @@ def _init_firebase():
         firebase_admin.initialize_app(cred)
 
 
+# More than this many new matches in one run → collapse into one summary
+# notification instead of spamming the device with dozens of pushes.
+_SUMMARY_THRESHOLD = 5
+
+
+def _send(messaging, msg, token: str) -> str:
+    """Send one FCM message. Returns 'ok', 'dead' (token removed) or 'error'."""
+    try:
+        messaging.send(msg)
+        return "ok"
+    except Exception as exc:
+        print(f"[fcm] send error: {exc}", flush=True)
+        err = str(exc).lower()
+        if "not found" in err or "unregistered" in err:
+            delete_push_subscriber(token)
+            return "dead"
+        return "error"
+
+
 def send_push_notifications(new_sightings: list[dict]) -> None:
     if not new_sightings or not _SERVICE_ACCOUNT.exists():
         return
@@ -49,7 +68,10 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
     for sub in subscribers:
         wishlist = set(json.loads(sub["wishlist"]))
         max_dist = sub["max_dist"]
+        token = sub["fcm_token"]
 
+        # Collect all matching, not-yet-notified sightings for this subscriber
+        matches = []
         for s in new_sightings:
             rarity = s.get("rarity", 3)
             match = (
@@ -59,38 +81,63 @@ def send_push_notifications(new_sightings: list[dict]) -> None:
             )
             if not match:
                 continue
-
             dist = _haversine(
                 sub["lat"], sub["lng"], s["latitude"], s["longitude"]
             )
             if max_dist > 0 and dist > max_dist:
                 continue
-
-            if already_notified(sub["fcm_token"], s["bird_name"],
+            if already_notified(token, s["bird_name"],
                                 s["latitude"], s["longitude"]):
                 continue
+            matches.append((s, dist))
 
-            dist_str = f"{round(dist)} km van jou · " if max_dist > 0 else ""
-            body = (f"📍 {s.get('location', '')} · "
-                    f"{dist_str}{s.get('date', '')}")
+        if not matches:
+            continue
+
+        if len(matches) <= _SUMMARY_THRESHOLD:
+            # Individual notifications
+            for s, dist in matches:
+                dist_str = f"{round(dist)} km van jou · " if max_dist > 0 else ""
+                body = (f"📍 {s.get('location', '')} · "
+                        f"{dist_str}{s.get('date', '')}")
+                msg = messaging.Message(
+                    data={
+                        "title": f"{s['bird_name']} gespot!",
+                        "body": body,
+                        "bird_name": s["bird_name"],
+                        "url": s.get("url", ""),
+                        "lat": str(s.get("latitude", "")),
+                        "lng": str(s.get("longitude", "")),
+                    },
+                    token=token,
+                )
+                status = _send(messaging, msg, token)
+                if status == "ok":
+                    record_notification(token, s["bird_name"],
+                                        s["latitude"], s["longitude"])
+                elif status == "dead":
+                    break
+        else:
+            # One summary notification for the whole batch
+            names = []
+            for s, _ in matches:
+                if s["bird_name"] not in names:
+                    names.append(s["bird_name"])
+            preview = ", ".join(names[:3])
+            if len(names) > 3:
+                preview += f" en {len(names) - 3} meer"
             msg = messaging.Message(
                 data={
-                    "title": f"{s['bird_name']} gespot!",
-                    "body": body,
-                    "bird_name": s["bird_name"],
-                    "url": s.get("url", ""),
-                    "lat": str(s.get("latitude", "")),
-                    "lng": str(s.get("longitude", "")),
+                    "title": f"{len(matches)} nieuwe wensvogels in de buurt",
+                    "body": preview,
+                    "bird_name": f"{len(matches)} nieuwe wensvogels",
+                    "url": "",
+                    "lat": "",
+                    "lng": "",
                 },
-                token=sub["fcm_token"],
+                token=token,
             )
-            try:
-                messaging.send(msg)
-                record_notification(sub["fcm_token"], s["bird_name"],
-                                    s["latitude"], s["longitude"])
-            except Exception as exc:
-                print(f"[fcm] send error: {exc}", flush=True)
-                err = str(exc).lower()
-                if "not found" in err or "unregistered" in err:
-                    delete_push_subscriber(sub["fcm_token"])
-                    break
+            if _send(messaging, msg, token) == "ok":
+                for s, _ in matches:
+                    record_notification(token, s["bird_name"],
+                                        s["latitude"], s["longitude"])
