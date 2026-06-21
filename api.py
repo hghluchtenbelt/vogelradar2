@@ -27,7 +27,7 @@ def _allow_rate(ip: str) -> bool:
 from database import (
     get_sightings, get_latest_update, init_db,
     upsert_push_subscriber, delete_push_subscriber,
-    get_daily_stats,
+    get_daily_stats, get_area_ranking,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
@@ -143,7 +143,7 @@ def unregister_token(token: str):
 
 @app.get("/stats.json")
 def stats_json():
-    return {"days": get_daily_stats(30)}
+    return {"days": get_daily_stats(30), "areas": get_area_ranking(7)}
 
 
 @app.get("/stats")

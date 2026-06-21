@@ -1,8 +1,18 @@
+import re
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent / "vogelradar.db"
+
+# Dutch province codes as they appear in a location like "... (UT)"
+_PROVINCES = {
+    "GR": "Groningen", "FR": "Friesland", "DR": "Drenthe",
+    "OV": "Overijssel", "FL": "Flevoland", "GE": "Gelderland",
+    "UT": "Utrecht", "NH": "Noord-Holland", "ZH": "Zuid-Holland",
+    "ZL": "Zeeland", "NB": "Noord-Brabant", "LI": "Limburg",
+}
+_PROV_RE = re.compile(r"\(([A-Z]{2})\)\s*$")
 
 
 def _connect() -> sqlite3.Connection:
@@ -304,3 +314,49 @@ def get_daily_stats(days: int = 30) -> list[dict]:
             (cutoff,),
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def get_area_ranking(days: int = 7) -> list[dict]:
+    """Ranking per province over the last `days`: unique species and
+    number of rare / very_rare sightings."""
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT location, bird_name, COALESCE(rarity,3) AS rarity
+            FROM   sightings
+            WHERE  date >= ?
+            """,
+            (cutoff,),
+        ).fetchall()
+
+    areas: dict[str, dict] = {}
+    for r in rows:
+        m = _PROV_RE.search(r["location"] or "")
+        if not m:
+            continue
+        prov = _PROVINCES.get(m.group(1))
+        if not prov:
+            continue
+        a = areas.setdefault(
+            prov, {"species": set(), "rare": 0, "very_rare": 0}
+        )
+        a["species"].add(r["bird_name"])
+        if r["rarity"] == 3:
+            a["rare"] += 1
+        elif r["rarity"] == 4:
+            a["very_rare"] += 1
+
+    ranking = [
+        {
+            "area": prov,
+            "unique_species": len(a["species"]),
+            "rare": a["rare"],
+            "very_rare": a["very_rare"],
+        }
+        for prov, a in areas.items()
+    ]
+    ranking.sort(
+        key=lambda x: (-x["unique_species"], -(x["rare"] + x["very_rare"]))
+    )
+    return ranking

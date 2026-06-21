@@ -52,9 +52,14 @@
   </div>
 
   <div id="today"></div>
+
+  <h2>Ranking per provincie · laatste 7 dagen</h2>
+  <div id="areas"></div>
+
   <h2>Laatste 30 dagen — unieke soorten per dag</h2>
   <div class="chart" id="chart"></div>
-  <h2>Overzicht</h2>
+
+  <h2>Overzicht per dag</h2>
   <div id="table"></div>
 </div>
 
@@ -76,6 +81,18 @@ fetch('/stats.json').then(r=>r.json()).then(j=>{
         <div><b>${t.very_rare}</b><span>zeer zeldzaam</span></div>
       </div>
     </div>`;
+
+  const areas=(j.areas||[]);
+  document.getElementById('areas').innerHTML = areas.length ? `
+    <table>
+      <tr><th>Provincie</th><th>Soorten</th><th>Zeldzaam</th><th>Zeer zeldzaam</th></tr>
+      ${areas.map((a,i)=>`<tr>
+        <td class="day">${i+1}. ${a.area}</td>
+        <td><b>${a.unique_species}</b></td>
+        <td>${a.rare}</td>
+        <td>${a.very_rare}</td>
+      </tr>`).join('')}
+    </table>` : '<p class="muted">Nog geen gegevens.</p>';
 
   const chrono=[...days].reverse();
   const max=Math.max(1,...chrono.map(d=>d.unique_species));
