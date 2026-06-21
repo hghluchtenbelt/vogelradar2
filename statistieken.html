@@ -53,7 +53,13 @@
 
   <div id="today"></div>
 
-  <h2>Ranking per provincie · laatste 7 dagen</h2>
+  <h2>Top 10 gemeentes · laatste 7 dagen</h2>
+  <div id="gemeentes"></div>
+
+  <h2>Top 10 gebieden · laatste 7 dagen</h2>
+  <div id="hotspots"></div>
+
+  <h2>Per provincie · laatste 7 dagen</h2>
   <div id="areas"></div>
 
   <h2>Laatste 30 dagen — unieke soorten per dag</h2>
@@ -82,17 +88,22 @@ fetch('/stats.json').then(r=>r.json()).then(j=>{
       </div>
     </div>`;
 
-  const areas=(j.areas||[]);
-  document.getElementById('areas').innerHTML = areas.length ? `
-    <table>
-      <tr><th>Provincie</th><th>Soorten</th><th>Zeldzaam</th><th>Zeer zeldzaam</th></tr>
-      ${areas.map((a,i)=>`<tr>
-        <td class="day">${i+1}. ${a.area}</td>
+  function rankTable(items, label, nameFn){
+    if(!items||!items.length) return '<p class="muted">Nog geen gegevens.</p>';
+    return `<table>
+      <tr><th>${label}</th><th>Soorten</th><th>Zeldzaam</th><th>Zeer zeldzaam</th></tr>
+      ${items.map((a,i)=>`<tr>
+        <td class="day">${i+1}. ${nameFn(a)}</td>
         <td><b>${a.unique_species}</b></td>
         <td>${a.rare}</td>
         <td>${a.very_rare}</td>
       </tr>`).join('')}
-    </table>` : '<p class="muted">Nog geen gegevens.</p>';
+    </table>`;
+  }
+  const stripProv = n => (n||'').replace(/\s*\([A-Z]{2}\)\s*$/,'');
+  document.getElementById('gemeentes').innerHTML = rankTable(j.gemeentes, 'Gemeente', a=>a.name);
+  document.getElementById('hotspots').innerHTML  = rankTable(j.hotspots, 'Gebied', a=>stripProv(a.name));
+  document.getElementById('areas').innerHTML     = rankTable(j.areas, 'Provincie', a=>a.area);
 
   const chrono=[...days].reverse();
   const max=Math.max(1,...chrono.map(d=>d.unique_species));

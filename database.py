@@ -98,6 +98,14 @@ def init_db() -> None:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS location_gemeente (
+                location TEXT PRIMARY KEY,
+                gemeente TEXT
+            )
+            """
+        )
         conn.commit()
 
 
@@ -360,3 +368,65 @@ def get_area_ranking(days: int = 7) -> list[dict]:
         key=lambda x: (-x["unique_species"], -(x["rare"] + x["very_rare"]))
     )
     return ranking
+
+
+def map_unmapped_locations() -> int:
+    """Resolve the gemeente for every location not yet cached, via local
+    point-in-polygon. Returns how many new locations were mapped."""
+    from gemeente import gemeente_for
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT location, latitude, longitude
+            FROM   sightings s
+            WHERE  location IS NOT NULL AND location != ''
+              AND  NOT EXISTS (SELECT 1 FROM location_gemeente g
+                               WHERE g.location = s.location)
+            GROUP  BY location
+            """
+        ).fetchall()
+        n = 0
+        for r in rows:
+            gem = gemeente_for(r["latitude"], r["longitude"]) or ""
+            conn.execute(
+                "INSERT OR REPLACE INTO location_gemeente (location, gemeente)"
+                " VALUES (?, ?)",
+                (r["location"], gem),
+            )
+            n += 1
+        conn.commit()
+    return n
+
+
+def _rank_query(group_col: str, join: str, days: int, limit: int) -> list[dict]:
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    sql = f"""
+        SELECT {group_col} AS name,
+               COUNT(DISTINCT s.bird_name) AS uniq,
+               SUM(CASE WHEN COALESCE(s.rarity,3)=3 THEN 1 ELSE 0 END) AS rare,
+               SUM(CASE WHEN COALESCE(s.rarity,3)=4 THEN 1 ELSE 0 END) AS vr
+        FROM   sightings s {join}
+        WHERE  s.date >= ? AND {group_col} != ''
+        GROUP  BY {group_col}
+        ORDER  BY uniq DESC, (rare + vr) DESC
+        LIMIT  ?
+    """
+    with _connect() as conn:
+        rows = conn.execute(sql, (cutoff, limit)).fetchall()
+    return [
+        {"name": r["name"], "unique_species": r["uniq"],
+         "rare": r["rare"], "very_rare": r["vr"]}
+        for r in rows
+    ]
+
+
+def get_gemeente_ranking(days: int = 7, limit: int = 10) -> list[dict]:
+    return _rank_query(
+        "g.gemeente",
+        "JOIN location_gemeente g ON g.location = s.location",
+        days, limit,
+    )
+
+
+def get_hotspot_ranking(days: int = 7, limit: int = 10) -> list[dict]:
+    return _rank_query("s.location", "", days, limit)
