@@ -76,6 +76,18 @@ def init_db() -> None:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_sent_at ON sent_notifications(sent_at)"
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS daily_stats (
+                day             TEXT PRIMARY KEY,
+                unique_species  INTEGER,
+                total_sightings INTEGER,
+                rare            INTEGER,
+                very_rare       INTEGER,
+                updated_at      TEXT
+            )
+            """
+        )
         conn.commit()
 
 
@@ -246,3 +258,49 @@ def record_notification(token: str, bird_name: str, lat: float, lng: float) -> N
         )
         conn.execute("DELETE FROM sent_notifications WHERE sent_at < ?", (cutoff,))
         conn.commit()
+
+
+def record_daily_stats() -> None:
+    """Snapshot today's stats; called each scraper run. Today's row updates
+    live and freezes once the day passes, building lasting history."""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    now = datetime.utcnow().isoformat(timespec="seconds")
+    with _connect() as conn:
+        r = conn.execute(
+            """
+            SELECT COUNT(DISTINCT bird_name) AS uniq,
+                   COUNT(*)                  AS total,
+                   SUM(CASE WHEN COALESCE(rarity,3)=3 THEN 1 ELSE 0 END) AS rare,
+                   SUM(CASE WHEN COALESCE(rarity,3)=4 THEN 1 ELSE 0 END) AS vr
+            FROM   sightings
+            WHERE  date = ?
+            """,
+            (today,),
+        ).fetchone()
+        conn.execute(
+            """
+            INSERT INTO daily_stats
+                (day, unique_species, total_sightings,
+                 rare, very_rare, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(day) DO UPDATE SET
+                unique_species  = excluded.unique_species,
+                total_sightings = excluded.total_sightings,
+                rare            = excluded.rare,
+                very_rare       = excluded.very_rare,
+                updated_at      = excluded.updated_at
+            """,
+            (today, r["uniq"] or 0, r["total"] or 0,
+             r["rare"] or 0, r["vr"] or 0, now),
+        )
+        conn.commit()
+
+
+def get_daily_stats(days: int = 30) -> list[dict]:
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT * FROM daily_stats WHERE day >= ? ORDER BY day DESC",
+            (cutoff,),
+        ).fetchall()
+    return [dict(r) for r in rows]

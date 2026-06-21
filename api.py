@@ -27,6 +27,7 @@ def _allow_rate(ip: str) -> bool:
 from database import (
     get_sightings, get_latest_update, init_db,
     upsert_push_subscriber, delete_push_subscriber,
+    get_daily_stats,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
@@ -138,6 +139,16 @@ def register_token(body: PushSubscriber, request: Request):
 def unregister_token(token: str):
     delete_push_subscriber(token)
     return {"ok": True}
+
+
+@app.get("/stats.json")
+def stats_json():
+    return {"days": get_daily_stats(30)}
+
+
+@app.get("/stats")
+def stats_page():
+    return FileResponse(_HERE / "statistieken.html", media_type="text/html")
 
 
 @app.get("/")

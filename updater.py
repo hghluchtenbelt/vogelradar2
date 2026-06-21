@@ -16,6 +16,7 @@ from typing import Callable
 from database import (
     init_db, insert_sightings, is_empty,
     get_all_urls, prune_old_sightings, prune_empty_subscribers,
+    record_daily_stats,
 )
 from scraper import fetch_rare_birds
 
@@ -51,6 +52,7 @@ def run_update(
     )
     prune_old_sightings()
     prune_empty_subscribers()
+    record_daily_stats()
 
     if new_sightings:
         try:
