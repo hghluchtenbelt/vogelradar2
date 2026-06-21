@@ -29,6 +29,7 @@ from database import (
     upsert_push_subscriber, delete_push_subscriber,
     get_daily_stats, get_area_ranking,
     get_gemeente_ranking, get_hotspot_ranking,
+    get_gemeente_history, get_hotspots_in_gemeente,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
@@ -142,14 +143,40 @@ def unregister_token(token: str):
     return {"ok": True}
 
 
+_STATS_TTL = 300  # cache computed stats for 5 min (spam-proof; data is hourly)
+_stats_cache: dict = {"t": 0.0, "data": None}
+_gem_cache: dict[str, tuple[float, dict]] = {}
+
+
 @app.get("/stats.json")
 def stats_json():
-    return {
-        "days": get_daily_stats(30),
-        "areas": get_area_ranking(7),
-        "gemeentes": get_gemeente_ranking(7, 10),
-        "hotspots": get_hotspot_ranking(7, 10),
+    now = time.time()
+    if _stats_cache["data"] is None or now - _stats_cache["t"] > _STATS_TTL:
+        _stats_cache["data"] = {
+            "days": get_daily_stats(4000),          # full history; sliced client-side
+            "areas": get_area_ranking(7),
+            "gemeentes": get_gemeente_ranking(7, 10),
+            "hotspots": get_hotspot_ranking(7, 10),
+        }
+        _stats_cache["t"] = now
+    return _stats_cache["data"]
+
+
+@app.get("/stats/gemeente.json")
+def gemeente_detail(name: str):
+    now = time.time()
+    hit = _gem_cache.get(name)
+    if hit and now - hit[0] <= _STATS_TTL:
+        return hit[1]
+    data = {
+        "name": name,
+        "history": get_gemeente_history(name),
+        "hotspots": get_hotspots_in_gemeente(name, 7, 25),
     }
+    if len(_gem_cache) > 200:
+        _gem_cache.clear()
+    _gem_cache[name] = (now, data)
+    return data
 
 
 @app.get("/stats")

@@ -106,6 +106,18 @@ def init_db() -> None:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS gemeente_daily (
+                day            TEXT,
+                gemeente       TEXT,
+                unique_species INTEGER,
+                rare           INTEGER,
+                very_rare      INTEGER,
+                PRIMARY KEY (day, gemeente)
+            )
+            """
+        )
         conn.commit()
 
 
@@ -430,3 +442,76 @@ def get_gemeente_ranking(days: int = 7, limit: int = 10) -> list[dict]:
 
 def get_hotspot_ranking(days: int = 7, limit: int = 10) -> list[dict]:
     return _rank_query("s.location", "", days, limit)
+
+
+def record_gemeente_daily() -> None:
+    """Snapshot today's per-gemeente stats (cheap; ~one row per active
+    gemeente per day) for the time-series dashboard."""
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT g.gemeente AS gem,
+                   COUNT(DISTINCT s.bird_name) AS uniq,
+                   SUM(CASE WHEN COALESCE(s.rarity,3)=3 THEN 1 ELSE 0 END) AS rare,
+                   SUM(CASE WHEN COALESCE(s.rarity,3)=4 THEN 1 ELSE 0 END) AS vr
+            FROM   sightings s
+            JOIN   location_gemeente g ON g.location = s.location
+            WHERE  s.date = ? AND g.gemeente != ''
+            GROUP  BY g.gemeente
+            """,
+            (today,),
+        ).fetchall()
+        for r in rows:
+            conn.execute(
+                """
+                INSERT INTO gemeente_daily
+                    (day, gemeente, unique_species, rare, very_rare)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(day, gemeente) DO UPDATE SET
+                    unique_species = excluded.unique_species,
+                    rare           = excluded.rare,
+                    very_rare      = excluded.very_rare
+                """,
+                (today, r["gem"], r["uniq"], r["rare"], r["vr"]),
+            )
+        conn.commit()
+
+
+def get_gemeente_history(gemeente: str) -> list[dict]:
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT day, unique_species, rare, very_rare
+            FROM   gemeente_daily WHERE gemeente = ? ORDER BY day
+            """,
+            (gemeente,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_hotspots_in_gemeente(
+    gemeente: str, days: int = 7, limit: int = 25
+) -> list[dict]:
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT s.location AS name,
+                   COUNT(DISTINCT s.bird_name) AS uniq,
+                   SUM(CASE WHEN COALESCE(s.rarity,3)=3 THEN 1 ELSE 0 END) AS rare,
+                   SUM(CASE WHEN COALESCE(s.rarity,3)=4 THEN 1 ELSE 0 END) AS vr
+            FROM   sightings s
+            JOIN   location_gemeente g ON g.location = s.location
+            WHERE  g.gemeente = ? AND s.date >= ?
+            GROUP  BY s.location
+            ORDER  BY uniq DESC, (rare + vr) DESC
+            LIMIT  ?
+            """,
+            (gemeente, cutoff, limit),
+        ).fetchall()
+    return [
+        {"name": r["name"], "unique_species": r["uniq"],
+         "rare": r["rare"], "very_rare": r["vr"]}
+        for r in rows
+    ]
