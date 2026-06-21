@@ -27,7 +27,7 @@ def _allow_rate(ip: str) -> bool:
 from database import (
     get_sightings, get_latest_update, init_db,
     upsert_push_subscriber, delete_push_subscriber,
-    get_daily_stats, get_area_ranking,
+    get_daily_stats,
     get_gemeente_ranking, get_hotspot_ranking,
     get_gemeente_history, get_hotspots_in_gemeente, get_all_gemeentes,
 )
@@ -154,7 +154,6 @@ def stats_json():
     if _stats_cache["data"] is None or now - _stats_cache["t"] > _STATS_TTL:
         _stats_cache["data"] = {
             "days": get_daily_stats(4000),          # full history; sliced client-side
-            "areas": get_area_ranking(7),
             "gemeentes": get_gemeente_ranking(7, 10),
             "hotspots": get_hotspot_ranking(7, 10),
             "gemeente_list": get_all_gemeentes(),

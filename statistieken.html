@@ -84,9 +84,6 @@
 
   <h2>Top 10 gebieden · laatste 7 dagen</h2>
   <div id="hotspots"></div>
-
-  <h2>Per provincie · laatste 7 dagen</h2>
-  <div id="areas"></div>
 </div>
 
 <script>
@@ -180,7 +177,6 @@ fetch('/stats.json').then(r=>r.json()).then(j=>{
   renderMain();
   $('gemeentes').innerHTML = rankTable(j.gemeentes, 'Gemeente', a=>a.name, true);
   $('hotspots').innerHTML  = rankTable(j.hotspots, 'Gebied', a=>stripProv(a.name), false);
-  $('areas').innerHTML     = rankTable(j.areas, 'Provincie', a=>a.area, false);
 }).catch(()=>{ $('today').innerHTML='<p class="err">Kon statistieken niet laden.</p>'; });
 </script>
 </body>
