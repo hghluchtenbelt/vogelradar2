@@ -478,6 +478,16 @@ def record_gemeente_daily() -> None:
         conn.commit()
 
 
+def get_all_gemeentes() -> list[str]:
+    """All gemeentes that have recorded history (for the dashboard filter)."""
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT DISTINCT gemeente FROM gemeente_daily"
+            " WHERE gemeente != '' ORDER BY gemeente"
+        ).fetchall()
+    return [r["gemeente"] for r in rows]
+
+
 def get_gemeente_history(gemeente: str) -> list[dict]:
     with _connect() as conn:
         rows = conn.execute(

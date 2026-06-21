@@ -29,7 +29,7 @@ from database import (
     upsert_push_subscriber, delete_push_subscriber,
     get_daily_stats, get_area_ranking,
     get_gemeente_ranking, get_hotspot_ranking,
-    get_gemeente_history, get_hotspots_in_gemeente,
+    get_gemeente_history, get_hotspots_in_gemeente, get_all_gemeentes,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
@@ -157,6 +157,7 @@ def stats_json():
             "areas": get_area_ranking(7),
             "gemeentes": get_gemeente_ranking(7, 10),
             "hotspots": get_hotspot_ranking(7, 10),
+            "gemeente_list": get_all_gemeentes(),
         }
         _stats_cache["t"] = now
     return _stats_cache["data"]
@@ -171,7 +172,7 @@ def gemeente_detail(name: str):
     data = {
         "name": name,
         "history": get_gemeente_history(name),
-        "hotspots": get_hotspots_in_gemeente(name, 7, 25),
+        "hotspots": get_hotspots_in_gemeente(name, 7, 200),
     }
     if len(_gem_cache) > 200:
         _gem_cache.clear()

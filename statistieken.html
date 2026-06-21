@@ -30,6 +30,14 @@
   .ranges button{border:1.5px solid var(--line);background:#fff;color:var(--muted);font-weight:650;
     font-size:12.5px;padding:5px 11px;border-radius:999px;cursor:pointer;font-family:inherit}
   .ranges button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .selrow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .selrow input{flex:1;min-width:160px;border:1.5px solid var(--line);border-radius:10px;padding:8px 11px;
+    font-size:13.5px;font-family:inherit;outline:none}
+  .selrow input:focus{border-color:var(--brand)}
+  .selrow button{border:1.5px solid var(--line);background:#fff;color:var(--muted);font-weight:650;
+    font-size:12.5px;padding:7px 12px;border-radius:10px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .chart-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+  .chart-title em{color:var(--brand-d);font-style:normal}
 
   svg.lc{width:100%;height:auto;display:block}
   .lc-x{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
@@ -45,11 +53,6 @@
   tr.click td.nm::after{content:'›';color:var(--brand);font-weight:800;margin-left:6px}
   .muted{color:var(--muted);font-size:13px}
   .err{color:#b91c1c;padding:20px;text-align:center}
-
-  #gemdetail{margin-top:12px;border:1.5px solid var(--brand);border-radius:14px;padding:14px;background:#fff}
-  #gemdetail .gd-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  #gemdetail .gd-head b{font-size:16px}
-  #gemdetail .gd-head button{margin-left:auto;border:none;background:none;color:var(--muted);font-size:18px;cursor:pointer}
   .hidden{display:none}
 </style>
 </head>
@@ -66,12 +69,18 @@
   <h2>Verloop — unieke soorten per dag</h2>
   <div class="card">
     <div class="ranges" id="ranges"></div>
+    <div class="selrow">
+      <input id="gemsearch" list="gemlist" placeholder="Hele land — typ een gemeente om te filteren…" autocomplete="off">
+      <datalist id="gemlist"></datalist>
+      <button id="selreset" class="hidden">↺ Hele land</button>
+    </div>
+    <div class="chart-title" id="charttitle"></div>
     <div id="mainchart"></div>
+    <div id="gebieden"></div>
   </div>
 
   <h2>Top 10 gemeentes · laatste 7 dagen</h2>
   <div id="gemeentes"></div>
-  <div id="gemdetail" class="hidden"></div>
 
   <h2>Top 10 gebieden · laatste 7 dagen</h2>
   <div id="hotspots"></div>
@@ -86,10 +95,9 @@ const $=s=>document.getElementById(s);
 function fmt(d){ const p=d.split('-'); return (+p[2])+' '+MND[(+p[1])-1]; }
 function stripProv(n){ return (n||'').replace(/\s*\([A-Z]{2}\)\s*$/,''); }
 
-// SVG line chart from [{day, value}] (chronological)
 function lineChart(series, color){
   if(!series || series.length<2)
-    return '<p class="muted">De grafiek verschijnt zodra er een paar dagen geschiedenis is.</p>';
+    return '<p class="muted">De grafiek verschijnt zodra er een paar dagen aan geschiedenis is.</p>';
   const W=620,H=160,pad=22, c=color||'#0d9488';
   const max=Math.max(1,...series.map(s=>s.value)), n=series.length;
   const X=i=> pad+(i/(n-1))*(W-2*pad);
@@ -107,7 +115,7 @@ function rankTable(items, label, nameFn, clickable){
   if(!items||!items.length) return '<p class="muted">Nog geen gegevens.</p>';
   return `<table>
     <tr><th>${label}</th><th>Soorten</th><th>Zeldzaam</th><th>Zeer zeldzaam</th></tr>
-    ${items.map((a,i)=>`<tr class="${clickable?'click':''}" ${clickable?`onclick="loadGemeente('${(a.name||'').replace(/'/g,"\\'")}')"`:''}>
+    ${items.map((a,i)=>`<tr class="${clickable?'click':''}" ${clickable?`onclick="selectGemeente('${(a.name||'').replace(/'/g,"\\'")}')"`:''}>
       <td class="nm">${i+1}. ${nameFn(a)}</td>
       <td><b>${a.unique_species}</b></td>
       <td>${a.rare}</td>
@@ -116,10 +124,12 @@ function rankTable(items, label, nameFn, clickable){
   </table>`;
 }
 
-let DAYS=[];                 // full daily history, chronological
-let RANGE=30;
+let DAYS=[], GEMLIST=[], RANGE=30, SELGEM=null, SELGEM_HIST=[];
+
 function renderMain(){
-  const series = (RANGE==='max') ? DAYS : DAYS.slice(-RANGE);
+  const src = SELGEM ? SELGEM_HIST : DAYS;
+  const series = (RANGE==='max') ? src : src.slice(-RANGE);
+  $('charttitle').innerHTML = SELGEM ? `Toont: <em>${SELGEM}</em>` : 'Toont: <em>hele land</em>';
   $('mainchart').innerHTML = lineChart(series.map(d=>({day:d.day, value:d.unique_species})));
   document.querySelectorAll('#ranges button').forEach(b=>
     b.classList.toggle('on', String(b.dataset.r)===String(RANGE)));
@@ -130,22 +140,31 @@ $('ranges').innerHTML = RANGES.map(([lbl,r])=>`<button data-r="${r}">${lbl}</but
 $('ranges').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b)return;
   RANGE = b.dataset.r==='max' ? 'max' : (+b.dataset.r); renderMain(); });
 
-function loadGemeente(name){
-  const box=$('gemdetail'); box.classList.remove('hidden');
-  box.innerHTML=`<div class="muted">Laden…</div>`;
-  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+function selectGemeente(name){
+  if(!name){ SELGEM=null; SELGEM_HIST=[]; $('gebieden').innerHTML=''; $('gemsearch').value='';
+    $('selreset').classList.add('hidden'); renderMain(); return; }
+  $('gemsearch').value=name;
+  $('selreset').classList.remove('hidden');
+  $('gebieden').innerHTML='<p class="muted">Laden…</p>';
+  $('charttitle').scrollIntoView({behavior:'smooth',block:'nearest'});
   fetch('/stats/gemeente.json?name='+encodeURIComponent(name)).then(r=>r.json()).then(d=>{
-    const hist=(d.history||[]).map(h=>({day:h.day, value:h.unique_species}));
-    box.innerHTML=`
-      <div class="gd-head"><b>${name}</b><button onclick="document.getElementById('gemdetail').classList.add('hidden')">✕</button></div>
-      ${lineChart(hist)}
-      <h2 style="margin:16px 0 8px">Gebieden in ${name}</h2>
-      ${rankTable(d.hotspots, 'Gebied', a=>stripProv(a.name), false)}`;
-  }).catch(()=>{ box.innerHTML='<p class="err">Kon gemeente niet laden.</p>'; });
+    SELGEM=name; SELGEM_HIST=[...(d.history||[])];   // already chronological
+    renderMain();
+    $('gebieden').innerHTML = `<h2 style="margin:18px 0 8px">Gebieden in ${name} · laatste 7 dagen</h2>`
+      + rankTable(d.hotspots,'Gebied',a=>stripProv(a.name),false);
+  }).catch(()=>{ $('gebieden').innerHTML='<p class="err">Kon gemeente niet laden.</p>'; });
 }
+$('gemsearch').addEventListener('change',e=>{
+  const v=e.target.value.trim();
+  if(!v) selectGemeente(null);
+  else if(GEMLIST.includes(v)) selectGemeente(v);
+});
+$('selreset').addEventListener('click',()=>selectGemeente(null));
 
 fetch('/stats.json').then(r=>r.json()).then(j=>{
-  DAYS=[...(j.days||[])].reverse();   // API is newest-first → make chronological
+  DAYS=[...(j.days||[])].reverse();   // API newest-first → chronological
+  GEMLIST=j.gemeente_list||[];
+  $('gemlist').innerHTML = GEMLIST.map(g=>`<option value="${g}">`).join('');
   if(!DAYS.length){ $('today').innerHTML='<p class="err">Nog geen statistieken — komt na de eerste update.</p>'; return; }
   const t=DAYS[DAYS.length-1];
   $('today').innerHTML=`
