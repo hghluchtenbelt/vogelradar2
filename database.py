@@ -103,34 +103,44 @@ def insert_sightings(sightings: list[dict]) -> int:
 def get_sightings(days_back: int = 7) -> list[dict]:
     """
     Tiered time window per rarity:
-      rarity 4+3 → last 7 days
-      rarity 1+2 → last 24 hours
+      rarity 4+3 (zeldzaam/zeer zeldzaam) → last 7 days
+      rarity 2   (vrij zeldzaam)          → last 10 hours
+      rarity 1   (algemeen)               → last 6 hours
     """
     now = datetime.utcnow()
     cut7  = (now - timedelta(days=7)).strftime("%Y-%m-%d")
-    cut24 = (now - timedelta(hours=24)).isoformat(timespec="seconds")
+    cut10 = (now - timedelta(hours=10)).isoformat(timespec="seconds")
+    cut6  = (now - timedelta(hours=6)).isoformat(timespec="seconds")
+    cols = """url, bird_name, location, date, obs_time,
+                   count, photo, latitude, longitude, scraped_at,
+                   COALESCE(rarity, 3) AS rarity"""
     with _connect() as conn:
         rows = conn.execute(
-            """
-            SELECT url, bird_name, location, date, obs_time,
-                   count, photo, latitude, longitude, scraped_at,
-                   COALESCE(rarity, 3) AS rarity
+            f"""
+            SELECT {cols}
             FROM   sightings
-            WHERE  (COALESCE(rarity,3) >= 3 AND date >= ?)
+            WHERE  COALESCE(rarity,3) >= 3 AND date >= ?
             ORDER  BY scraped_at DESC
             """,
             (cut7,),
         ).fetchall()
         rows += conn.execute(
-            """
-            SELECT url, bird_name, location, date, obs_time,
-                   count, photo, latitude, longitude, scraped_at,
-                   COALESCE(rarity, 3) AS rarity
+            f"""
+            SELECT {cols}
             FROM   sightings
-            WHERE  COALESCE(rarity,3) IN (1,2) AND scraped_at >= ?
+            WHERE  COALESCE(rarity,3) = 2 AND scraped_at >= ?
             ORDER  BY scraped_at DESC
             """,
-            (cut24,),
+            (cut10,),
+        ).fetchall()
+        rows += conn.execute(
+            f"""
+            SELECT {cols}
+            FROM   sightings
+            WHERE  COALESCE(rarity,3) = 1 AND scraped_at >= ?
+            ORDER  BY scraped_at DESC
+            """,
+            (cut6,),
         ).fetchall()
     return [dict(r) for r in rows]
 
