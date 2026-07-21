@@ -17,6 +17,7 @@ from database import (
     init_db, insert_sightings, is_empty,
     get_all_urls, prune_old_sightings, prune_empty_subscribers,
     record_daily_stats, map_unmapped_locations, record_gemeente_daily,
+    record_scrape_run,
 )
 from scraper import fetch_rare_birds
 
@@ -63,6 +64,7 @@ def run_update(
         except Exception as exc:
             print(f"[fcm] notification error: {exc}", flush=True)
 
+    record_scrape_run(total_new, total_scraped)
     return total_new, total_scraped
 
 

@@ -118,6 +118,15 @@ def init_db() -> None:
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS scrape_runs (
+                ts            TEXT PRIMARY KEY,
+                new_count     INTEGER NOT NULL,
+                total_scraped INTEGER NOT NULL
+            )
+            """
+        )
         conn.commit()
 
 
@@ -258,6 +267,33 @@ def prune_old_sightings(keep_days: int = 15) -> int:
         cur = conn.execute("DELETE FROM sightings WHERE scraped_at < ?", (cutoff,))
         conn.commit()
         return cur.rowcount
+
+
+def record_scrape_run(new_count: int, total_scraped: int,
+                      keep_days: int = 30) -> None:
+    """Log one scrape run (UTC) so the status bot can summarise activity."""
+    ts = datetime.utcnow().isoformat(timespec="seconds")
+    cutoff = (datetime.utcnow() - timedelta(days=keep_days)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO scrape_runs (ts, new_count, total_scraped) "
+            "VALUES (?, ?, ?)",
+            (ts, new_count, total_scraped),
+        )
+        conn.execute("DELETE FROM scrape_runs WHERE ts < ?", (cutoff,))
+        conn.commit()
+
+
+def get_scrape_runs_since(hours: int = 12) -> list[dict]:
+    """Return scrape runs (UTC ts, new_count, total_scraped) in the window."""
+    cutoff = (datetime.utcnow() - timedelta(hours=hours)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT ts, new_count, total_scraped FROM scrape_runs "
+            "WHERE ts >= ? ORDER BY ts",
+            (cutoff,),
+        ).fetchall()
+    return [dict(r) for r in rows]
 
 
 def already_notified(token: str, bird_name: str, lat: float, lng: float,

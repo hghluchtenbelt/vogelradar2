@@ -89,6 +89,8 @@
 <script>
 const MND=['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 const $=s=>document.getElementById(s);
+// Escape scraped location names before they enter innerHTML.
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function fmt(d){ const p=d.split('-'); return (+p[2])+' '+MND[(+p[1])-1]; }
 function stripProv(n){ return (n||'').replace(/\s*\([A-Z]{2}\)\s*$/,''); }
 
@@ -113,7 +115,7 @@ function rankTable(items, label, nameFn, clickable){
   return `<table>
     <tr><th>${label}</th><th>Soorten</th><th>Zeldzaam</th><th>Zeer zeldzaam</th></tr>
     ${items.map((a,i)=>`<tr class="${clickable?'click':''}" ${clickable?`onclick="selectGemeente('${(a.name||'').replace(/'/g,"\\'")}')"`:''}>
-      <td class="nm">${i+1}. ${nameFn(a)}</td>
+      <td class="nm">${i+1}. ${esc(nameFn(a))}</td>
       <td><b>${a.unique_species}</b></td>
       <td>${a.rare}</td>
       <td>${a.very_rare}</td>

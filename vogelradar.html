@@ -289,9 +289,12 @@ function dateFromDaysAgo(d){ const t=new Date(); t.setHours(8,0,0,0); t.setDate(
 function daysAgo(s){ const d=new Date(s.date+"T00:00:00"); const n=new Date(); n.setHours(0,0,0,0); return Math.round((n-d)/864e5); }
 function haversine(a,b){ const R=6371,r=x=>x*Math.PI/180; const dLa=r(b.lat-a.lat),dLn=r(b.lng-a.lng);
   const x=Math.sin(dLa/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLn/2)**2; return 2*R*Math.asin(Math.sqrt(x)); }
+// Escape scraped free-text (bird names, locations) before it enters innerHTML.
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function safeUrl(u){ return /^https?:\/\//i.test(String(u==null?"":u)) ? String(u) : ""; }
 function fmtDist(km){ if(km<1) return Math.round(km*1000)+" m"; if(km<10) return km.toFixed(1)+" km"; return Math.round(km)+" km"; }
-function ago(s){ const d=daysAgo(s),t=s.time?" · "+s.time:""; if(d<=0)return"vandaag"+t; if(d===1)return"gisteren"+t; return d+" dagen geleden"; }
-function obsUrl(s){ return s.url||("https://waarneming.nl/observation/"+s.id+"/"); }
+function ago(s){ const d=daysAgo(s),t=s.time?" · "+esc(s.time):""; if(d<=0)return"vandaag"+t; if(d===1)return"gisteren"+t; return d+" dagen geleden"; }
+function obsUrl(s){ return safeUrl(s.url) || ("https://waarneming.nl/observation/"+encodeURIComponent(s.id)+"/"); }
 function mapsUrl(s){ return "https://www.google.com/maps?q="+s.lat+","+s.lng; }
 function timePass(s){ const d=daysAgo(s); if(d<=3)return true;
   return state.win===7 && (s.rarity==="rare"||s.rarity==="very_rare") && d<=7; }
@@ -465,8 +468,8 @@ function renderCards(){
     const near = s._d<=10?`<span class="near">dichtbij</span>`:"";
     return `<div class="card${state.selected===s.id?" sel":""}" data-id="${s.id}" style="border-left-color:${r.hex}">
       <div class="cbody">
-        <div class="cname"><b>${s.nl}</b> ${tag}<span class="en">${s.en||s.sci||""}</span></div>
-        <div class="cmeta"><span class="w">📍 ${s.loc}</span> ${ph} <span>${ago(s)} ${cnt}</span></div>
+        <div class="cname"><b>${esc(s.nl)}</b> ${tag}<span class="en">${esc(s.en||s.sci||"")}</span></div>
+        <div class="cmeta"><span class="w">📍 ${esc(s.loc)}</span> ${ph} <span>${ago(s)} ${cnt}</span></div>
       </div>
       <div class="cright"><div class="cdist">${fmtDist(s._d)}<small>van hier</small></div>${near}</div>
     </div>`;
@@ -516,11 +519,11 @@ function drawMarkers(){
   visible().forEach(s=>{
     const m=L.marker([s.lat,s.lng],{icon:makeIcon(s,state.selected===s.id)});
     m.bindPopup(`<div class="pop">
-      <div class="pnl">${s.nl} ${s.count>1?`<small>×${s.count}</small>`:""}</div>
-      <div class="pen">${s.en||s.sci||""}</div>
-      <div class="pmeta">📍 ${s.loc}<br>${ago(s)} · ${fmtDist(haversine(state.user,s))} van hier</div>
-      <div style="margin-top:6px"><a href="${mapsUrl(s)}" target="_blank" rel="noopener">Routebeschrijving</a> &nbsp;·&nbsp;
-      <a href="${obsUrl(s)}" target="_blank" rel="noopener">waarneming.nl ↗</a></div></div>`);
+      <div class="pnl">${esc(s.nl)} ${s.count>1?`<small>×${esc(s.count)}</small>`:""}</div>
+      <div class="pen">${esc(s.en||s.sci||"")}</div>
+      <div class="pmeta">📍 ${esc(s.loc)}<br>${ago(s)} · ${fmtDist(haversine(state.user,s))} van hier</div>
+      <div style="margin-top:6px"><a href="${esc(mapsUrl(s))}" target="_blank" rel="noopener">Routebeschrijving</a> &nbsp;·&nbsp;
+      <a href="${esc(obsUrl(s))}" target="_blank" rel="noopener">waarneming.nl ↗</a></div></div>`);
     m.on("click",()=>{ state.selected=s.id; updateSel(); });
     markers[s.id]=m;
     if(s.rarity==="rare"||s.rarity==="very_rare") m.addTo(map);

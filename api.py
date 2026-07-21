@@ -30,12 +30,14 @@ from database import (
     get_daily_stats,
     get_gemeente_ranking, get_hotspot_ranking,
     get_gemeente_history, get_hotspots_in_gemeente, get_all_gemeentes,
+    get_scrape_runs_since,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
 SCRAPE_INTERVAL = 60 * 60   # 1 hour — change to e.g. 30*60 for 30 min
 
-app = FastAPI(title="Vogelradar")
+app = FastAPI(title="Vogelradar", docs_url=None, redoc_url=None,
+              openapi_url=None)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -177,6 +179,18 @@ def gemeente_detail(name: str):
         _gem_cache.clear()
     _gem_cache[name] = (now, data)
     return data
+
+
+@app.get("/scrape-stats.json")
+def scrape_stats(hours: int = 12):
+    """Aggregate scrape activity for the status bot (no PII)."""
+    hours = max(1, min(hours, 168))
+    runs = get_scrape_runs_since(hours)
+    return {
+        "hours": hours,
+        "total_new": sum(r["new_count"] for r in runs),
+        "runs": runs,  # [{ts (UTC ISO), new_count, total_scraped}]
+    }
 
 
 @app.get("/stats")
