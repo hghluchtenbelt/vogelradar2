@@ -1,9 +1,13 @@
+import os
 import re
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent / "vogelradar.db"
+# Override with VOGELRADAR_DB_PATH when the database lives outside the
+# code directory (e.g. a mounted volume in a container).
+DB_PATH = Path(os.environ.get("VOGELRADAR_DB_PATH")
+               or Path(__file__).parent / "vogelradar.db")
 
 # Dutch province codes as they appear in a location like "... (UT)"
 _PROVINCES = {
