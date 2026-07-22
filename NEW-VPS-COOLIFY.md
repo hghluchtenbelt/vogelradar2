@@ -1,5 +1,84 @@
 # New VPS (Coolify) setup: state and next steps
 
+## Migration status (2026-07-22 evening): vogelradar CUTOVER DONE
+
+- DONE: vogel-radar.nl + www LIVE on the new VPS. Sequence: Coolify
+  domains switched to vogel-radar.nl + www (labels verified), old
+  vogelradar-api.service stopped AND disabled, final DB backup via
+  Python sqlite3 backup API (integrity ok, 116805 sightings, sha256
+  verified on every hop), DB swapped into the /data volume (test copy
+  kept as vogelradar.db.test-copy.bak), firebase-test.json renamed to
+  firebase-service-account.json, DNS A records replaced by proxied
+  CNAMEs to the tunnel. birds.json serves the migrated data through
+  the edge; www had one transient 502 while Traefik reloaded.
+- FALLBACK: old VPS untouched otherwise (code, venv, DB, .env all in
+  place). Rollback = point DNS back to A 85.10.140.213 and
+  `sudo systemctl enable --now vogelradar-api`. Wind-down after ~2
+  weeks (target: ~2026-08-05).
+- DONE: statusbot deployed on the new VPS (env vars copied from the
+  old VPS over ssh, never through chat). Both statusbots run for now
+  per user choice: alerts and summaries arrive twice; Telegram
+  getUpdates gives 409 conflicts, so /status commands are unreliable
+  until the old one is stopped at wind-down.
+- DONE: natwacht DISCONTINUED (user decision, 2026-07-22): Coolify
+  apps + project deleted, natwacht.nl/www/api 301 to hermen.dev via
+  Traefik dynamic config on the new VPS, natwacht checks stripped
+  from vps-watch worker and statusbot. Old-VPS natwacht backend still
+  runs as leftover; stop it at wind-down.
+- FCM note: push not yet observed live from the new VPS (dry-run was
+  OK on 2026-07-21); the next hourly scrape with a rare sighting is
+  the real test. Watch container logs / sent_notifications.
+
+## Migration status (2026-07-21 evening)
+
+Migration design: docs/superpowers/specs/2026-07-21-vps-migration-design.md.
+
+- DONE: natwacht.nl LIVE on the new VPS. Zones natwacht.nl (active) and
+  vogel-radar.nl (pending delegation via Hostnet) in Cloudflare. Tunnel
+  ingress v3 covers natwacht.nl, www, api + vogel-radar.nl, www.
+  Coolify project "natwacht": natwacht-api (backend Dockerfile, volume,
+  anonymous KNMI key; user still to add own key via UI) and
+  natwacht-web (app/Dockerfile added, merged to main). DNS: apex/api
+  proxied CNAMEs to the tunnel. Old VPS stack untouched as fallback.
+- DONE: vogelradar test app on vogelradar-test.hermen.dev (Coolify
+  project "vogelradar", branch coolify-migration: Dockerfile +
+  VOGELRADAR_DB_PATH/FIREBASE_CREDENTIALS env overrides, volume /data
+  with a copy of the production DB). Verified: full scrape run from the
+  new IP works (Anubis OK, 271 new loaded). Push cannot fire from test
+  (no firebase file mounted).
+- DONE: FCM dry-run from the new VPS OK (credential staged on the
+  vogelradar volume as firebase-test.json, deliberately NOT the
+  FIREBASE_CREDENTIALS path so the hourly scrape cannot push during
+  testing; rename to firebase-service-account.json at cutover).
+- DONE: statusbot container edition pushed to
+  github.com/hghluchtenbelt/vps-statusbot (2 commits: old-VPS baseline
+  + containerize) and staged as Coolify app "statusbot" in project
+  "monitoring" (dockerfile pack, /data volume, no public domain,
+  deliberately NOT deployed: running both bots = duplicate alerts).
+  At wind-down: user sets TELEGRAM_BOT_TOKEN (+ optional
+  TELEGRAM_CHAT_ID) in the app's env via the Coolify UI (values are on
+  the old VPS in ~/statusbot/.env and state.json), deploy, then stop
+  the old statusbot service.
+- DONE: external down-detector live: Cloudflare Worker "vps-watch"
+  (account email got verified, workers.dev subdomain "hermen-dev"
+  created via API), cron */5, checks natwacht.nl, vogel-radar.nl and
+  hermen.dev from outside, alert after 2 consecutive fails + recovery
+  message, dedup state in KV "vps-watch-state". Still needed from the
+  user: TELEGRAM_BOT_TOKEN (secret) and TELEGRAM_CHAT_ID in the
+  worker's dashboard Settings > Variables; until then it checks but
+  cannot send. TELEGRAM_CHAT_ID is already set (plain_text binding via
+  API). NOTE: when redeploying this worker via the API, preserve
+  existing bindings (keep_bindings / re-send the full bindings list)
+  or the dashboard-added secret is dropped.
+- NEXT: vogelradar cutover once the vogel-radar.nl zone is active
+  (Hostnet NS change was submitted 2026-07-21, registry still showed
+  Hostnet NS at last check): final DB sync (sqlite3 backup), rename
+  firebase file, switch Coolify domains to vogel-radar.nl + www, flip
+  DNS to the tunnel (ingress rules already in place, tunnel config
+  v3), merge vogelradar2 branch coolify-migration to main. Then
+  2-week fallback window, then old VPS wind-down (statusbot deploy,
+  final backup, cancel).
+
 ## Next session: start here
 
 State as of 2026-07-21 (afternoon session): the Cloudflare MCP
