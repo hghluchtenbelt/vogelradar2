@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 from pathlib import Path
 
 from database import (
@@ -10,7 +11,10 @@ from database import (
     already_notified, record_notification,
 )
 
-_SERVICE_ACCOUNT = Path(__file__).parent / "firebase-service-account.json"
+# Override with FIREBASE_CREDENTIALS when the file is mounted elsewhere
+# (e.g. a secret mount in a container). Push is skipped if the file is absent.
+_SERVICE_ACCOUNT = Path(os.environ.get("FIREBASE_CREDENTIALS")
+                        or Path(__file__).parent / "firebase-service-account.json")
 _RARITY_NUM = {
     "common": 1, "uncommon": 2, "rare": 3, "very_rare": 4
 }

@@ -1,0 +1,7 @@
+.git
+.venv
+__pycache__
+vogelradar.db
+firebase-service-account.json
+docs
+NEW-VPS-COOLIFY.md
