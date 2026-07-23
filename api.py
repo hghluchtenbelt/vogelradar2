@@ -89,6 +89,7 @@ def _to_sighting(row: dict) -> dict:
         "date": row.get("date") or "",
         "time": row.get("obs_time") or "",
         "photo": bool(row.get("photo")),
+        "img": row.get("photo_url") or "",
         "url": row["url"],
     }
 

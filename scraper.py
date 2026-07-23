@@ -347,8 +347,14 @@ def _scrape_observation(session: cffi_requests.Session, path: str) -> dict | Non
     # Count: try common icon patterns, fall back to looking for "Aantal" label
     count = _extract_count(soup)
 
-    # Photo: check if a photo/media block is present on the page
-    photo = bool(
+    # Photo: first gallery image. The /media/ URL is public (no Anubis)
+    # and supports ?w=&h= resizing, so the frontend can load it directly.
+    photo_url = ""
+    gallery_a = soup.find("a", class_="lightbox-gallery-image", href=True)
+    if gallery_a and "/media/" in gallery_a["href"]:
+        href = gallery_a["href"]
+        photo_url = href if href.startswith("http") else f"{BASE_URL}{href}"
+    photo = bool(photo_url) or bool(
         soup.find("div", class_=re.compile(r"photo|media|gallery", re.I)) or
         soup.find("a", href=re.compile(r"\.(jpg|jpeg|png|webp)", re.I))
     )
@@ -362,6 +368,7 @@ def _scrape_observation(session: cffi_requests.Session, path: str) -> dict | Non
         "obs_time": obs_time,
         "count": count,
         "photo": photo,
+        "photo_url": photo_url,
         "latitude": lat,
         "longitude": lon,
         "url": url,

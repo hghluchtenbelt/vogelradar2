@@ -49,6 +49,7 @@ def init_db() -> None:
                 obs_time   TEXT DEFAULT '',
                 count      INTEGER DEFAULT 1,
                 photo      INTEGER DEFAULT 0,
+                photo_url  TEXT DEFAULT '',
                 latitude   REAL NOT NULL,
                 longitude  REAL NOT NULL,
                 scraped_at TEXT NOT NULL,
@@ -65,6 +66,7 @@ def init_db() -> None:
             ("obs_time", "TEXT DEFAULT ''"),
             ("count", "INTEGER DEFAULT 1"),
             ("photo", "INTEGER DEFAULT 0"),
+            ("photo_url", "TEXT DEFAULT ''"),
         ]:
             if col not in existing:
                 conn.execute(f"ALTER TABLE sightings ADD COLUMN {col} {defn}")
@@ -138,16 +140,17 @@ def insert_sightings(sightings: list[dict]) -> int:
     if not sightings:
         return 0
     now = datetime.utcnow().isoformat(timespec="seconds")
-    rows = [{**s, "scraped_at": now} for s in sightings]
+    rows = [{"photo_url": "", **s, "scraped_at": now} for s in sightings]
     with _connect() as conn:
         cur = conn.executemany(
             """
             INSERT OR IGNORE INTO sightings
                 (url, bird_name, location, date, obs_time, count,
-                 photo, latitude, longitude, scraped_at, rarity)
+                 photo, photo_url, latitude, longitude, scraped_at, rarity)
             VALUES
                 (:url, :bird_name, :location, :date, :obs_time, :count,
-                 :photo, :latitude, :longitude, :scraped_at, :rarity)
+                 :photo, :photo_url, :latitude, :longitude, :scraped_at,
+                 :rarity)
             """,
             rows,
         )
@@ -167,7 +170,8 @@ def get_sightings(days_back: int = 7) -> list[dict]:
     cut10 = (now - timedelta(hours=10)).isoformat(timespec="seconds")
     cut6  = (now - timedelta(hours=6)).isoformat(timespec="seconds")
     cols = """url, bird_name, location, date, obs_time,
-                   count, photo, latitude, longitude, scraped_at,
+                   count, photo, COALESCE(photo_url, '') AS photo_url,
+                   latitude, longitude, scraped_at,
                    COALESCE(rarity, 3) AS rarity"""
     with _connect() as conn:
         rows = conn.execute(
