@@ -31,7 +31,7 @@ from database import (
     get_daily_stats,
     get_gemeente_ranking, get_hotspot_ranking,
     get_gemeente_history, get_hotspots_in_gemeente, get_all_gemeentes,
-    get_scrape_runs_since,
+    get_scrape_runs_since, get_meta,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
@@ -188,12 +188,16 @@ def gemeente_detail(name: str):
 @app.get("/scrape-stats.json")
 def scrape_stats(hours: int = 12):
     """Aggregate scrape activity for the status bot (no PII)."""
+    import json
     hours = max(1, min(hours, 168))
     runs = get_scrape_runs_since(hours)
+    reval = get_meta("last_revalidation_result")
     return {
         "hours": hours,
         "total_new": sum(r["new_count"] for r in runs),
         "runs": runs,  # [{ts (UTC ISO), new_count, total_scraped}]
+        # last revalidation sweep: {ts, checked, updated, deleted} | null
+        "revalidation": json.loads(reval) if reval else None,
     }
 
 

@@ -17,6 +17,7 @@ photo_url column existed.
 """
 from __future__ import annotations
 
+import json
 import sys
 import time
 from datetime import datetime, timedelta
@@ -71,8 +72,12 @@ def run_revalidation(
                     f"Hercontrole {i + 1}/{len(urls)}…",
                 )
             time.sleep(0.35)
-    set_meta("last_revalidation",
-             datetime.utcnow().isoformat(timespec="seconds"))
+    now = datetime.utcnow().isoformat(timespec="seconds")
+    set_meta("last_revalidation", now)
+    set_meta("last_revalidation_result", json.dumps({
+        "ts": now + "Z", "checked": len(urls),
+        "updated": updated, "deleted": deleted,
+    }))
     print(f"[reval] checked={len(urls)} updated={updated} "
           f"deleted={deleted}", flush=True)
     return len(urls), updated, deleted
