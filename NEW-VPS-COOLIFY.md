@@ -1,5 +1,38 @@
 # New VPS (Coolify) setup: state and next steps
 
+## Feature day (2026-07-23): staging pipeline + clustering/photos/sweep live
+
+- DONE: staging pipeline. Coolify app "vogelradar-staging" (project
+  vogelradar) deploys branch `dev` to vogelradar-staging.hermen.dev.
+  Own /data volume with a prod DB copy; push_subscribers and
+  sent_notifications stripped and NO firebase file on the volume, so
+  staging can never send push. SCRAPE_INTERVAL_MIN=360 (4 scrapes/day
+  vs 60 min on prod). Workflow: push to dev = staging deploy; merge
+  dev into main = production (prod app tracks main since today).
+- Staging is STOPPED when idle (polite to waarneming.nl: no scraping
+  while nobody looks at it). The staging URL then returns 503; that is
+  expected, not an outage (statusbot does not monitor staging). A push
+  to dev redeploys and starts it again, and a scrape runs at startup,
+  so data is fresh right away. To stop it after testing: Coolify UI >
+  vogelradar-staging > Stop. Do NOT set SCRAPE_INTERVAL_MIN=0 to
+  disable scraping: api.py has no "0 = off" handling yet, so 0 means
+  sleep(0), i.e. scraping in a tight loop (fix planned with the
+  cron-scraper roadmap item in TODO.md).
+- DONE, merged to main (b82b28f) and live on vogel-radar.nl:
+  same-species-within-2km clustering (client-side, "N× waargenomen"
+  badge + "x eerdere waarnemingen" in the popup), observation photo in
+  the popup (photo_url column, scraped from the lightbox gallery link,
+  served via ?w=496), daily revalidation sweep in updater.py (deletes
+  404/410 rows, syncs corrections, backfills photos; login-protected
+  observations left untouched; force with `python updater.py
+  --revalidate`; result lands in scrape-stats.json and as an
+  "Opschoonronde" line in the statusbot daily summary).
+- First prod sweep after deploy: 801 checked, 336 updated (mostly
+  photo backfill), 18 deleted.
+- Android app repo (hghluchtenbelt/vogelradar-app) brought up to date
+  and features hand-ported to www/index.html; v48 (1.2.0) AAB built at
+  android/app/release/app-release.aab, awaiting Play Console upload.
+
 ## Migration status (2026-07-22 evening): vogelradar CUTOVER DONE
 
 - DONE: vogel-radar.nl + www LIVE on the new VPS. Sequence: Coolify
