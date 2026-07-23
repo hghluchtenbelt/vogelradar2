@@ -45,6 +45,16 @@ Infra/migration state lives in NEW-VPS-COOLIFY.md; this is the loose-ends list.
   website and app at once; the UI part is a frontend change, so it
   reaches app users only with the next Play Store release. Check
   hotlinking politeness first (or proxy/cache thumbnails ourselves).
+- [ ] **Vogelradar: move the scraper out of the web process**: the
+  hourly scrape (and daily sweep) run in a daemon thread inside the
+  API container, so every deploy resets the one-hour timer, scrape
+  memory peaks linger in the web process (Python keeps the heap), a
+  hung scrape can affect the API, and multiple uvicorn workers would
+  each start their own scraper. Plan: a Coolify Scheduled Task on the
+  same app runs `python updater.py` hourly (same image, no extra
+  infra), and SCRAPE_INTERVAL_MIN=0 disables the in-process thread
+  (small api.py change). Test on staging first; statusbot needs no
+  change (it reads scrape_runs from the DB via the API).
 - [ ] **Vogelradar: highlight sightings new since last visit**:
   remember the newest seen sighting ids in localStorage and mark
   anything newer with a "nieuw" accent on card + marker. Pure
