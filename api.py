@@ -1,6 +1,7 @@
 """FastAPI backend — serves /birds.json for the Vogelradar frontend."""
 from __future__ import annotations
 
+import os
 import re
 import threading
 import time
@@ -30,11 +31,13 @@ from database import (
     get_daily_stats,
     get_gemeente_ranking, get_hotspot_ranking,
     get_gemeente_history, get_hotspots_in_gemeente, get_all_gemeentes,
-    get_scrape_runs_since,
+    get_scrape_runs_since, get_meta,
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
-SCRAPE_INTERVAL = 60 * 60   # 1 hour — change to e.g. 30*60 for 30 min
+# Override with SCRAPE_INTERVAL_MIN (minutes); staging uses a longer
+# interval so the extra instance stays polite towards waarneming.nl.
+SCRAPE_INTERVAL = int(os.environ.get("SCRAPE_INTERVAL_MIN", "60")) * 60
 
 app = FastAPI(title="Vogelradar", docs_url=None, redoc_url=None,
               openapi_url=None)
@@ -86,6 +89,7 @@ def _to_sighting(row: dict) -> dict:
         "date": row.get("date") or "",
         "time": row.get("obs_time") or "",
         "photo": bool(row.get("photo")),
+        "img": row.get("photo_url") or "",
         "url": row["url"],
     }
 
@@ -184,12 +188,16 @@ def gemeente_detail(name: str):
 @app.get("/scrape-stats.json")
 def scrape_stats(hours: int = 12):
     """Aggregate scrape activity for the status bot (no PII)."""
+    import json
     hours = max(1, min(hours, 168))
     runs = get_scrape_runs_since(hours)
+    reval = get_meta("last_revalidation_result")
     return {
         "hours": hours,
         "total_new": sum(r["new_count"] for r in runs),
         "runs": runs,  # [{ts (UTC ISO), new_count, total_scraped}]
+        # last revalidation sweep: {ts, checked, updated, deleted} | null
+        "revalidation": json.loads(reval) if reval else None,
     }
 
 

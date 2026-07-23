@@ -326,7 +326,37 @@ def _scrape_observation(session: cffi_requests.Session, path: str) -> dict | Non
     soup = _get(session, url)
     if not soup:
         return None
+    return _parse_observation(soup, url)
 
+
+def check_observation(
+    session: cffi_requests.Session, url: str
+) -> tuple[str, dict | None]:
+    """
+    Re-fetch a known observation for the revalidation sweep.
+
+    Returns (status, obs):
+      'ok'    → obs is the freshly parsed observation
+      'gone'  → HTTP 404/410, the observation was deleted on the site
+      'error' → transient fetch/parse failure, treat as still present
+    """
+    try:
+        r = session.get(url, impersonate=_IMPERSONATE, timeout=15)
+        if r.status_code in (404, 410):
+            return "gone", None
+        if "anubis_challenge" in r.text:
+            _solve_anubis(session, url)
+            r = session.get(url, impersonate=_IMPERSONATE, timeout=15)
+            if r.status_code in (404, 410):
+                return "gone", None
+        r.raise_for_status()
+        obs = _parse_observation(BeautifulSoup(r.content, "lxml"), url)
+        return ("ok", obs) if obs else ("error", None)
+    except Exception:
+        return "error", None
+
+
+def _parse_observation(soup: BeautifulSoup, url: str) -> dict | None:
     gps_span = soup.find("span", class_="teramap-coordinates-coords")
     if not gps_span:
         return None
@@ -347,8 +377,14 @@ def _scrape_observation(session: cffi_requests.Session, path: str) -> dict | Non
     # Count: try common icon patterns, fall back to looking for "Aantal" label
     count = _extract_count(soup)
 
-    # Photo: check if a photo/media block is present on the page
-    photo = bool(
+    # Photo: first gallery image. The /media/ URL is public (no Anubis)
+    # and supports ?w=&h= resizing, so the frontend can load it directly.
+    photo_url = ""
+    gallery_a = soup.find("a", class_="lightbox-gallery-image", href=True)
+    if gallery_a and "/media/" in gallery_a["href"]:
+        href = gallery_a["href"]
+        photo_url = href if href.startswith("http") else f"{BASE_URL}{href}"
+    photo = bool(photo_url) or bool(
         soup.find("div", class_=re.compile(r"photo|media|gallery", re.I)) or
         soup.find("a", href=re.compile(r"\.(jpg|jpeg|png|webp)", re.I))
     )
@@ -362,6 +398,7 @@ def _scrape_observation(session: cffi_requests.Session, path: str) -> dict | Non
         "obs_time": obs_time,
         "count": count,
         "photo": photo,
+        "photo_url": photo_url,
         "latitude": lat,
         "longitude": lon,
         "url": url,

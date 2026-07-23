@@ -57,6 +57,8 @@
   .pop .pen{color:#64748b;font-size:11.5px;margin:1px 0 4px}
   .pop .pmeta{font-size:12px;color:#0f172a;line-height:1.5}
   .pop a{color:var(--brand-d);font-weight:650;font-size:12px;text-decoration:none}
+  .pop .pothers{margin-top:5px;font-size:11px;color:#64748b}
+  .pop .pimg{display:block;width:248px;max-width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:8px;background:#f1f5f9}
 
   /* Markers */
   .mk{display:block;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 1px 5px rgba(2,6,23,.4)}
@@ -126,6 +128,7 @@
   .cmeta .w{color:var(--ink);font-weight:600}
   .mega{font-size:9.5px;font-weight:800;color:#fff;background:var(--c-very_rare);padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
   .rar{font-size:9.5px;font-weight:800;color:#fff;background:var(--c-rare);padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
+  .xn{font-size:9.5px;font-weight:800;color:#475569;background:#f1f5f9;border:1px solid #cbd5e1;padding:1px 6px;border-radius:999px;letter-spacing:.3px}
   .ph{font-size:11px}
   .cright{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto}
   .cdist{font-size:15.5px;font-weight:780;letter-spacing:-.3px;white-space:nowrap}
@@ -216,7 +219,6 @@
         <button data-s="dist" class="on">Afstand</button>
         <button data-s="time">Nieuwste</button>
       </div>
-
     </div>
   </div>
   <div class="cards" id="cards"></div>
@@ -298,17 +300,34 @@ function obsUrl(s){ return safeUrl(s.url) || ("https://waarneming.nl/observation
 function mapsUrl(s){ return "https://www.google.com/maps?q="+s.lat+","+s.lng; }
 function timePass(s){ const d=daysAgo(s); if(d<=3)return true;
   return state.win===7 && (s.rarity==="rare"||s.rarity==="very_rare") && d<=7; }
+/* Repeat reports of the same species within CLUSTER_KM are almost
+   certainly the same staked-out bird; collapse them into the newest
+   report and keep the older ones behind it (shown in the popup). */
+const CLUSTER_KM = 2;
+function clusterSightings(items){
+  const bySpecies=new Map(), groups=[];
+  const newestFirst=[...items].sort((a,b)=>((b.date||"")+(b.time||"")).localeCompare((a.date||"")+(a.time||"")));
+  for(const s of newestFirst){
+    let list=bySpecies.get(s.nl);
+    if(!list){ list=[]; bySpecies.set(s.nl,list); }
+    const g=list.find(g=>haversine(g.rep,s)<=CLUSTER_KM);
+    if(g) g.others.push(s);
+    else{ const ng={rep:s,others:[]}; list.push(ng); groups.push(ng); }
+  }
+  return groups.map(g=>({...g.rep,_n:1+g.others.length,_others:g.others}));
+}
+function baseVisible(){
+  return state.data.map(s=>({...s,_d:haversine(state.user,s)}))
+    .filter(timePass).filter(s=>state.maxDist===0||s._d<=state.maxDist);
+}
 function visible(){
-  const items = state.data.map(s=>({...s,_d:haversine(state.user,s)}))
-    .filter(timePass).filter(s=>state.maxDist===0||s._d<=state.maxDist)
-    .filter(s=>state.active.has(s.rarity));
+  const items = clusterSightings(baseVisible().filter(s=>state.active.has(s.rarity)));
   return state.sortBy==='time'
     ? items.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time))
     : items.sort((a,b)=>a._d-b._d);
 }
 function counts(){ const c={common:0,uncommon:0,rare:0,very_rare:0};
-  state.data.forEach(s=>{ const d=haversine(state.user,s);
-    if(timePass(s)&&(state.maxDist===0||d<=state.maxDist)) c[s.rarity]++; }); return c; }
+  clusterSightings(baseVisible()).forEach(s=>c[s.rarity]++); return c; }
 
 /* ===== WENSVOGELS ===== */
 const _WK='vr_wens', _NK='vr_notified', _DK='vr_dist';
@@ -451,7 +470,7 @@ function renderChips(){
 /* ===== CARDS ===== */
 function renderCards(){
   const items=visible(), box=$("#cards");
-  $("#sumbig").textContent = items.length+" zeldzame vogel"+(items.length===1?"":"s")+" in de buurt";
+  $("#sumbig").textContent = items.length+" zeldzame vogel"+(items.length===1?"":"s")+" in Nederland";
   
   if(!items.length){
     box.innerHTML=`<div class="empty"><div class="e">🪹</div>
@@ -464,11 +483,12 @@ function renderCards(){
     const tag = s.rarity==="very_rare"?`<span class="mega">Zeer zeldzaam</span>`
              : s.rarity==="rare"?`<span class="rar">Zeldzaam</span>`:"";
     const ph = s.photo?`<span class="ph">📷</span>`:"";
+    const xn = s._n>1?`<span class="xn">${s._n}× waargenomen</span>`:"";
     const cnt = s.count>1?`· ×${s.count}`:"";
     const near = s._d<=10?`<span class="near">dichtbij</span>`:"";
     return `<div class="card${state.selected===s.id?" sel":""}" data-id="${s.id}" style="border-left-color:${r.hex}">
       <div class="cbody">
-        <div class="cname"><b>${esc(s.nl)}</b> ${tag}<span class="en">${esc(s.en||s.sci||"")}</span></div>
+        <div class="cname"><b>${esc(s.nl)}</b> ${tag}${xn}<span class="en">${esc(s.en||s.sci||"")}</span></div>
         <div class="cmeta"><span class="w">📍 ${esc(s.loc)}</span> ${ph} <span>${ago(s)} ${cnt}</span></div>
       </div>
       <div class="cright"><div class="cdist">${fmtDist(s._d)}<small>van hier</small></div>${near}</div>
@@ -518,10 +538,20 @@ function drawMarkers(){
       html:`<span class="mk-cluster">${c.getChildCount()}</span>`})});
   visible().forEach(s=>{
     const m=L.marker([s.lat,s.lng],{icon:makeIcon(s,state.selected===s.id)});
+    const others = (s._others&&s._others.length)
+      ? `<div class="pothers">${s._others.length} eerdere waarneming${s._others.length===1?"":"en"}</div>`
+      : "";
+    // Clusters: fall back to the newest photo among the older reports.
+    const imgUrl = s.img || (s._others||[]).map(o=>o.img).find(Boolean) || "";
+    const pimg = imgUrl
+      ? `<a href="${esc(imgUrl)}" target="_blank" rel="noopener"><img class="pimg" src="${esc(imgUrl)}?w=496" loading="lazy" referrerpolicy="no-referrer" alt="Foto: ${esc(s.nl)}"></a>`
+      : "";
     m.bindPopup(`<div class="pop">
-      <div class="pnl">${esc(s.nl)} ${s.count>1?`<small>×${esc(s.count)}</small>`:""}</div>
+      ${pimg}
+      <div class="pnl">${esc(s.nl)} ${s.count>1?`<small>×${esc(s.count)}</small>`:""} ${s._n>1?`<small>· ${s._n}× waargenomen</small>`:""}</div>
       <div class="pen">${esc(s.en||s.sci||"")}</div>
       <div class="pmeta">📍 ${esc(s.loc)}<br>${ago(s)} · ${fmtDist(haversine(state.user,s))} van hier</div>
+      ${others}
       <div style="margin-top:6px"><a href="${esc(mapsUrl(s))}" target="_blank" rel="noopener">Routebeschrijving</a> &nbsp;·&nbsp;
       <a href="${esc(obsUrl(s))}" target="_blank" rel="noopener">waarneming.nl ↗</a></div></div>`);
     m.on("click",()=>{ state.selected=s.id; updateSel(); });

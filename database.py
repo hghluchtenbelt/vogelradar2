@@ -49,6 +49,7 @@ def init_db() -> None:
                 obs_time   TEXT DEFAULT '',
                 count      INTEGER DEFAULT 1,
                 photo      INTEGER DEFAULT 0,
+                photo_url  TEXT DEFAULT '',
                 latitude   REAL NOT NULL,
                 longitude  REAL NOT NULL,
                 scraped_at TEXT NOT NULL,
@@ -65,6 +66,7 @@ def init_db() -> None:
             ("obs_time", "TEXT DEFAULT ''"),
             ("count", "INTEGER DEFAULT 1"),
             ("photo", "INTEGER DEFAULT 0"),
+            ("photo_url", "TEXT DEFAULT ''"),
         ]:
             if col not in existing:
                 conn.execute(f"ALTER TABLE sightings ADD COLUMN {col} {defn}")
@@ -124,6 +126,14 @@ def init_db() -> None:
         )
         conn.execute(
             """
+            CREATE TABLE IF NOT EXISTS meta (
+                key   TEXT PRIMARY KEY,
+                value TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
             CREATE TABLE IF NOT EXISTS scrape_runs (
                 ts            TEXT PRIMARY KEY,
                 new_count     INTEGER NOT NULL,
@@ -138,16 +148,17 @@ def insert_sightings(sightings: list[dict]) -> int:
     if not sightings:
         return 0
     now = datetime.utcnow().isoformat(timespec="seconds")
-    rows = [{**s, "scraped_at": now} for s in sightings]
+    rows = [{"photo_url": "", **s, "scraped_at": now} for s in sightings]
     with _connect() as conn:
         cur = conn.executemany(
             """
             INSERT OR IGNORE INTO sightings
                 (url, bird_name, location, date, obs_time, count,
-                 photo, latitude, longitude, scraped_at, rarity)
+                 photo, photo_url, latitude, longitude, scraped_at, rarity)
             VALUES
                 (:url, :bird_name, :location, :date, :obs_time, :count,
-                 :photo, :latitude, :longitude, :scraped_at, :rarity)
+                 :photo, :photo_url, :latitude, :longitude, :scraped_at,
+                 :rarity)
             """,
             rows,
         )
@@ -167,7 +178,8 @@ def get_sightings(days_back: int = 7) -> list[dict]:
     cut10 = (now - timedelta(hours=10)).isoformat(timespec="seconds")
     cut6  = (now - timedelta(hours=6)).isoformat(timespec="seconds")
     cols = """url, bird_name, location, date, obs_time,
-                   count, photo, latitude, longitude, scraped_at,
+                   count, photo, COALESCE(photo_url, '') AS photo_url,
+                   latitude, longitude, scraped_at,
                    COALESCE(rarity, 3) AS rarity"""
     with _connect() as conn:
         rows = conn.execute(
@@ -263,6 +275,70 @@ def prune_empty_subscribers() -> None:
     with _connect() as conn:
         conn.execute("DELETE FROM push_subscribers WHERE wishlist = '[]'")
         conn.commit()
+
+
+def get_meta(key: str) -> str | None:
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT value FROM meta WHERE key = ?", (key,)
+        ).fetchone()
+    return row["value"] if row else None
+
+
+def set_meta(key: str, value: str) -> None:
+    with _connect() as conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
+            (key, value),
+        )
+        conn.commit()
+
+
+def get_revalidation_candidates(days: int = 7) -> list[str]:
+    """URLs of the long-lived (rare/very rare) sightings still in the
+    visible window; the commoner tiers expire within hours anyway."""
+    cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT url FROM sightings"
+            " WHERE COALESCE(rarity,3) >= 3 AND date >= ?"
+            " ORDER BY date DESC",
+            (cutoff,),
+        ).fetchall()
+    return [r["url"] for r in rows]
+
+
+def delete_sighting(url: str) -> None:
+    with _connect() as conn:
+        conn.execute("DELETE FROM sightings WHERE url = ?", (url,))
+        conn.commit()
+
+
+_REVAL_FIELDS = ("bird_name", "location", "date", "obs_time", "count",
+                 "photo", "photo_url", "latitude", "longitude", "rarity")
+
+
+def update_sighting(obs: dict) -> bool:
+    """Sync a re-scraped observation into its existing row (corrections,
+    photo backfill). Returns True when something actually changed."""
+    new = {k: obs[k] for k in _REVAL_FIELDS}
+    new["photo"] = int(bool(new["photo"]))
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM sightings WHERE url = ?", (obs["url"],)
+        ).fetchone()
+        if row is None:
+            return False
+        if all(row[k] == new[k] for k in _REVAL_FIELDS):
+            return False
+        conn.execute(
+            "UPDATE sightings SET "
+            + ", ".join(f"{k} = :{k}" for k in _REVAL_FIELDS)
+            + " WHERE url = :url",
+            {**new, "url": obs["url"]},
+        )
+        conn.commit()
+    return True
 
 
 def prune_old_sightings(keep_days: int = 15) -> int:
