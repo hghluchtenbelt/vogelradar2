@@ -1,6 +1,7 @@
 """FastAPI backend — serves /birds.json for the Vogelradar frontend."""
 from __future__ import annotations
 
+import os
 import re
 import threading
 import time
@@ -34,7 +35,9 @@ from database import (
 )
 
 # How often to re-scrape waarneming.nl in the background (seconds).
-SCRAPE_INTERVAL = 60 * 60   # 1 hour — change to e.g. 30*60 for 30 min
+# Override with SCRAPE_INTERVAL_MIN (minutes); staging uses a longer
+# interval so the extra instance stays polite towards waarneming.nl.
+SCRAPE_INTERVAL = int(os.environ.get("SCRAPE_INTERVAL_MIN", "60")) * 60
 
 app = FastAPI(title="Vogelradar", docs_url=None, redoc_url=None,
               openapi_url=None)
