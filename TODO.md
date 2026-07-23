@@ -2,7 +2,8 @@
 
 Infra/migration state lives in NEW-VPS-COOLIFY.md; this is the loose-ends list.
 
-- [ ] **Vogelradar: cluster repeat sightings of the same rarity**: a
+- [x] **Vogelradar: cluster repeat sightings of the same rarity**
+  (website done on dev/staging 2026-07-23; app port pending): a
   staked-out rare bird gets reported by many observers over several
   days, so one individual shows up as a pile of markers and cards.
   Rare/very-rare markers currently bypass the marker-cluster layer on
@@ -15,7 +16,12 @@ Infra/migration state lives in NEW-VPS-COOLIFY.md; this is the loose-ends list.
   makes same-species-within-2km almost certainly the same bird.
   Needs the same change in vogelradar.html and www/index.html
   (remember: the two files differ on purpose, port by hand).
-- [ ] **Vogelradar: drop sightings that were deleted on waarneming.nl**:
+- [x] **Vogelradar: drop sightings that were deleted on waarneming.nl**
+  (done on dev 2026-07-23 as the daily revalidation sweep in
+  updater.py: runs after the first scrape once 24h have passed,
+  deletes 404/410 rows, syncs corrections and backfills photo URLs;
+  force with `python updater.py --revalidate`; login-protected
+  observations are left untouched):
   false reports get removed from the site later, but the scraper only
   ever inserts, so they linger locally for up to 7 visible days.
   Proposed approach: a revalidation sweep in updater.py, one run per
@@ -31,7 +37,8 @@ Infra/migration state lives in NEW-VPS-COOLIFY.md; this is the loose-ends list.
   Also covers the case where the observation was corrected rather
   than deleted (species/coords edited): while re-fetching we can
   re-parse and update the row instead of only checking liveness.
-- [ ] **Vogelradar: show the observation photo on tap**: scrape the
+- [x] **Vogelradar: show the observation photo on tap**
+  (website done on dev/staging 2026-07-23; app port pending): scrape the
   photo/thumbnail URL in _scrape_observation (we already detect
   photo presence) and expose it in birds.json; the frontend shows
   the image when the user taps a sighting. Server side benefits

@@ -326,7 +326,37 @@ def _scrape_observation(session: cffi_requests.Session, path: str) -> dict | Non
     soup = _get(session, url)
     if not soup:
         return None
+    return _parse_observation(soup, url)
 
+
+def check_observation(
+    session: cffi_requests.Session, url: str
+) -> tuple[str, dict | None]:
+    """
+    Re-fetch a known observation for the revalidation sweep.
+
+    Returns (status, obs):
+      'ok'    → obs is the freshly parsed observation
+      'gone'  → HTTP 404/410, the observation was deleted on the site
+      'error' → transient fetch/parse failure, treat as still present
+    """
+    try:
+        r = session.get(url, impersonate=_IMPERSONATE, timeout=15)
+        if r.status_code in (404, 410):
+            return "gone", None
+        if "anubis_challenge" in r.text:
+            _solve_anubis(session, url)
+            r = session.get(url, impersonate=_IMPERSONATE, timeout=15)
+            if r.status_code in (404, 410):
+                return "gone", None
+        r.raise_for_status()
+        obs = _parse_observation(BeautifulSoup(r.content, "lxml"), url)
+        return ("ok", obs) if obs else ("error", None)
+    except Exception:
+        return "error", None
+
+
+def _parse_observation(soup: BeautifulSoup, url: str) -> dict | None:
     gps_span = soup.find("span", class_="teramap-coordinates-coords")
     if not gps_span:
         return None
