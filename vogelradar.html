@@ -57,8 +57,7 @@
   .pop .pen{color:#64748b;font-size:11.5px;margin:1px 0 4px}
   .pop .pmeta{font-size:12px;color:#0f172a;line-height:1.5}
   .pop a{color:var(--brand-d);font-weight:650;font-size:12px;text-decoration:none}
-  .pop .pothers{margin-top:6px;padding-top:6px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.6;color:#334155}
-  .pop .pothers b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;margin-bottom:2px}
+  .pop .pothers{margin-top:5px;font-size:11px;color:#64748b}
   .pop .pimg{display:block;width:248px;max-width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:8px;background:#f1f5f9}
 
   /* Markers */
@@ -108,7 +107,7 @@
   .summary{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
   .summary .big{font-size:15px;font-weight:740;letter-spacing:-.2px}
   .summary .sm{font-size:11px;color:var(--muted)}
-  .filters{display:flex;gap:8px;margin-top:9px;align-items:center;flex-wrap:wrap}
+  .filters{display:flex;gap:8px;margin-top:9px;align-items:center}
   .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
   .seg button{border:0;background:transparent;padding:6px 12px;font-size:12.5px;font-weight:680;color:var(--muted);cursor:pointer}
   .seg button.on{background:var(--brand);color:#fff}
@@ -220,13 +219,6 @@
         <button data-s="dist" class="on">Afstand</button>
         <button data-s="time">Nieuwste</button>
       </div>
-      <select id="dist" title="Afstand tot jou">
-        <option value="10">10 km</option>
-        <option value="25">25 km</option>
-        <option value="50">50 km</option>
-        <option value="100">100 km</option>
-        <option value="0" selected>heel NL</option>
-      </select>
     </div>
   </div>
   <div class="cards" id="cards"></div>
@@ -287,7 +279,7 @@ const RARITY = {
 /* ===== STATE ===== */
 const state = {
   active: new Set(["rare","very_rare"]),
-  win: 3, maxDist: parseInt(localStorage.getItem('vr_maxdist')||'0'), sortBy: 'dist',
+  win: 3, maxDist: 0, sortBy: 'dist',
   user: { ...CONFIG.DEFAULT_LOC, precise:false },
   data: [], lastUpdated: null, selected: null
 };
@@ -478,8 +470,7 @@ function renderChips(){
 /* ===== CARDS ===== */
 function renderCards(){
   const items=visible(), box=$("#cards");
-  const scope = state.maxDist ? `binnen ${state.maxDist} km` : "in Nederland";
-  $("#sumbig").textContent = `${items.length} zeldzame vogel${items.length===1?"":"s"} ${scope}`;
+  $("#sumbig").textContent = items.length+" zeldzame vogel"+(items.length===1?"":"s")+" in Nederland";
   
   if(!items.length){
     box.innerHTML=`<div class="empty"><div class="e">🪹</div>
@@ -548,12 +539,12 @@ function drawMarkers(){
   visible().forEach(s=>{
     const m=L.marker([s.lat,s.lng],{icon:makeIcon(s,state.selected===s.id)});
     const others = (s._others&&s._others.length)
-      ? `<div class="pothers"><b>Eerdere waarnemingen hier</b>${
-          s._others.slice(0,3).map(o=>`<a href="${esc(obsUrl(o))}" target="_blank" rel="noopener">${ago(o)}</a> · ${esc(o.loc)}`).join("<br>")}${
-          s._others.length>3?`<br>+ ${s._others.length-3} eerdere`:""}</div>`
+      ? `<div class="pothers">${s._others.length} eerdere waarneming${s._others.length===1?"":"en"}</div>`
       : "";
-    const pimg = s.img
-      ? `<a href="${esc(s.img)}" target="_blank" rel="noopener"><img class="pimg" src="${esc(s.img)}?w=496" loading="lazy" referrerpolicy="no-referrer" alt="Foto: ${esc(s.nl)}"></a>`
+    // Clusters: fall back to the newest photo among the older reports.
+    const imgUrl = s.img || (s._others||[]).map(o=>o.img).find(Boolean) || "";
+    const pimg = imgUrl
+      ? `<a href="${esc(imgUrl)}" target="_blank" rel="noopener"><img class="pimg" src="${esc(imgUrl)}?w=496" loading="lazy" referrerpolicy="no-referrer" alt="Foto: ${esc(s.nl)}"></a>`
       : "";
     m.bindPopup(`<div class="pop">
       ${pimg}
@@ -641,9 +632,6 @@ $("#win").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
   state.win=+b.dataset.w; $("#win").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); render(); }));
 $("#sort-seg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
   state.sortBy=b.dataset.s; $("#sort-seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); render(); }));
-$("#dist").value=String(state.maxDist);
-$("#dist").addEventListener("change",e=>{
-  state.maxDist=parseInt(e.target.value)||0; localStorage.setItem('vr_maxdist',e.target.value); render(); });
 $("#refresh").addEventListener("click",loadData);
 $("#loc").addEventListener("click",locate);
 $("#cards").addEventListener("click",e=>{ const c=e.target.closest(".card"); if(c) selectFromCard(c.dataset.id); });
