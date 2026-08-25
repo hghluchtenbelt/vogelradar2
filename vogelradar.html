@@ -65,7 +65,10 @@
   .mk-pulse{animation:pulse 1.9s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
   .mk-sel{box-shadow:0 0 0 4px rgba(13,148,136,.9),0 2px 8px rgba(2,6,23,.45);border-width:3px}
-  .me{display:block;width:14px;height:14px;border-radius:50%;background:#7c3aed;border:3px solid #fff;box-shadow:0 0 0 6px rgba(124,58,237,.22)}
+  /* User location: emerald teardrop pin, tip on the exact spot */
+  .me{display:block;width:30px;height:38px;position:relative;filter:drop-shadow(0 2px 3px rgba(2,6,23,.4))}
+  .me::before{content:"";position:absolute;left:2px;top:4.5px;width:26px;height:26px;background:#059669;border:2.5px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
+  .me::after{content:"";position:absolute;left:12px;top:14.5px;width:6px;height:6px;border-radius:50%;background:#fff}
   .mk-cluster{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#64748b;color:#fff;font-size:11px;font-weight:700;border:2px solid #fff;box-shadow:0 1px 5px rgba(2,6,23,.4)}
 
   /* Floating top bar */
@@ -531,7 +534,7 @@ function drawMarkers(){
   if(_clusterLayer){ map.removeLayer(_clusterLayer); _clusterLayer=null; }
   markers={};
   markers["__user"]=L.marker([state.user.lat,state.user.lng],{
-    icon:L.divIcon({className:"",iconSize:[20,20],iconAnchor:[10,10],html:'<span class="me"></span>'}),
+    icon:L.divIcon({className:"",iconSize:[30,38],iconAnchor:[15,36],html:'<span class="me"></span>'}),
     zIndexOffset:1000}).addTo(map);
   _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,disableClusteringAtZoom:13,showCoverageOnHover:false,spiderfyOnMaxZoom:false,
     iconCreateFunction:c=>L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
