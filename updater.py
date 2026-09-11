@@ -14,6 +14,10 @@ rare/very-rare sighting in the visible window: rows deleted on
 waarneming.nl are removed, corrections (species, rarity, coords) are
 synced, and photo URLs are backfilled for rows scraped before the
 photo_url column existed.
+
+On the runs in between, a quick check re-fetches only the very-rare
+rows (a few dozen), so a misidentified top-rarity entry disappears
+within the hour instead of after a day.
 """
 from __future__ import annotations
 
@@ -51,11 +55,14 @@ def _revalidation_due() -> bool:
 
 def run_revalidation(
     progress_callback: Callable[[float, str], None] | None = None,
+    min_rarity: int = 3,
 ) -> tuple[int, int, int]:
-    """Re-check every candidate sighting against waarneming.nl.
+    """Re-check candidate sightings against waarneming.nl.
+    min_rarity=3 is the daily full sweep (rare + very rare);
+    min_rarity=4 is the hourly quick check (very rare only).
     Returns (checked, updated, deleted)."""
     init_db()
-    urls = get_revalidation_candidates()
+    urls = get_revalidation_candidates(min_rarity=min_rarity)
     deleted = updated = 0
     if urls:
         session = _make_authenticated_session()
@@ -73,12 +80,18 @@ def run_revalidation(
                 )
             time.sleep(0.35)
     now = datetime.utcnow().isoformat(timespec="seconds")
-    set_meta("last_revalidation", now)
-    set_meta("last_revalidation_result", json.dumps({
+    result = json.dumps({
         "ts": now + "Z", "checked": len(urls),
         "updated": updated, "deleted": deleted,
-    }))
-    print(f"[reval] checked={len(urls)} updated={updated} "
+    })
+    if min_rarity <= 3:
+        tag = "reval"
+        set_meta("last_revalidation", now)
+        set_meta("last_revalidation_result", result)
+    else:
+        tag = "reval-mini"
+        set_meta("last_mini_revalidation_result", result)
+    print(f"[{tag}] checked={len(urls)} updated={updated} "
           f"deleted={deleted}", flush=True)
     return len(urls), updated, deleted
 
@@ -132,6 +145,11 @@ def run_update(
             run_revalidation(progress_callback)
         except Exception as exc:
             print(f"[reval] error: {exc}", flush=True)
+    else:
+        try:
+            run_revalidation(progress_callback, min_rarity=4)
+        except Exception as exc:
+            print(f"[reval-mini] error: {exc}", flush=True)
 
     return total_new, total_scraped
 

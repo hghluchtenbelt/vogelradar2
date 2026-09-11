@@ -192,12 +192,15 @@ def scrape_stats(hours: int = 12):
     hours = max(1, min(hours, 168))
     runs = get_scrape_runs_since(hours)
     reval = get_meta("last_revalidation_result")
+    mini = get_meta("last_mini_revalidation_result")
     return {
         "hours": hours,
         "total_new": sum(r["new_count"] for r in runs),
         "runs": runs,  # [{ts (UTC ISO), new_count, total_scraped}]
         # last revalidation sweep: {ts, checked, updated, deleted} | null
         "revalidation": json.loads(reval) if reval else None,
+        # last hourly very-rare quick check, same shape | null
+        "mini_revalidation": json.loads(mini) if mini else None,
     }
 
 

@@ -294,16 +294,20 @@ def set_meta(key: str, value: str) -> None:
         conn.commit()
 
 
-def get_revalidation_candidates(days: int = 7) -> list[str]:
-    """URLs of the long-lived (rare/very rare) sightings still in the
-    visible window; the commoner tiers expire within hours anyway."""
+def get_revalidation_candidates(
+    days: int = 7, min_rarity: int = 3
+) -> list[str]:
+    """URLs of the long-lived sightings still in the visible window;
+    the commoner tiers expire within hours anyway. min_rarity=3 selects
+    rare + very rare (daily full sweep), 4 only very rare (hourly
+    quick check)."""
     cutoff = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
     with _connect() as conn:
         rows = conn.execute(
             "SELECT url FROM sightings"
-            " WHERE COALESCE(rarity,3) >= 3 AND date >= ?"
+            " WHERE COALESCE(rarity,3) >= ? AND date >= ?"
             " ORDER BY date DESC",
-            (cutoff,),
+            (min_rarity, cutoff),
         ).fetchall()
     return [r["url"] for r in rows]
 
