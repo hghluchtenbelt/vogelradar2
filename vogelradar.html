@@ -515,7 +515,7 @@ function initMap(){
     maxBounds:[[49.5,1.5],[55.0,9.5]],maxBoundsViscosity:0.7}).setView([52.1,5.3],7);
   NL_BOUNDS=L.latLngBounds([[50.72,3.35],[53.55,7.24]]);
   map.fitBounds(NL_BOUNDS,{padding:[16,16]});
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",{
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2ku2_1_1aee07ab82ba19b6feb23fd9",{
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains:"abcd", maxZoom:19
   }).addTo(map);
