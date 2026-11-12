@@ -1,0 +1,35 @@
+# Stops staging so it uses no memory on the VPS while nobody is testing.
+# Runs every night, and on demand from the Actions tab. Settings, domain
+# and data stay in Coolify; "Deploy staging" brings it back.
+name: Park staging
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 2 * * *" # 03:00 Amsterdam in winter, 04:00 in summer
+
+permissions: {}
+
+jobs:
+  stop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      COOLIFY_URL: https://deploy.hermen.dev
+      COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      UUID: ${{ vars.COOLIFY_UUID_STAGING }}
+    steps:
+      - name: Stop staging in Coolify
+        run: |
+          set -euo pipefail
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$UUID" ]; then
+            echo "::notice::Deploy secrets or COOLIFY_UUID_STAGING not set yet; nothing to stop."
+            exit 0
+          fi
+          curl -fsS --retry 3 -X POST "$COOLIFY_URL/api/v1/applications/$UUID/stop" \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+            -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET"
+          echo

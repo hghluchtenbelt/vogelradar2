@@ -1,0 +1,145 @@
+# Builds the Docker image on GitHub instead of on the 3.8 GB VPS and deploys
+# it with Coolify. In Coolify this app has ghcr.io/hghluchtenbelt/vogelradar2 set as its
+# "Docker Registry" image: when Coolify deploys a commit it finds
+# ghcr.io/hghluchtenbelt/vogelradar2:<commit sha> there, pulls it and skips its own build.
+#
+#   push to main -> build, push, deploy production
+#   pull request       -> build only (proves the image still builds)
+#   Run workflow       -> rebuild and redeploy the selected branch
+#   Deploy staging     -> staging.yml calls this workflow for dev
+#
+# Deploying needs the secret COOLIFY_TOKEN (permissions deploy + read) and
+# the variable COOLIFY_UUID_PRODUCTION (and COOLIFY_UUID_STAGING for dev). Until those exist the image is built
+# and pushed and the deploy step is skipped.
+# Avoid "Force deploy (without cache)" in Coolify: that builds on the VPS.
+# The Coolify API is not behind Cloudflare Access (only the dashboard is);
+# the CF_ACCESS_CLIENT_ID/SECRET secrets are optional.
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**/*.md", "docs/**"]
+  pull_request:
+    paths-ignore: ["**/*.md", "docs/**"]
+  workflow_dispatch: {}
+  workflow_call:
+    inputs:
+      ref:
+        description: Branch to build and deploy
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: build-deploy-${{ inputs.ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Coolify needs a separate image name per app: production pulls
+  # vogelradar2, staging (dev) pulls vogelradar2-staging.
+  IMAGE: ghcr.io/hghluchtenbelt/vogelradar2${{ (inputs.ref || github.ref_name) != 'main' && '-staging' || '' }}
+  COOLIFY_URL: https://deploy.hermen.dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      sha: ${{ steps.meta.outputs.sha }}
+      ref: ${{ steps.meta.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || '' }}
+      - id: meta
+        env:
+          REF: ${{ inputs.ref || github.ref_name }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          sha=$(git rev-parse HEAD)
+          tags="$IMAGE:$sha"
+          if [ "$EVENT" != pull_request ]; then tags="$tags,$IMAGE:${REF//\//-}"; fi
+          { echo "sha=$sha"; echo "ref=$REF"; echo "tags=$tags"; } >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          # One plain manifest per tag, so pruning cannot break an image.
+          provenance: false
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha,scope=vogelradar2
+          cache-to: type=gha,mode=max,scope=vogelradar2
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GH_TOKEN: ${{ github.token }}
+      COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      REF: ${{ needs.build.outputs.ref }}
+      SHA: ${{ needs.build.outputs.sha }}
+      UUID: ${{ needs.build.outputs.ref == 'main' && vars.COOLIFY_UUID_PRODUCTION || vars.COOLIFY_UUID_STAGING }}
+    steps:
+      - name: Deploy in Coolify and wait for the result
+        run: |
+          set -euo pipefail
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$UUID" ]; then
+            echo "::notice::Deploy secrets or Coolify UUID not set yet; image pushed, deploy skipped."
+            exit 0
+          fi
+          # Coolify deploys the branch head. If a newer commit landed meanwhile,
+          # its own run deploys it; deploying now would make Coolify build
+          # that newer commit on the VPS because its image does not exist yet.
+          head=$(gh api "repos/$GITHUB_REPOSITORY/commits/$REF" -q .sha)
+          if [ "$head" != "$SHA" ]; then
+            echo "::notice::$REF moved on to $head; the run for that commit deploys."
+            exit 0
+          fi
+          api() {
+            curl -fsS --retry 3 -X "$1" "$COOLIFY_URL/api/v1$2" \
+              -H "Authorization: Bearer $COOLIFY_TOKEN" \
+              -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+              -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET"
+          }
+          d=$(api POST "/deploy?uuid=$UUID&force=false" | jq -r '.deployments[0].deployment_uuid')
+          for _ in $(seq 1 120); do
+            status=$(api GET "/deployments/$d" | jq -r '.status')
+            case "$status" in
+              finished) echo "deployed $SHA"; exit 0 ;;
+              failed|cancelled*) echo "::error::deployment $d $status"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::deployment $d still $status after 20 min"; exit 1
+
+  prune:
+    needs: [build, deploy]
+    if: always() && needs.build.result == 'success' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [vogelradar2, vogelradar2-staging]
+    steps:
+      - name: Keep only the 15 newest image versions
+        uses: actions/delete-package-versions@v5
+        continue-on-error: true
+        with:
+          package-name: ${{ matrix.package }}
+          package-type: container
+          min-versions-to-keep: 15

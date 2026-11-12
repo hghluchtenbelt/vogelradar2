@@ -1,0 +1,19 @@
+# "Deploy staging" button in the Actions tab: builds the dev branch on
+# GitHub and deploys it to staging (vogelradar-staging.hermen.dev). Staging
+# is parked (stopped) by default to save memory on the VPS; "Park staging"
+# stops it again, and does so automatically every night.
+name: Deploy staging
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  staging:
+    uses: ./.github/workflows/build-deploy.yml
+    with:
+      ref: dev
+    secrets: inherit
