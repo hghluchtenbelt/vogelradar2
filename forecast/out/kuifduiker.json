@@ -1,0 +1,722 @@
+{
+ "species": "kuifduiker",
+ "label": "Kuifduiker",
+ "names": [
+  "Kuifduiker"
+ ],
+ "sci": "",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeldzaam volgens de meldingen",
+ "source": "feed",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:53+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 29,
+ "n_sites": 10,
+ "n_sites_recent": 4,
+ "profile": "Wintergast op open water: IJsselmeer, Grevelingen, plassen en de kust; honkvast zolang het water open blijft.",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.8,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.4,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "tree": 0.005,
+  "grass": 0.025,
+  "built": 0.011,
+  "bare": 0.0,
+  "moss": 0.0,
+  "wetland": 0.248,
+  "water": 1.0,
+  "snow": 0.0,
+  "crop": 0.005,
+  "shrub": 0.0,
+  "mangrove": 0.0
+ },
+ "learned_weights": {
+  "tree": 0.01,
+  "shrub": 0.0,
+  "grass": 0.05,
+  "crop": 0.01,
+  "built": 0.02,
+  "bare": 0.0,
+  "snow": 0.0,
+  "water": 1.0,
+  "wetland": 0.2,
+  "mangrove": 0.0,
+  "moss": 0.0
+ },
+ "classes": {
+  "p30": 0,
+  "p10": 4,
+  "p3": 5,
+  "p1": 18,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Almere": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Zeewolde": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Leeuwarden": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Opsterland": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Terschelling": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Vlieland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Weststellingwerf": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Emmen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Hardenberg": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Noordoostpolder": {
+   "p": 0.016,
+   "expected": 0.016
+  },
+  "Apeldoorn": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Barneveld": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Ede": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Dronten": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Eemnes": {
+   "p": 0.028,
+   "expected": 0.029
+  },
+  "Alkmaar": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Amsterdam": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Bergen (NH.)": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Blaricum": {
+   "p": 0.074,
+   "expected": 0.077
+  },
+  "Castricum": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Haarlemmermeer": {
+   "p": 0.328,
+   "expected": 0.397
+  },
+  "Den Helder": {
+   "p": 0.161,
+   "expected": 0.176
+  },
+  "Medemblik": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Schagen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Texel": {
+   "p": 0.29,
+   "expected": 0.342
+  },
+  "Uitgeest": {
+   "p": 0.068,
+   "expected": 0.07
+  },
+  "Zaanstad": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Alphen aan den Rijn": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Rotterdam": {
+   "p": 0.022,
+   "expected": 0.022
+  },
+  "Borsele": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hulst": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Reimerswaal": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Terneuzen": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Tholen": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Veere": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Ronde Venen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Tytsjerksteradiel": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Bergen op Zoom": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Oss": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Steenbergen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Waterland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Lelystad": {
+   "p": 0.02,
+   "expected": 0.02
+  },
+  "Utrechtse Heuvelrug": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.275,
+   "expected": 0.321
+  },
+  "Noord-Beveland": {
+   "p": 0.007,
+   "expected": 0.008
+  },
+  "Wijdemeren": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerveld": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Steenwijkerland": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Moerdijk": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Sluis": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Drimmelen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Midden-Drenthe": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Bronckhorst": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Kaag en Braassem": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.028,
+   "expected": 0.028
+  },
+  "Bodegraven-Reeuwijk": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Stichtse Vecht": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Hollands Kroon": {
+   "p": 0.021,
+   "expected": 0.022
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.311,
+   "expected": 0.372
+  },
+  "Krimpenerwaard": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Fryske Marren": {
+   "p": 0.022,
+   "expected": 0.022
+  },
+  "Waadhoeke": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Midden-Groningen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Altena": {
+   "p": 0.012,
+   "expected": 0.013
+  },
+  "West Betuwe": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Vijfheerenlanden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hoeksche Waard": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "Het Hogeland": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Westerkwartier": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Molenlanden": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Land van Cuijk": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Voorne aan Zee": {
+   "p": 0.01,
+   "expected": 0.01
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   59,
+   113,
+   0.031
+  ],
+  [
+   60,
+   113,
+   0.011
+  ],
+  [
+   61,
+   112,
+   0.013
+  ],
+  [
+   61,
+   113,
+   0.012
+  ],
+  [
+   62,
+   111,
+   0.012
+  ],
+  [
+   62,
+   112,
+   0.167
+  ],
+  [
+   62,
+   113,
+   0.018
+  ],
+  [
+   73,
+   104,
+   0.106
+  ],
+  [
+   74,
+   104,
+   0.011
+  ],
+  [
+   74,
+   105,
+   0.017
+  ],
+  [
+   116,
+   103,
+   0.05
+  ],
+  [
+   139,
+   96,
+   0.021
+  ],
+  [
+   139,
+   97,
+   0.017
+  ],
+  [
+   140,
+   96,
+   0.159
+  ],
+  [
+   140,
+   97,
+   0.081
+  ],
+  [
+   142,
+   140,
+   0.07
+  ],
+  [
+   193,
+   43,
+   0.017
+  ],
+  [
+   194,
+   42,
+   0.263
+  ],
+  [
+   194,
+   43,
+   0.023
+  ],
+  [
+   195,
+   40,
+   0.015
+  ],
+  [
+   195,
+   41,
+   0.029
+  ],
+  [
+   200,
+   40,
+   0.059
+  ],
+  [
+   200,
+   41,
+   0.028
+  ],
+  [
+   201,
+   42,
+   0.021
+  ],
+  [
+   201,
+   43,
+   0.011
+  ],
+  [
+   202,
+   43,
+   0.012
+  ],
+  [
+   206,
+   46,
+   0.027
+  ]
+ ],
+ "max_p": 0.263,
+ "expected_reports": 2.9,
+ "expected_new_sites": 1.17,
+ "sites": [
+  {
+   "lat": 51.7567,
+   "lon": 3.82934,
+   "n": 5,
+   "days": 4,
+   "first": "2026-10-18",
+   "last": "2026-10-24",
+   "max_count": 4,
+   "photos": 0,
+   "weight": 2.95,
+   "p_stay": 0.425,
+   "loc": "Brouwersdam - Noordzeezijde - Spuisluis e.o. (ZL)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 52.96331,
+   "lon": 4.77838,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.96,
+   "p_stay": 0.172,
+   "loc": "Den Helder - TESO-Haven / Fort Harssens (NH)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 52.27616,
+   "lon": 5.30851,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 1.08,
+   "p_stay": 0.108,
+   "loc": "Eemmeer - Vogelkijkhut Gooyersgracht",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 52.53421,
+   "lon": 4.75026,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.94,
+   "p_stay": 0.079,
+   "loc": "Alkmaar - Alkmaardermeer (NH)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 52.29839,
+   "lon": 4.65425,
+   "n": 9,
+   "days": 2,
+   "first": "2026-10-20",
+   "last": "2026-10-21",
+   "max_count": 2,
+   "photos": 6,
+   "weight": 2.38,
+   "p_stay": 0.388,
+   "loc": "Hoofddorp - Toolenburgerplas (NH)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 51.6391,
+   "lon": 3.90298,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.52,
+   "p_stay": 0.053,
+   "loc": "Zierikzee - Levensstrijd (ZL)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 53.07441,
+   "lon": 4.89075,
+   "n": 5,
+   "days": 2,
+   "first": "2026-10-18",
+   "last": "2026-10-19",
+   "max_count": 2,
+   "photos": 1,
+   "weight": 1.5,
+   "p_stay": 0.274,
+   "loc": "Texel - IJzeren Kaap e.o. (NH)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 53.10085,
+   "lon": 4.90545,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.053,
+   "loc": "Texel - Waddenzee - De Bol (NH)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 51.69472,
+   "lon": 3.81419,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 2,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.123,
+   "loc": "Serooskerke (SD) - Schelphoek Buitendijks Oost (ZL)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  },
+  {
+   "lat": 51.67989,
+   "lon": 3.8443,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.053,
+   "loc": "Kerkwerve - Flaauwers Inlaag (ZL)",
+   "sub": [
+    "Kuifduiker"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 6,
+  "first": "2026-10-18",
+  "last": "2026-10-23",
+  "n_all_total": 22,
+  "n_new_total": 8,
+  "persist_share": 0.003,
+  "model_all": 0.667,
+  "model_new": 0.25,
+  "new_rank_all": 0.714,
+  "new_rank_new": 0.75,
+  "nowind_all": 0.667,
+  "nowind_new": 0.25,
+  "persist_all": 0.571,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.19,
+  "habitat_only_new": 0.25,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/kuifduiker.png",
+  "image_new": "/forecast/kuifduiker-nieuw.png"
+ }
+}

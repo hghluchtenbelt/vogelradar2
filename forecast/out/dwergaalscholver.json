@@ -1,0 +1,247 @@
+{
+ "species": "dwergaalscholver",
+ "label": "Dwergaalscholver",
+ "names": [
+  "Dwergaalscholver"
+ ],
+ "sci": "Microcarbo pygmaeus",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeer zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 27,
+ "n_sites": 3,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.8,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.3,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "water": 1.0,
+  "wetland": 0.7,
+  "grass": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 1,
+  "p10": 1,
+  "p3": 2,
+  "p1": 8,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Almelo": {
+   "p": 0.161,
+   "expected": 0.175
+  },
+  "Wierden": {
+   "p": 0.009,
+   "expected": 0.01
+  },
+  "Lopik": {
+   "p": 0.409,
+   "expected": 0.526
+  },
+  "Montfoort": {
+   "p": 0.027,
+   "expected": 0.028
+  },
+  "Oudewater": {
+   "p": 0.157,
+   "expected": 0.171
+  },
+  "Olst-Wijhe": {
+   "p": 0.051,
+   "expected": 0.052
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   127,
+   195,
+   0.034
+  ],
+  [
+   138,
+   229,
+   0.113
+  ],
+  [
+   167,
+   113,
+   0.012
+  ],
+  [
+   168,
+   112,
+   0.023
+  ],
+  [
+   168,
+   113,
+   0.064
+  ],
+  [
+   168,
+   114,
+   0.019
+  ],
+  [
+   169,
+   112,
+   0.026
+  ],
+  [
+   169,
+   113,
+   0.352
+  ],
+  [
+   169,
+   114,
+   0.022
+  ],
+  [
+   170,
+   112,
+   0.012
+  ],
+  [
+   170,
+   113,
+   0.016
+  ],
+  [
+   170,
+   114,
+   0.01
+  ]
+ ],
+ "max_p": 0.352,
+ "expected_reports": 1.13,
+ "expected_new_sites": 0.17,
+ "sites": [
+  {
+   "lat": 52.00877,
+   "lon": 4.90074,
+   "n": 23,
+   "days": 7,
+   "first": "2026-10-18",
+   "last": "2026-10-24",
+   "max_count": 1,
+   "photos": 14,
+   "weight": 8.47,
+   "p_stay": 0.725,
+   "loc": "Polsbroekerdam - Natuurontwikkelingsgebied Willeskop (UT)",
+   "sub": [
+    "Dwergaalscholver"
+   ]
+  },
+  {
+   "lat": 52.4241,
+   "lon": 6.13356,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.52,
+   "p_stay": 0.053,
+   "loc": "Herxen - Herxerwaard (OV)",
+   "sub": [
+    "Dwergaalscholver"
+   ]
+  },
+  {
+   "lat": 52.31647,
+   "lon": 6.64246,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 3,
+   "weight": 0.74,
+   "p_stay": 0.186,
+   "loc": "Bornerbroek - Wolbeslanden (OV)",
+   "sub": [
+    "Dwergaalscholver"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 6,
+  "first": "2026-10-18",
+  "last": "2026-10-23",
+  "n_all_total": 20,
+  "n_new_total": 1,
+  "persist_share": 0.002,
+  "model_all": 0.95,
+  "model_new": 0.0,
+  "new_rank_all": 0.95,
+  "new_rank_new": 0.0,
+  "nowind_all": 0.95,
+  "nowind_new": 0.0,
+  "persist_all": 0.95,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.0,
+  "habitat_only_new": 0.0,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/dwergaalscholver.png",
+  "image_new": "/forecast/dwergaalscholver-nieuw.png"
+ }
+}

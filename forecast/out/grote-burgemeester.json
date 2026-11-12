@@ -1,0 +1,159 @@
+{
+ "species": "grote-burgemeester",
+ "label": "Grote Burgemeester",
+ "names": [
+  "Grote Burgemeester",
+  "Grote Burgemeester ssp hyperboreus"
+ ],
+ "sci": "Larus hyperboreus",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:52+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 11,
+ "n_sites": 1,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.8,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.3,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "water": 1.0,
+  "wetland": 0.7,
+  "grass": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 1,
+  "p3": 0,
+  "p1": 2,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Beverwijk": {
+   "p": 0.232,
+   "expected": 0.264
+  },
+  "Velsen": {
+   "p": 0.043,
+   "expected": 0.044
+  },
+  "Zaanstad": {
+   "p": 0.015,
+   "expected": 0.016
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   122,
+   97,
+   0.189
+  ],
+  [
+   122,
+   98,
+   0.013
+  ],
+  [
+   123,
+   97,
+   0.012
+  ]
+ ],
+ "max_p": 0.189,
+ "expected_reports": 0.38,
+ "expected_new_sites": 0.06,
+ "sites": [
+  {
+   "lat": 52.47332,
+   "lon": 4.66503,
+   "n": 11,
+   "days": 3,
+   "first": "2026-10-18",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 7,
+   "weight": 2.51,
+   "p_stay": 0.324,
+   "loc": "Velsen-Noord/Beverwijk - Industrieterrein (NH)",
+   "sub": [
+    "Grote Burgemeester"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 2,
+  "first": "2026-10-18",
+  "last": "2026-10-19",
+  "n_all_total": 5,
+  "n_new_total": 0,
+  "persist_share": 0.001,
+  "model_all": 1.0,
+  "model_new": null,
+  "new_rank_all": 0.0,
+  "new_rank_new": null,
+  "nowind_all": 1.0,
+  "nowind_new": null,
+  "persist_all": 1.0,
+  "persist_new": null,
+  "habitat_only_all": 0.0,
+  "habitat_only_new": null,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/grote-burgemeester.png",
+  "image_new": "/forecast/grote-burgemeester-nieuw.png"
+ }
+}

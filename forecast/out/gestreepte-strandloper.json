@@ -1,0 +1,123 @@
+{
+ "species": "gestreepte-strandloper",
+ "label": "Gestreepte Strandloper",
+ "names": [
+  "Gestreepte Strandloper"
+ ],
+ "sci": "Calidris melanotos",
+ "guild": "steltloper",
+ "guild_label": "Steltlopers",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 1,
+ "n_sites": 1,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 4.0,
+  "p_stay": 0.7,
+  "sigma_stay_km": 4.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.7,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "wetland": 1.0,
+  "bare": 0.8,
+  "grass": 0.6,
+  "water": 0.5,
+  "crop": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 0,
+  "p1": 1,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Amsterdam": {
+   "p": 0.033,
+   "expected": 0.033
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   131,
+   120,
+   0.023
+  ]
+ ],
+ "max_p": 0.023,
+ "expected_reports": 0.09,
+ "expected_new_sites": 0.06,
+ "sites": [
+  {
+   "lat": 52.37953,
+   "lon": 5.00862,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.28,
+   "p_stay": 0.033,
+   "loc": "Waterland - Polder IJdoorn - Plasdras (NH)",
+   "sub": [
+    "Gestreepte Strandloper"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/gestreepte-strandloper.png",
+  "image_new": "/forecast/gestreepte-strandloper-nieuw.png"
+ }
+}

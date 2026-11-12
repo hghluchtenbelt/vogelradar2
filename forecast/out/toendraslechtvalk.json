@@ -1,0 +1,240 @@
+{
+ "species": "toendraslechtvalk",
+ "label": "Toendraslechtvalk",
+ "names": [
+  "Toendraslechtvalk"
+ ],
+ "sci": "Falco peregrinus calidus",
+ "guild": "roofvogel",
+ "guild_label": "Roofvogels en uilen",
+ "rarity_class": "zeer zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:56+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 14,
+ "n_sites": 3,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 2.0,
+  "p_stay": 0.4,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 80.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.0,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 0.7,
+  "onshore": 0.0,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "crop": 1.0,
+  "grass": 0.8,
+  "wetland": 0.5,
+  "shrub": 0.3,
+  "bare": 0.3,
+  "tree": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 1,
+  "p3": 1,
+  "p1": 3,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Schiermonnikoog": {
+   "p": 0.232,
+   "expected": 0.264
+  },
+  "Emmen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Noordoostpolder": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.025,
+   "expected": 0.025
+  },
+  "Midden-Drenthe": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hollands Kroon": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "De Fryske Marren": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Waadhoeke": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Westerwolde": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Midden-Groningen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Het Hogeland": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Westerkwartier": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Eemsdelta": {
+   "p": 0.006,
+   "expected": 0.006
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   20,
+   202,
+   0.031
+  ],
+  [
+   20,
+   203,
+   0.015
+  ],
+  [
+   21,
+   200,
+   0.114
+  ],
+  [
+   22,
+   200,
+   0.011
+  ],
+  [
+   200,
+   42,
+   0.015
+  ]
+ ],
+ "max_p": 0.114,
+ "expected_reports": 0.66,
+ "expected_new_sites": 0.37,
+ "sites": [
+  {
+   "lat": 53.48193,
+   "lon": 6.20608,
+   "n": 9,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 1.47,
+   "p_stay": 0.189,
+   "loc": "Schiermonnikoog - Waddenzeedijk (FR)",
+   "sub": [
+    "Toendraslechtvalk"
+   ]
+  },
+  {
+   "lat": 53.49921,
+   "lon": 6.24417,
+   "n": 4,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.42,
+   "p_stay": 0.075,
+   "loc": "Schiermonnikoog - Telpost Paal 10 (FR)",
+   "sub": [
+    "Toendraslechtvalk"
+   ]
+  },
+  {
+   "lat": 51.69815,
+   "lon": 3.83845,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.06,
+   "p_stay": 0.023,
+   "loc": "Kerkwerve - Prunje Noord (ZL)",
+   "sub": [
+    "Toendraslechtvalk"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/toendraslechtvalk.png",
+  "image_new": "/forecast/toendraslechtvalk-nieuw.png"
+ }
+}

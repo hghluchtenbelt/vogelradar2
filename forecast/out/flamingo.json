@@ -1,0 +1,159 @@
+{
+ "species": "flamingo",
+ "label": "Flamingo",
+ "names": [
+  "Flamingo"
+ ],
+ "sci": "Phoenicopterus roseus",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 7,
+ "n_sites": 1,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.8,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.3,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "water": 1.0,
+  "wetland": 0.7,
+  "grass": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 1,
+  "p3": 1,
+  "p1": 2,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Schouwen-Duiveland": {
+   "p": 0.021,
+   "expected": 0.021
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.274,
+   "expected": 0.32
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   200,
+   63,
+   0.017
+  ],
+  [
+   200,
+   64,
+   0.019
+  ],
+  [
+   201,
+   63,
+   0.072
+  ],
+  [
+   201,
+   64,
+   0.151
+  ]
+ ],
+ "max_p": 0.151,
+ "expected_reports": 0.4,
+ "expected_new_sites": 0.06,
+ "sites": [
+  {
+   "lat": 51.68792,
+   "lon": 4.16084,
+   "n": 7,
+   "days": 5,
+   "first": "2026-10-18",
+   "last": "2026-10-23",
+   "max_count": 40,
+   "photos": 5,
+   "weight": 5.95,
+   "p_stay": 0.338,
+   "loc": "Grevelingen - Battenoord tot Grevelingendam (buitendijks) (ZH)",
+   "sub": [
+    "Flamingo"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 3,
+  "first": "2026-10-18",
+  "last": "2026-10-20",
+  "n_all_total": 4,
+  "n_new_total": 0,
+  "persist_share": 0.001,
+  "model_all": 1.0,
+  "model_new": null,
+  "new_rank_all": 1.0,
+  "new_rank_new": null,
+  "nowind_all": 1.0,
+  "nowind_new": null,
+  "persist_all": 1.0,
+  "persist_new": null,
+  "habitat_only_all": 1.0,
+  "habitat_only_new": null,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/flamingo.png",
+  "image_new": "/forecast/flamingo-nieuw.png"
+ }
+}

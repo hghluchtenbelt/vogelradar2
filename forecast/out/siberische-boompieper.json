@@ -1,0 +1,761 @@
+{
+ "species": "siberische-boompieper",
+ "label": "Siberische Boompieper",
+ "names": [
+  "Siberische Boompieper"
+ ],
+ "sci": "Anthus hodgsoni",
+ "guild": "zangvogel-doortrekker",
+ "guild_label": "Doortrekkende zangvogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:55+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 28,
+ "n_sites": 15,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 3.0,
+  "p_stay": 0.6,
+  "sigma_stay_km": 3.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 1.0,
+  "onshore": 0.5,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "tree": 0.662,
+  "grass": 0.414,
+  "bare": 0.15,
+  "moss": 0.0,
+  "wetland": 0.304,
+  "shrub": 0.5,
+  "built": 0.384,
+  "water": 0.5,
+  "snow": 0.0,
+  "crop": 0.167,
+  "mangrove": 0.0
+ },
+ "learned_weights": {
+  "tree": 0.42,
+  "shrub": 0.0,
+  "grass": 0.43,
+  "crop": 0.03,
+  "built": 0.27,
+  "bare": 0.0,
+  "snow": 0.0,
+  "water": 1.0,
+  "wetland": 0.31,
+  "mangrove": 0.0,
+  "moss": 0.0
+ },
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 13,
+  "p1": 17,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Zeewolde": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Ameland": {
+   "p": 0.066,
+   "expected": 0.068
+  },
+  "Heerenveen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Leeuwarden": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Ooststellingwerf": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Opsterland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Weststellingwerf": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Coevorden": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Emmen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hardenberg": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Noordoostpolder": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Apeldoorn": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Ede": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Dronten": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Leusden": {
+   "p": 0.059,
+   "expected": 0.061
+  },
+  "Woudenberg": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Amsterdam": {
+   "p": 0.008,
+   "expected": 0.009
+  },
+  "Bergen (NH.)": {
+   "p": 0.173,
+   "expected": 0.189
+  },
+  "Castricum": {
+   "p": 0.163,
+   "expected": 0.178
+  },
+  "Diemen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Haarlemmermeer": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Heemskerk": {
+   "p": 0.024,
+   "expected": 0.025
+  },
+  "Schagen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Texel": {
+   "p": 0.215,
+   "expected": 0.242
+  },
+  "Zandvoort": {
+   "p": 0.11,
+   "expected": 0.117
+  },
+  "Rotterdam": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Wassenaar": {
+   "p": 0.132,
+   "expected": 0.141
+  },
+  "Veere": {
+   "p": 0.076,
+   "expected": 0.079
+  },
+  "Vlissingen": {
+   "p": 0.101,
+   "expected": 0.107
+  },
+  "Tytsjerksteradiel": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Lelystad": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Utrechtse Heuvelrug": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.081,
+   "expected": 0.085
+  },
+  "Aa en Hunze": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Borger-Odoorn": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "De Wolden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerveld": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Steenwijkerland": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Midden-Drenthe": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Bronckhorst": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.083,
+   "expected": 0.086
+  },
+  "Hollands Kroon": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Fryske Marren": {
+   "p": 0.015,
+   "expected": 0.015
+  },
+  "Gooise Meren": {
+   "p": 0.038,
+   "expected": 0.039
+  },
+  "Waadhoeke": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Midden-Groningen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Altena": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "West Betuwe": {
+   "p": 0.005,
+   "expected": 0.006
+  },
+  "Hoeksche Waard": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Het Hogeland": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Westerkwartier": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Molenlanden": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Eemsdelta": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Land van Cuijk": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Voorne aan Zee": {
+   "p": 0.005,
+   "expected": 0.005
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   24,
+   174,
+   0.044
+  ],
+  [
+   63,
+   102,
+   0.018
+  ],
+  [
+   64,
+   102,
+   0.042
+  ],
+  [
+   64,
+   103,
+   0.014
+  ],
+  [
+   64,
+   155,
+   0.039
+  ],
+  [
+   67,
+   102,
+   0.04
+  ],
+  [
+   67,
+   103,
+   0.028
+  ],
+  [
+   68,
+   102,
+   0.015
+  ],
+  [
+   68,
+   103,
+   0.012
+  ],
+  [
+   97,
+   95,
+   0.024
+  ],
+  [
+   97,
+   96,
+   0.056
+  ],
+  [
+   108,
+   94,
+   0.042
+  ],
+  [
+   113,
+   93,
+   0.049
+  ],
+  [
+   113,
+   94,
+   0.06
+  ],
+  [
+   115,
+   94,
+   0.017
+  ],
+  [
+   116,
+   94,
+   0.016
+  ],
+  [
+   134,
+   87,
+   0.014
+  ],
+  [
+   135,
+   87,
+   0.069
+  ],
+  [
+   136,
+   121,
+   0.029
+  ],
+  [
+   153,
+   76,
+   0.01
+  ],
+  [
+   153,
+   77,
+   0.018
+  ],
+  [
+   154,
+   76,
+   0.023
+  ],
+  [
+   154,
+   77,
+   0.058
+  ],
+  [
+   159,
+   144,
+   0.026
+  ],
+  [
+   160,
+   144,
+   0.019
+  ],
+  [
+   203,
+   34,
+   0.052
+  ],
+  [
+   217,
+   15,
+   0.018
+  ],
+  [
+   217,
+   16,
+   0.03
+  ],
+  [
+   223,
+   22,
+   0.015
+  ],
+  [
+   224,
+   22,
+   0.067
+  ]
+ ],
+ "max_p": 0.069,
+ "expected_reports": 2.23,
+ "expected_new_sites": 0.86,
+ "sites": [
+  {
+   "lat": 53.02064,
+   "lon": 4.7446,
+   "n": 3,
+   "days": 2,
+   "first": "2026-10-18",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.9,
+   "p_stay": 0.127,
+   "loc": "Texel - Bollekamer - zuid (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.15922,
+   "lon": 4.35607,
+   "n": 4,
+   "days": 3,
+   "first": "2026-10-19",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 1.21,
+   "p_stay": 0.139,
+   "loc": "Berkheide k IV A (ZH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.10017,
+   "lon": 5.3653,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.33,
+   "p_stay": 0.066,
+   "loc": "Leusden - Den Treek - Treekerpunt/Kelderbos (UT)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 51.52364,
+   "lon": 3.44059,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.33,
+   "p_stay": 0.066,
+   "loc": "Westkapelle - Opslagterrein Erika (ZL)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 53.05948,
+   "lon": 4.7437,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.21,
+   "p_stay": 0.108,
+   "loc": "Texel - Staatsbossen - De Tureluur (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 51.66703,
+   "lon": 3.7157,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.19,
+   "p_stay": 0.078,
+   "loc": "Westenschouwen - Trektelpost 'De Punt' (ZL)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.33739,
+   "lon": 5.02535,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.15,
+   "p_stay": 0.044,
+   "loc": "Diemen - Vijfhoek (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 51.45896,
+   "lon": 3.53442,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.29,
+   "p_stay": 0.116,
+   "loc": "Vlissingen - Duinen Vijgheter (incl. Telpost De Nolle) (ZL)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.56266,
+   "lon": 4.61023,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 0.33,
+   "p_stay": 0.158,
+   "loc": "Noordhollands Duinreservaat - Vogelduin-Zuid (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.72345,
+   "lon": 4.64096,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.29,
+   "p_stay": 0.116,
+   "loc": "Camperduin - Trektelpost (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.61682,
+   "lon": 4.62155,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.24,
+   "p_stay": 0.066,
+   "loc": "Egmond aan Zee (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.34885,
+   "lon": 4.51192,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.29,
+   "p_stay": 0.116,
+   "loc": "Amsterdamse Waterleidingduinen - Zeeveld - Zuid (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 52.53997,
+   "lon": 4.61566,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.15,
+   "p_stay": 0.044,
+   "loc": "Noordhollands Duinreservaat - Zuidernollen (NH)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 53.45899,
+   "lon": 5.82108,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.17,
+   "p_stay": 0.066,
+   "loc": "Ameland - Oostbos (FR)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  },
+  {
+   "lat": 53.05796,
+   "lon": 5.52765,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.17,
+   "p_stay": 0.066,
+   "loc": "Bolsward - Zuidoost (FR)",
+   "sub": [
+    "Siberische Boompieper"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 3,
+  "first": "2026-10-18",
+  "last": "2026-10-20",
+  "n_all_total": 24,
+  "n_new_total": 18,
+  "persist_share": 0.006,
+  "model_all": 0.709,
+  "model_new": 0.611,
+  "new_rank_all": 0.625,
+  "new_rank_new": 0.611,
+  "nowind_all": 0.625,
+  "nowind_new": 0.5,
+  "persist_all": 0.25,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.375,
+  "habitat_only_new": 0.333,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/siberische-boompieper.png",
+  "image_new": "/forecast/siberische-boompieper-nieuw.png"
+ }
+}

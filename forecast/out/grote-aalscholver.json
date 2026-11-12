@@ -1,0 +1,130 @@
+{
+ "species": "grote-aalscholver",
+ "label": "Grote Aalscholver",
+ "names": [
+  "Grote Aalscholver"
+ ],
+ "sci": "Phalacrocorax carbo carbo",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:52+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 1,
+ "n_sites": 1,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.8,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.3,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "water": 1.0,
+  "wetland": 0.7,
+  "grass": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 1,
+  "p1": 1,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Zaanstad": {
+   "p": 0.071,
+   "expected": 0.074
+  },
+  "Wormerland": {
+   "p": 0.006,
+   "expected": 0.006
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   123,
+   107,
+   0.011
+  ],
+  [
+   123,
+   108,
+   0.036
+  ]
+ ],
+ "max_p": 0.036,
+ "expected_reports": 0.14,
+ "expected_new_sites": 0.06,
+ "sites": [
+  {
+   "lat": 52.46909,
+   "lon": 4.82136,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.71,
+   "p_stay": 0.079,
+   "loc": "Zaanstad - De Zaan (NH)",
+   "sub": [
+    "Grote Aalscholver"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/grote-aalscholver.png",
+  "image_new": "/forecast/grote-aalscholver-nieuw.png"
+ }
+}

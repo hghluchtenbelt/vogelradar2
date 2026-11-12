@@ -1,0 +1,224 @@
+{
+ "species": "siberische-braamsluiper",
+ "label": "Siberische Braamsluiper",
+ "names": [
+  "Siberische Braamsluiper"
+ ],
+ "sci": "Curruca curruca blythi",
+ "guild": "zangvogel-doortrekker",
+ "guild_label": "Doortrekkende zangvogels",
+ "rarity_class": "zeer zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:55+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 4,
+ "n_sites": 3,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 3.0,
+  "p_stay": 0.6,
+  "sigma_stay_km": 3.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 1.0,
+  "onshore": 0.5,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "shrub": 1.0,
+  "tree": 0.9,
+  "built": 0.5,
+  "grass": 0.4,
+  "crop": 0.3,
+  "bare": 0.3,
+  "wetland": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 4,
+  "p1": 0,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Schiermonnikoog": {
+   "p": 0.065,
+   "expected": 0.067
+  },
+  "Vlieland": {
+   "p": 0.103,
+   "expected": 0.109
+  },
+  "Noordoostpolder": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Texel": {
+   "p": 0.066,
+   "expected": 0.069
+  },
+  "Midden-Drenthe": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Hollands Kroon": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "De Fryske Marren": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Waadhoeke": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Het Hogeland": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Westerkwartier": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.008,
+   "expected": 0.009
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   21,
+   198,
+   0.041
+  ],
+  [
+   44,
+   115,
+   0.038
+  ],
+  [
+   44,
+   116,
+   0.037
+  ],
+  [
+   51,
+   110,
+   0.038
+  ]
+ ],
+ "max_p": 0.041,
+ "expected_reports": 0.61,
+ "expected_new_sites": 0.37,
+ "sites": [
+  {
+   "lat": 53.25341,
+   "lon": 4.93995,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.71,
+   "p_stay": 0.106,
+   "loc": "Vlieland - Kroon's polders (FR)",
+   "sub": [
+    "Siberische Braamsluiper"
+   ]
+  },
+  {
+   "lat": 53.18094,
+   "lon": 4.85669,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.46,
+   "p_stay": 0.066,
+   "loc": "Texel - Vuurtoren (NH)",
+   "sub": [
+    "Siberische Braamsluiper"
+   ]
+  },
+  {
+   "lat": 53.48759,
+   "lon": 6.17321,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.24,
+   "p_stay": 0.066,
+   "loc": "Schiermonnikoog - Prikkebosk (FR)",
+   "sub": [
+    "Siberische Braamsluiper"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/siberische-braamsluiper.png",
+  "image_new": "/forecast/siberische-braamsluiper-nieuw.png"
+ }
+}

@@ -1,0 +1,271 @@
+{
+ "species": "zwarte-rotgans",
+ "label": "Zwarte Rotgans",
+ "names": [
+  "Zwarte Rotgans"
+ ],
+ "sci": "Branta bernicla nigricans",
+ "guild": "gans",
+ "guild_label": "Ganzen",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:56+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 12,
+ "n_sites": 5,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.85,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "grass": 1.0,
+  "crop": 0.4,
+  "wetland": 0.3,
+  "water": 0.2
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 3,
+  "p1": 4,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Ameland": {
+   "p": 0.174,
+   "expected": 0.191
+  },
+  "Schiermonnikoog": {
+   "p": 0.039,
+   "expected": 0.04
+  },
+  "Terschelling": {
+   "p": 0.136,
+   "expected": 0.146
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.061,
+   "expected": 0.063
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "De Fryske Marren": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Waadhoeke": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Het Hogeland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerkwartier": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.009,
+   "expected": 0.009
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   22,
+   197,
+   0.026
+  ],
+  [
+   25,
+   161,
+   0.087
+  ],
+  [
+   25,
+   162,
+   0.014
+  ],
+  [
+   25,
+   171,
+   0.026
+  ],
+  [
+   26,
+   161,
+   0.012
+  ],
+  [
+   32,
+   136,
+   0.094
+  ],
+  [
+   201,
+   37,
+   0.036
+  ]
+ ],
+ "max_p": 0.094,
+ "expected_reports": 0.72,
+ "expected_new_sites": 0.29,
+ "sites": [
+  {
+   "lat": 53.44165,
+   "lon": 5.6274,
+   "n": 5,
+   "days": 3,
+   "first": "2026-10-20",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 3,
+   "weight": 2.64,
+   "p_stay": 0.15,
+   "loc": "Ameland - Westermieden (FR)",
+   "sub": [
+    "Zwarte Rotgans"
+   ]
+  },
+  {
+   "lat": 53.36822,
+   "lon": 5.24639,
+   "n": 4,
+   "days": 2,
+   "first": "2026-10-18",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 1.51,
+   "p_stay": 0.144,
+   "loc": "Terschelling - Terschellinger Polder - Westdijk (FR)",
+   "sub": [
+    "Zwarte Rotgans"
+   ]
+  },
+  {
+   "lat": 53.43792,
+   "lon": 5.77656,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.04,
+   "loc": "Ameland - Pier (FR)",
+   "sub": [
+    "Zwarte Rotgans"
+   ]
+  },
+  {
+   "lat": 51.68027,
+   "lon": 3.76833,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.61,
+   "p_stay": 0.06,
+   "loc": "Haamstede - Zeedijk Koudekerksche Inlaag (ZL)",
+   "sub": [
+    "Zwarte Rotgans"
+   ]
+  },
+  {
+   "lat": 53.4739,
+   "lon": 6.16162,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.04,
+   "loc": "Schiermonnikoog - Banckspolder (FR)",
+   "sub": [
+    "Zwarte Rotgans"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 4,
+  "first": "2026-10-18",
+  "last": "2026-10-21",
+  "n_all_total": 9,
+  "n_new_total": 2,
+  "persist_share": 0.002,
+  "model_all": 0.889,
+  "model_new": 0.0,
+  "new_rank_all": 0.889,
+  "new_rank_new": 0.0,
+  "nowind_all": 0.889,
+  "nowind_new": 0.0,
+  "persist_all": 0.889,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.0,
+  "habitat_only_new": 0.0,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/zwarte-rotgans.png",
+  "image_new": "/forecast/zwarte-rotgans-nieuw.png"
+ }
+}

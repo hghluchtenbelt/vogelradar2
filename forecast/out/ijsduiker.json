@@ -1,0 +1,287 @@
+{
+ "species": "ijsduiker",
+ "label": "IJsduiker",
+ "names": [
+  "IJsduiker"
+ ],
+ "sci": "Gavia immer",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:52+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 5,
+ "n_sites": 5,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.8,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.3,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "water": 1.0,
+  "wetland": 0.7,
+  "grass": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 1,
+  "p3": 4,
+  "p1": 2,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Harlingen": {
+   "p": 0.075,
+   "expected": 0.078
+  },
+  "Leeuwarden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Vlieland": {
+   "p": 0.167,
+   "expected": 0.183
+  },
+  "Noordoostpolder": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Bergen (NH.)": {
+   "p": 0.102,
+   "expected": 0.107
+  },
+  "Texel": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Rotterdam": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Veere": {
+   "p": 0.071,
+   "expected": 0.074
+  },
+  "Lelystad": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Steenwijkerland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.022,
+   "expected": 0.022
+  },
+  "Hollands Kroon": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "De Fryske Marren": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Waadhoeke": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Het Hogeland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Westerkwartier": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.01,
+   "expected": 0.01
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   39,
+   122,
+   0.012
+  ],
+  [
+   39,
+   123,
+   0.114
+  ],
+  [
+   52,
+   147,
+   0.056
+  ],
+  [
+   107,
+   94,
+   0.036
+  ],
+  [
+   110,
+   93,
+   0.036
+  ],
+  [
+   215,
+   15,
+   0.033
+  ],
+  [
+   216,
+   15,
+   0.017
+  ]
+ ],
+ "max_p": 0.114,
+ "expected_reports": 0.92,
+ "expected_new_sites": 0.49,
+ "sites": [
+  {
+   "lat": 53.30426,
+   "lon": 5.04969,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-24",
+   "last": "2026-10-24",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.8,
+   "p_stay": 0.179,
+   "loc": "Vlieland - Strandhotel (FR)",
+   "sub": [
+    "IJsduiker"
+   ]
+  },
+  {
+   "lat": 51.54042,
+   "lon": 3.43733,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 2,
+   "photos": 0,
+   "weight": 0.56,
+   "p_stay": 0.071,
+   "loc": "Westkapelle - Zeedijk (ZL)",
+   "sub": [
+    "IJsduiker"
+   ]
+  },
+  {
+   "lat": 53.17594,
+   "lon": 5.40291,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.61,
+   "p_stay": 0.079,
+   "loc": "Harlingen - Zuiderhavenhoofd (FR)",
+   "sub": [
+    "IJsduiker"
+   ]
+  },
+  {
+   "lat": 52.59658,
+   "lon": 4.60426,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.053,
+   "loc": "Bergen (NH)",
+   "sub": [
+    "IJsduiker"
+   ]
+  },
+  {
+   "lat": 52.6255,
+   "lon": 4.60845,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.053,
+   "loc": "Egmond aan Zee - strand en zee",
+   "sub": [
+    "IJsduiker"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/ijsduiker.png",
+  "image_new": "/forecast/ijsduiker-nieuw.png"
+ }
+}

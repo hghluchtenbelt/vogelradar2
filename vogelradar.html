@@ -86,6 +86,7 @@
   .loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .rf{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);flex:0 0 auto}
   .rf:active,.loc:active{transform:scale(.94)}
+  a.rf{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
   .spin{animation:spin .8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -201,6 +202,7 @@
     <div class="grow"></div>
     <button class="loc" id="loc">📍 <span id="locname">locatie bepalen…</span></button>
     <button class="rf" id="wens-btn" title="Wensvogels">🔔</button>
+    <a class="rf" href="/voorspelling" title="Voorspelling (test)">🍂</a>
     <button class="rf" id="refresh" title="Verversen">⟳</button>
   </div>
   <div class="chips" id="chips"></div>

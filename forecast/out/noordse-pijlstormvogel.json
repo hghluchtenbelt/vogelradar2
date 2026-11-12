@@ -1,0 +1,467 @@
+{
+ "species": "noordse-pijlstormvogel",
+ "label": "Noordse Pijlstormvogel",
+ "names": [
+  "Noordse Pijlstormvogel"
+ ],
+ "sci": "Puffinus puffinus",
+ "guild": "zeevogel",
+ "guild_label": "Zeevogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:54+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 10,
+ "n_sites": 5,
+ "n_sites_recent": 4,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 1.5,
+  "p_stay": 0.3,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 60.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 1.0,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 0.0,
+  "onshore": 1.5,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "water": 1.0,
+  "bare": 0.8,
+  "grass": 0.2,
+  "wetland": 0.2
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 0,
+  "p1": 3,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Zeewolde": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Heerenveen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Leeuwarden": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Ooststellingwerf": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Opsterland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Terschelling": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Vlieland": {
+   "p": 0.019,
+   "expected": 0.019
+  },
+  "Weststellingwerf": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Coevorden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Emmen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hardenberg": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Noordoostpolder": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "Ommen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Apeldoorn": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Ede": {
+   "p": 0.008,
+   "expected": 0.009
+  },
+  "Dronten": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Amsterdam": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Bergen (NH.)": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Haarlemmermeer": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Schagen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Texel": {
+   "p": 0.064,
+   "expected": 0.067
+  },
+  "Rotterdam": {
+   "p": 0.05,
+   "expected": 0.051
+  },
+  "Borsele": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Hulst": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Terneuzen": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Tholen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Veere": {
+   "p": 0.021,
+   "expected": 0.021
+  },
+  "Tytsjerksteradiel": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Steenbergen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Lelystad": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Aa en Hunze": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Borger-Odoorn": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Wolden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Noordenveld": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Westerveld": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Steenwijkerland": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Moerdijk": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Sluis": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Midden-Drenthe": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Berkelland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Bronckhorst": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.02,
+   "expected": 0.02
+  },
+  "Hollands Kroon": {
+   "p": 0.016,
+   "expected": 0.016
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Krimpenerwaard": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "De Fryske Marren": {
+   "p": 0.015,
+   "expected": 0.015
+  },
+  "Meierijstad": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Waadhoeke": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Westerwolde": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Midden-Groningen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Altena": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "West Betuwe": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Vijfheerenlanden": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Hoeksche Waard": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Het Hogeland": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Westerkwartier": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Molenlanden": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Eemsdelta": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Land van Cuijk": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Voorne aan Zee": {
+   "p": 0.008,
+   "expected": 0.008
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   51,
+   109,
+   0.012
+  ],
+  [
+   53,
+   108,
+   0.025
+  ],
+  [
+   171,
+   55,
+   0.022
+  ]
+ ],
+ "max_p": 0.025,
+ "expected_reports": 1.2,
+ "expected_new_sites": 1.09,
+ "sites": [
+  {
+   "lat": 51.9864,
+   "lon": 4.03742,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-24",
+   "last": "2026-10-24",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.8,
+   "p_stay": 0.034,
+   "loc": "Maasvlakte - Nieuwe Stuifdijk (ZH)",
+   "sub": [
+    "Noordse Pijlstormvogel"
+   ]
+  },
+  {
+   "lat": 53.30377,
+   "lon": 5.05175,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.41,
+   "p_stay": 0.013,
+   "loc": "Vlieland - Duinkersoord (FR)",
+   "sub": [
+    "Noordse Pijlstormvogel"
+   ]
+  },
+  {
+   "lat": 51.54036,
+   "lon": 3.43768,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.33,
+   "p_stay": 0.014,
+   "loc": "Westkapelle - Zeedijk (ZL)",
+   "sub": [
+    "Noordse Pijlstormvogel"
+   ]
+  },
+  {
+   "lat": 53.16383,
+   "lon": 4.8181,
+   "n": 5,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.036,
+   "loc": "Texel - Paal 28 / Krimweg (NH)",
+   "sub": [
+    "Noordse Pijlstormvogel"
+   ]
+  },
+  {
+   "lat": 53.18316,
+   "lon": 4.84121,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.02,
+   "p_stay": 0.017,
+   "loc": "Texel - Eierlandse Dam (NH)",
+   "sub": [
+    "Noordse Pijlstormvogel"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 2,
+  "first": "2026-10-22",
+  "last": "2026-10-23",
+  "n_all_total": 2,
+  "n_new_total": 2,
+  "persist_share": 0.001,
+  "model_all": 1.0,
+  "model_new": 1.0,
+  "new_rank_all": 1.0,
+  "new_rank_new": 1.0,
+  "nowind_all": 1.0,
+  "nowind_new": 1.0,
+  "persist_all": 0.0,
+  "persist_new": 0.0,
+  "habitat_only_all": 1.0,
+  "habitat_only_new": 1.0,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/noordse-pijlstormvogel.png",
+  "image_new": "/forecast/noordse-pijlstormvogel-nieuw.png"
+ }
+}

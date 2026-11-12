@@ -1,0 +1,189 @@
+{
+ "species": "maskergors",
+ "label": "Maskergors",
+ "names": [
+  "Maskergors"
+ ],
+ "sci": "Emberiza spodocephala",
+ "guild": "zangvogel-doortrekker",
+ "guild_label": "Doortrekkende zangvogels",
+ "rarity_class": "zeer zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:54+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 9,
+ "n_sites": 1,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 3.0,
+  "p_stay": 0.6,
+  "sigma_stay_km": 3.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 1.0,
+  "onshore": 0.5,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "shrub": 1.0,
+  "tree": 0.9,
+  "built": 0.5,
+  "grass": 0.4,
+  "crop": 0.3,
+  "bare": 0.3,
+  "wetland": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 1,
+  "p10": 0,
+  "p3": 0,
+  "p1": 8,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Terschelling": {
+   "p": 0.452,
+   "expected": 0.602
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Het Hogeland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerkwartier": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.006,
+   "expected": 0.006
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   29,
+   140,
+   0.016
+  ],
+  [
+   29,
+   141,
+   0.027
+  ],
+  [
+   29,
+   142,
+   0.019
+  ],
+  [
+   30,
+   140,
+   0.02
+  ],
+  [
+   30,
+   141,
+   0.321
+  ],
+  [
+   30,
+   142,
+   0.023
+  ],
+  [
+   31,
+   140,
+   0.011
+  ],
+  [
+   31,
+   141,
+   0.016
+  ],
+  [
+   31,
+   142,
+   0.012
+  ]
+ ],
+ "max_p": 0.321,
+ "expected_reports": 0.86,
+ "expected_new_sites": 0.26,
+ "sites": [
+  {
+   "lat": 53.39749,
+   "lon": 5.32389,
+   "n": 9,
+   "days": 2,
+   "first": "2026-10-23",
+   "last": "2026-10-24",
+   "max_count": 1,
+   "photos": 3,
+   "weight": 3.42,
+   "p_stay": 0.6,
+   "loc": "Terschelling - Eerste Plak / Liesingerplak (FR)",
+   "sub": [
+    "Maskergors"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/maskergors.png",
+  "image_new": "/forecast/maskergors-nieuw.png"
+ }
+}

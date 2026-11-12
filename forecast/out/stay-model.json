@@ -1,0 +1,127 @@
+{
+ "ok": true,
+ "n": 2095,
+ "base_rate": 0.195,
+ "weights": {
+  "bias": -2.087,
+  "log_days": -0.3692,
+  "age1": -1.0226,
+  "age2plus": -1.365,
+  "photo": 0.4361,
+  "log_reports": 0.8847,
+  "flock": 0.3089,
+  "g_invasiegast": 0.261,
+  "g_wintergast-territoriaal": 0.6475,
+  "g_zangvogel-doortrekker": 0.3691,
+  "g_watervogel": 0.5649,
+  "g_gans": 0.2628,
+  "g_roofvogel": -0.7298,
+  "g_zeevogel": -1.2463,
+  "g_steltloper": -0.3672,
+  "g_standvogel": 0.238
+ },
+ "brier": 0.1241,
+ "brier_base": 0.1568,
+ "spread_median_km": 0.18,
+ "spread_p75_km": 0.95,
+ "strata": {
+  "by_days": {
+   "1": {
+    "n": 1535,
+    "rate": 0.139
+   },
+   "2": {
+    "n": 339,
+    "rate": 0.263
+   },
+   "3-4": {
+    "n": 175,
+    "rate": 0.474
+   },
+   "5+": {
+    "n": 46,
+    "rate": 0.5
+   }
+  },
+  "by_age": {
+   "0": {
+    "n": 909,
+    "rate": 0.32
+   },
+   "1": {
+    "n": 529,
+    "rate": 0.117
+   },
+   "2-3": {
+    "n": 657,
+    "rate": 0.084
+   }
+  },
+  "by_photo": {
+   "met": {
+    "n": 971,
+    "rate": 0.282
+   },
+   "zonder": {
+    "n": 1124,
+    "rate": 0.119
+   }
+  },
+  "by_guild": {
+   "invasiegast": {
+    "n": 342,
+    "rate": 0.219
+   },
+   "wintergast-territoriaal": {
+    "n": 532,
+    "rate": 0.222
+   },
+   "zangvogel-doortrekker": {
+    "n": 768,
+    "rate": 0.177
+   },
+   "watervogel": {
+    "n": 210,
+    "rate": 0.243
+   },
+   "gans": {
+    "n": 71,
+    "rate": 0.225
+   },
+   "roofvogel": {
+    "n": 86,
+    "rate": 0.047
+   },
+   "zeevogel": {
+    "n": 45,
+    "rate": 0.022
+   },
+   "steltloper": {
+    "n": 19,
+    "rate": 0.105
+   },
+   "standvogel": {
+    "n": 22,
+    "rate": 0.227
+   }
+  },
+  "by_days_age0": {
+   "1": {
+    "n": 598,
+    "rate": 0.209
+   },
+   "2": {
+    "n": 159,
+    "rate": 0.447
+   },
+   "3-4": {
+    "n": 115,
+    "rate": 0.635
+   },
+   "5+": {
+    "n": 37,
+    "rate": 0.595
+   }
+  }
+ }
+}
