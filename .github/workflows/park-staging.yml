@@ -24,7 +24,7 @@ jobs:
       - name: Stop staging in Coolify
         run: |
           set -euo pipefail
-          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$CF_ACCESS_CLIENT_ID" ] || [ -z "$UUID" ]; then
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$UUID" ]; then
             echo "::notice::Deploy secrets or COOLIFY_UUID_STAGING not set yet; nothing to stop."
             exit 0
           fi
