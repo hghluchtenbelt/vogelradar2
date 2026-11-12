@@ -39,7 +39,9 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE: ghcr.io/hghluchtenbelt/vogelradar2
+  # Coolify needs a separate image name per app: production pulls
+  # vogelradar2, staging (dev) pulls vogelradar2-staging.
+  IMAGE: ghcr.io/hghluchtenbelt/vogelradar2${{ (inputs.ref || github.ref_name) != 'main' && '-staging' || '' }}
   COOLIFY_URL: https://deploy.hermen.dev
 
 jobs:
@@ -130,11 +132,14 @@ jobs:
     needs: [build, deploy]
     if: always() && needs.build.result == 'success' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [vogelradar2, vogelradar2-staging]
     steps:
       - name: Keep only the 15 newest image versions
         uses: actions/delete-package-versions@v5
         continue-on-error: true
         with:
-          package-name: vogelradar2
+          package-name: ${{ matrix.package }}
           package-type: container
           min-versions-to-keep: 15
