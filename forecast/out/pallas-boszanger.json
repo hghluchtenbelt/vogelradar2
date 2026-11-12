@@ -1,0 +1,192 @@
+{
+ "species": "pallas-boszanger",
+ "label": "Pallas' Boszanger",
+ "names": [
+  "Pallas' Boszanger"
+ ],
+ "sci": "Phylloscopus proregulus",
+ "guild": "zangvogel-doortrekker",
+ "guild_label": "Doortrekkende zangvogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:54+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 7,
+ "n_sites": 2,
+ "n_sites_recent": 1,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 3.0,
+  "p_stay": 0.6,
+  "sigma_stay_km": 3.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 1.0,
+  "onshore": 0.5,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "shrub": 1.0,
+  "tree": 0.9,
+  "built": 0.5,
+  "grass": 0.4,
+  "crop": 0.3,
+  "bare": 0.3,
+  "wetland": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 1,
+  "p3": 2,
+  "p1": 1,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Noordoostpolder": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Hoorn": {
+   "p": 0.029,
+   "expected": 0.029
+  },
+  "Texel": {
+   "p": 0.077,
+   "expected": 0.081
+  },
+  "Drechterland": {
+   "p": 0.233,
+   "expected": 0.265
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Hollands Kroon": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "De Fryske Marren": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.006,
+   "expected": 0.006
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   69,
+   102,
+   0.019
+  ],
+  [
+   69,
+   103,
+   0.035
+  ],
+  [
+   104,
+   127,
+   0.077
+  ],
+  [
+   105,
+   127,
+   0.115
+  ]
+ ],
+ "max_p": 0.115,
+ "expected_reports": 0.69,
+ "expected_new_sites": 0.31,
+ "sites": [
+  {
+   "lat": 52.64976,
+   "lon": 5.11236,
+   "n": 5,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 3,
+   "weight": 1.45,
+   "p_stay": 0.293,
+   "loc": "Hoorn - Kersenboogerd (NH)",
+   "sub": [
+    "Pallas' Boszanger"
+   ]
+  },
+  {
+   "lat": 53.00289,
+   "lon": 4.74564,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.26,
+   "p_stay": 0.078,
+   "loc": "Texel - Oostelijk Horsmeertje (NH)",
+   "sub": [
+    "Pallas' Boszanger"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/pallas-boszanger.png",
+  "image_new": "/forecast/pallas-boszanger-nieuw.png"
+ }
+}

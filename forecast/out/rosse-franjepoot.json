@@ -1,0 +1,187 @@
+{
+ "species": "rosse-franjepoot",
+ "label": "Rosse Franjepoot",
+ "names": [
+  "Rosse Franjepoot"
+ ],
+ "sci": "Phalaropus fulicarius",
+ "guild": "steltloper",
+ "guild_label": "Steltlopers",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:55+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 5,
+ "n_sites": 3,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 4.0,
+  "p_stay": 0.7,
+  "sigma_stay_km": 4.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.7,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "wetland": 1.0,
+  "bare": 0.8,
+  "grass": 0.6,
+  "water": 0.5,
+  "crop": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 1,
+  "p1": 1,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Texel": {
+   "p": 0.076,
+   "expected": 0.079
+  },
+  "'s-Gravenhage": {
+   "p": 0.022,
+   "expected": 0.022
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.005,
+   "expected": 0.005
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   53,
+   111,
+   0.036
+  ],
+  [
+   162,
+   69,
+   0.012
+  ]
+ ],
+ "max_p": 0.036,
+ "expected_reports": 0.27,
+ "expected_new_sites": 0.17,
+ "sites": [
+  {
+   "lat": 52.07772,
+   "lon": 4.23624,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.29,
+   "p_stay": 0.021,
+   "loc": "Den Haag - Telpost De Vulkaan (ZH)",
+   "sub": [
+    "Rosse Franjepoot"
+   ]
+  },
+  {
+   "lat": 53.07995,
+   "lon": 4.89872,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.23,
+   "p_stay": 0.021,
+   "loc": "Texel - IJzeren Kaap e.o. (NH)",
+   "sub": [
+    "Rosse Franjepoot"
+   ]
+  },
+  {
+   "lat": 53.16638,
+   "lon": 4.87665,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.25,
+   "p_stay": 0.055,
+   "loc": "Texel - Volharding (NH)",
+   "sub": [
+    "Rosse Franjepoot"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 2,
+  "first": "2026-10-18",
+  "last": "2026-10-19",
+  "n_all_total": 2,
+  "n_new_total": 2,
+  "persist_share": 0.002,
+  "model_all": 0.5,
+  "model_new": 0.5,
+  "new_rank_all": 0.5,
+  "new_rank_new": 0.5,
+  "nowind_all": 0.5,
+  "nowind_new": 0.5,
+  "persist_all": 0.0,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.5,
+  "habitat_only_new": 0.5,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/rosse-franjepoot.png",
+  "image_new": "/forecast/rosse-franjepoot-nieuw.png"
+ }
+}

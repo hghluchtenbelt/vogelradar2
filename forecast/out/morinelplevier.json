@@ -1,0 +1,206 @@
+{
+ "species": "morinelplevier",
+ "label": "Morinelplevier",
+ "names": [
+  "Morinelplevier"
+ ],
+ "sci": "Eudromias morinellus",
+ "guild": "steltloper",
+ "guild_label": "Steltlopers",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:54+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 8,
+ "n_sites": 4,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 4.0,
+  "p_stay": 0.7,
+  "sigma_stay_km": 4.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.7,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "wetland": 1.0,
+  "bare": 0.8,
+  "grass": 0.6,
+  "water": 0.5,
+  "crop": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 1,
+  "p1": 3,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Medemblik": {
+   "p": 0.016,
+   "expected": 0.017
+  },
+  "Tholen": {
+   "p": 0.03,
+   "expected": 0.031
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hollands Kroon": {
+   "p": 0.089,
+   "expected": 0.093
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.033,
+   "expected": 0.034
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   88,
+   116,
+   0.051
+  ],
+  [
+   93,
+   126,
+   0.011
+  ],
+  [
+   190,
+   45,
+   0.02
+  ],
+  [
+   206,
+   65,
+   0.021
+  ]
+ ],
+ "max_p": 0.051,
+ "expected_reports": 0.4,
+ "expected_new_sites": 0.23,
+ "sites": [
+  {
+   "lat": 51.79568,
+   "lon": 3.8803,
+   "n": 2,
+   "days": 2,
+   "first": "2026-10-19",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.66,
+   "p_stay": 0.03,
+   "loc": "Ouddorp - Springertpolder (ZH)",
+   "sub": [
+    "Morinelplevier"
+   ]
+  },
+  {
+   "lat": 51.6371,
+   "lon": 4.17935,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.59,
+   "p_stay": 0.033,
+   "loc": "Sint Philipsland - Kramerspolder (ZL)",
+   "sub": [
+    "Morinelplevier"
+   ]
+  },
+  {
+   "lat": 52.76929,
+   "lon": 5.097,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.23,
+   "p_stay": 0.021,
+   "loc": "Medemblik - Plan West (NH)",
+   "sub": [
+    "Morinelplevier"
+   ]
+  },
+  {
+   "lat": 52.81695,
+   "lon": 4.94441,
+   "n": 4,
+   "days": 2,
+   "first": "2026-10-18",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 0.77,
+   "p_stay": 0.082,
+   "loc": "Ulkeweg (NH)",
+   "sub": [
+    "Morinelplevier"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/morinelplevier.png",
+  "image_new": "/forecast/morinelplevier-nieuw.png"
+ }
+}

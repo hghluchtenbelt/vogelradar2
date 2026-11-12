@@ -1,0 +1,743 @@
+{
+ "species": "steppekiekendief",
+ "label": "Steppekiekendief",
+ "names": [
+  "Steppekiekendief"
+ ],
+ "sci": "Circus macrourus",
+ "guild": "roofvogel",
+ "guild_label": "Roofvogels en uilen",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:56+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 21,
+ "n_sites": 14,
+ "n_sites_recent": 2,
+ "profile": "Roofvogel op doortrek, zeer mobiel; jaagt boven open akkers en graslanden en is de volgende dag vaak ver weg.",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 2.0,
+  "p_stay": 0.4,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 80.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.0,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 0.7,
+  "onshore": 0.0,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "grass": 0.556,
+  "bare": 0.15,
+  "tree": 0.348,
+  "moss": 0.0,
+  "wetland": 0.64,
+  "shrub": 0.15,
+  "built": 0.104,
+  "water": 0.5,
+  "snow": 0.0,
+  "crop": 0.581,
+  "mangrove": 0.0
+ },
+ "learned_weights": {
+  "tree": 0.4,
+  "shrub": 0.0,
+  "grass": 0.31,
+  "crop": 0.16,
+  "built": 0.21,
+  "bare": 0.0,
+  "snow": 0.0,
+  "water": 1.0,
+  "wetland": 0.78,
+  "mangrove": 0.0,
+  "moss": 0.0
+ },
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 1,
+  "p1": 7,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Groningen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Almere": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Zeewolde": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Heerenveen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Leeuwarden": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Ooststellingwerf": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Opsterland": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Weststellingwerf": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Coevorden": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Emmen": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Dalfsen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Enschede": {
+   "p": 0.028,
+   "expected": 0.028
+  },
+  "Hardenberg": {
+   "p": 0.051,
+   "expected": 0.052
+  },
+  "Kampen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Noordoostpolder": {
+   "p": 0.019,
+   "expected": 0.019
+  },
+  "Ommen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Raalte": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Tubbergen": {
+   "p": 0.02,
+   "expected": 0.02
+  },
+  "Apeldoorn": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Arnhem": {
+   "p": 0.026,
+   "expected": 0.026
+  },
+  "Barneveld": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Ede": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Lochem": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Renkum": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Voorst": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Dronten": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "De Bilt": {
+   "p": 0.066,
+   "expected": 0.068
+  },
+  "Utrecht": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Amsterdam": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Bergen (NH.)": {
+   "p": 0.018,
+   "expected": 0.018
+  },
+  "Haarlemmermeer": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Medemblik": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Schagen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Texel": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Rotterdam": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Hulst": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Terneuzen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Tholen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Tytsjerksteradiel": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Deurne": {
+   "p": 0.026,
+   "expected": 0.026
+  },
+  "Oss": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Lelystad": {
+   "p": 0.027,
+   "expected": 0.027
+  },
+  "Horst aan de Maas": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Oude IJsselstreek": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Utrechtse Heuvelrug": {
+   "p": 0.018,
+   "expected": 0.018
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Aa en Hunze": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Borger-Odoorn": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "De Wolden": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Noordenveld": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Westerveld": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Steenwijkerland": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Moerdijk": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Sluis": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Tynaarlo": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Midden-Drenthe": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "Overbetuwe": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hof van Twente": {
+   "p": 0.007,
+   "expected": 0.008
+  },
+  "Olst-Wijhe": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Dinkelland": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Berkelland": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Bronckhorst": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Zuidplas": {
+   "p": 0.034,
+   "expected": 0.035
+  },
+  "Oldambt": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.022,
+   "expected": 0.022
+  },
+  "Stichtse Vecht": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hollands Kroon": {
+   "p": 0.016,
+   "expected": 0.016
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.016,
+   "expected": 0.016
+  },
+  "Krimpenerwaard": {
+   "p": 0.006,
+   "expected": 0.007
+  },
+  "De Fryske Marren": {
+   "p": 0.018,
+   "expected": 0.018
+  },
+  "Meierijstad": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Waadhoeke": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Westerwolde": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Midden-Groningen": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Altena": {
+   "p": 0.03,
+   "expected": 0.03
+  },
+  "West Betuwe": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Vijfheerenlanden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hoeksche Waard": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Het Hogeland": {
+   "p": 0.017,
+   "expected": 0.017
+  },
+  "Westerkwartier": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.015,
+   "expected": 0.016
+  },
+  "Molenlanden": {
+   "p": 0.035,
+   "expected": 0.035
+  },
+  "Eemsdelta": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Land van Cuijk": {
+   "p": 0.012,
+   "expected": 0.012
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   119,
+   229,
+   0.027
+  ],
+  [
+   142,
+   246,
+   0.011
+  ],
+  [
+   158,
+   130,
+   0.037
+  ],
+  [
+   170,
+   92,
+   0.02
+  ],
+  [
+   173,
+   177,
+   0.017
+  ],
+  [
+   183,
+   102,
+   0.012
+  ],
+  [
+   192,
+   105,
+   0.013
+  ],
+  [
+   229,
+   177,
+   0.015
+  ]
+ ],
+ "max_p": 0.037,
+ "expected_reports": 1.55,
+ "expected_new_sites": 1.2,
+ "sites": [
+  {
+   "lat": 51.99815,
+   "lon": 4.58806,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.76,
+   "p_stay": 0.032,
+   "loc": "Zevenhuizen (ZH) - Eendragtspolder - Plasdrasgebied (ZH)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.50629,
+   "lon": 6.63987,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.57,
+   "p_stay": 0.042,
+   "loc": "Kloosterhaar - Rauwbloksweg Midden / Noord (OV)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 51.75593,
+   "lon": 3.98261,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.28,
+   "p_stay": 0.023,
+   "loc": "Grevelingen - Veermansplaat (ZL)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.13932,
+   "lon": 5.15007,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.18,
+   "p_stay": 0.015,
+   "loc": "Westbroek - Gelder Polder (UT)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 51.86035,
+   "lon": 4.73647,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.13,
+   "p_stay": 0.027,
+   "loc": "Bleskensgraaf - Polder Bleskensgraaf - zuid (ZH)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 51.77182,
+   "lon": 4.78494,
+   "n": 2,
+   "days": 2,
+   "first": "2026-10-19",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.19,
+   "p_stay": 0.021,
+   "loc": "Brabantse Biesbosch - Spaarbekken Petrusplaat (NB)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.11526,
+   "lon": 5.16107,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.24,
+   "p_stay": 0.059,
+   "loc": "Groenekan - Hoogekampse Plas (UT)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.07372,
+   "lon": 5.28507,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.11,
+   "p_stay": 0.015,
+   "loc": "Zeist - Telpost Heidestein (UT)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 51.96937,
+   "lon": 5.86494,
+   "n": 2,
+   "days": 2,
+   "first": "2026-10-19",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.29,
+   "p_stay": 0.033,
+   "loc": "Arnhem - Meinerswijk - Doorlaatsluis (GE)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.38691,
+   "lon": 6.7971,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.07,
+   "p_stay": 0.015,
+   "loc": "Fleringen - Flingeresch (OV)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.71575,
+   "lon": 4.6807,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.07,
+   "p_stay": 0.015,
+   "loc": "Schoorl - Bregtdorp en Catrijp (NH)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.44387,
+   "lon": 5.27922,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.07,
+   "p_stay": 0.015,
+   "loc": "Oostvaardersdijk - Uitkijkpunt Kuifeend (FL)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 51.40285,
+   "lon": 5.86621,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.06,
+   "p_stay": 0.023,
+   "loc": "Liessel - Siberie (NB)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  },
+  {
+   "lat": 52.27018,
+   "lon": 6.89347,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.05,
+   "p_stay": 0.027,
+   "loc": "Enschede - Vliegveld Twente (OV)",
+   "sub": [
+    "Steppekiekendief"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 5,
+  "first": "2026-10-18",
+  "last": "2026-10-22",
+  "n_all_total": 18,
+  "n_new_total": 15,
+  "persist_share": 0.007,
+  "model_all": 0.292,
+  "model_new": 0.133,
+  "new_rank_all": 0.0,
+  "new_rank_new": 0.0,
+  "nowind_all": 0.292,
+  "nowind_new": 0.133,
+  "persist_all": 0.292,
+  "persist_new": 0.133,
+  "habitat_only_all": 0.111,
+  "habitat_only_new": 0.133,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/steppekiekendief.png",
+  "image_new": "/forecast/steppekiekendief-nieuw.png"
+ }
+}

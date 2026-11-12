@@ -1,0 +1,906 @@
+{
+ "species": "zwarte-ibis",
+ "label": "Zwarte Ibis",
+ "names": [
+  "Zwarte Ibis"
+ ],
+ "sci": "Plegadis falcinellus",
+ "guild": "watervogel",
+ "guild_label": "Watervogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:56+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 37,
+ "n_sites": 15,
+ "n_sites_recent": 4,
+ "profile": "Zwerver uit Zuid-Europa, vaak in groepjes; foerageert in natte graslanden en moeras en verplaatst zich tientallen km.",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 5.0,
+  "p_stay": 0.7,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.0,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "grass": 0.558,
+  "tree": 0.105,
+  "built": 0.079,
+  "bare": 0.0,
+  "moss": 0.0,
+  "wetland": 0.846,
+  "water": 0.8,
+  "snow": 0.0,
+  "crop": 0.253,
+  "shrub": 0.0,
+  "mangrove": 0.0
+ },
+ "learned_weights": {
+  "tree": 0.21,
+  "shrub": 0.0,
+  "grass": 0.42,
+  "crop": 0.31,
+  "built": 0.16,
+  "bare": 0.0,
+  "snow": 0.0,
+  "water": 1.0,
+  "wetland": 0.69,
+  "mangrove": 0.0,
+  "moss": 0.0
+ },
+ "classes": {
+  "p30": 0,
+  "p10": 5,
+  "p3": 10,
+  "p1": 16,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Groningen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Almere": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Zeewolde": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Heerenveen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Leeuwarden": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Ooststellingwerf": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Opsterland": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Smallingerland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Weststellingwerf": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Coevorden": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Emmen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hardenberg": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Kampen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Noordoostpolder": {
+   "p": 0.015,
+   "expected": 0.015
+  },
+  "Ommen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Raalte": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Apeldoorn": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Barneveld": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Buren": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Ede": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Lochem": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Voorst": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Dronten": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Bunschoten": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Eemnes": {
+   "p": 0.236,
+   "expected": 0.27
+  },
+  "Amsterdam": {
+   "p": 0.262,
+   "expected": 0.304
+  },
+  "Bergen (NH.)": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Blaricum": {
+   "p": 0.076,
+   "expected": 0.08
+  },
+  "Haarlemmermeer": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Heemskerk": {
+   "p": 0.04,
+   "expected": 0.04
+  },
+  "Medemblik": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Schagen": {
+   "p": 0.091,
+   "expected": 0.095
+  },
+  "Texel": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Zaanstad": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Alphen aan den Rijn": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "'s-Gravenhage": {
+   "p": 0.095,
+   "expected": 0.1
+  },
+  "Rotterdam": {
+   "p": 0.062,
+   "expected": 0.064
+  },
+  "Woerden": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Borsele": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hulst": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Reimerswaal": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Terneuzen": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Tholen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Veere": {
+   "p": 0.204,
+   "expected": 0.228
+  },
+  "Vlissingen": {
+   "p": 0.049,
+   "expected": 0.05
+  },
+  "De Ronde Venen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Tytsjerksteradiel": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Oss": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Steenbergen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Waterland": {
+   "p": 0.005,
+   "expected": 0.006
+  },
+  "Lelystad": {
+   "p": 0.015,
+   "expected": 0.015
+  },
+  "Utrechtse Heuvelrug": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.101,
+   "expected": 0.107
+  },
+  "Aa en Hunze": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Borger-Odoorn": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Wolden": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Noord-Beveland": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Noordenveld": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerveld": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Steenwijkerland": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "Moerdijk": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Sluis": {
+   "p": 0.148,
+   "expected": 0.16
+  },
+  "Drimmelen": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Tynaarlo": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Midden-Drenthe": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Hof van Twente": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Olst-Wijhe": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Westland": {
+   "p": 0.202,
+   "expected": 0.226
+  },
+  "Berkelland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Bronckhorst": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Zuidplas": {
+   "p": 0.078,
+   "expected": 0.081
+  },
+  "Oldambt": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.027,
+   "expected": 0.027
+  },
+  "Bodegraven-Reeuwijk": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Stichtse Vecht": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Hollands Kroon": {
+   "p": 0.016,
+   "expected": 0.016
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.014,
+   "expected": 0.014
+  },
+  "Krimpenerwaard": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "De Fryske Marren": {
+   "p": 0.021,
+   "expected": 0.021
+  },
+  "Meierijstad": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Waadhoeke": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Westerwolde": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Midden-Groningen": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Altena": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "West Betuwe": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Vijfheerenlanden": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hoeksche Waard": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Het Hogeland": {
+   "p": 0.017,
+   "expected": 0.017
+  },
+  "Westerkwartier": {
+   "p": 0.016,
+   "expected": 0.016
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.225,
+   "expected": 0.254
+  },
+  "Molenlanden": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Eemsdelta": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Land van Cuijk": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Voorne aan Zee": {
+   "p": 0.007,
+   "expected": 0.007
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   32,
+   192,
+   0.135
+  ],
+  [
+   33,
+   192,
+   0.015
+  ],
+  [
+   94,
+   98,
+   0.059
+  ],
+  [
+   120,
+   99,
+   0.016
+  ],
+  [
+   120,
+   100,
+   0.02
+  ],
+  [
+   130,
+   118,
+   0.125
+  ],
+  [
+   130,
+   119,
+   0.069
+  ],
+  [
+   131,
+   118,
+   0.013
+  ],
+  [
+   131,
+   119,
+   0.012
+  ],
+  [
+   142,
+   140,
+   0.072
+  ],
+  [
+   142,
+   141,
+   0.025
+  ],
+  [
+   143,
+   139,
+   0.014
+  ],
+  [
+   143,
+   140,
+   0.014
+  ],
+  [
+   144,
+   139,
+   0.106
+  ],
+  [
+   144,
+   140,
+   0.043
+  ],
+  [
+   162,
+   68,
+   0.014
+  ],
+  [
+   162,
+   69,
+   0.042
+  ],
+  [
+   164,
+   65,
+   0.01
+  ],
+  [
+   164,
+   66,
+   0.04
+  ],
+  [
+   165,
+   65,
+   0.118
+  ],
+  [
+   165,
+   66,
+   0.011
+  ],
+  [
+   170,
+   91,
+   0.047
+  ],
+  [
+   171,
+   60,
+   0.014
+  ],
+  [
+   171,
+   61,
+   0.023
+  ],
+  [
+   201,
+   48,
+   0.048
+  ],
+  [
+   202,
+   48,
+   0.016
+  ],
+  [
+   215,
+   17,
+   0.123
+  ],
+  [
+   215,
+   18,
+   0.022
+  ],
+  [
+   224,
+   22,
+   0.031
+  ],
+  [
+   230,
+   20,
+   0.073
+  ],
+  [
+   230,
+   21,
+   0.029
+  ]
+ ],
+ "max_p": 0.135,
+ "expected_reports": 3.25,
+ "expected_new_sites": 1.26,
+ "sites": [
+  {
+   "lat": 53.37158,
+   "lon": 6.09008,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 3,
+   "photos": 2,
+   "weight": 1.4,
+   "p_stay": 0.234,
+   "loc": "Morra (FR)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.39239,
+   "lon": 4.98433,
+   "n": 8,
+   "days": 5,
+   "first": "2026-10-19",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 6,
+   "weight": 4.27,
+   "p_stay": 0.297,
+   "loc": "Waterland - Bloemendalergouw (NH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 51.39715,
+   "lon": 3.51401,
+   "n": 2,
+   "days": 2,
+   "first": "2026-10-22",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 1.78,
+   "p_stay": 0.148,
+   "loc": "Breskens - Waterdunen (ZL)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.27482,
+   "lon": 5.31377,
+   "n": 3,
+   "days": 3,
+   "first": "2026-10-20",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 2.02,
+   "p_stay": 0.132,
+   "loc": "Blaricum (NH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.25805,
+   "lon": 5.29898,
+   "n": 4,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 4,
+   "weight": 0.85,
+   "p_stay": 0.227,
+   "loc": "Eempolders - Maatpolder (UT)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 51.98724,
+   "lon": 4.11551,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.36,
+   "p_stay": 0.053,
+   "loc": "Hoek van Holland - Kapittelduinen (ZH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.0446,
+   "lon": 4.18275,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.78,
+   "p_stay": 0.186,
+   "loc": "Ter Heijde - Zandmotor",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.05729,
+   "lon": 4.20169,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.36,
+   "p_stay": 0.053,
+   "loc": "Solleveld & Kapittelduinen - N2000 (ZH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.07772,
+   "lon": 4.23628,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.56,
+   "p_stay": 0.079,
+   "loc": "Den Haag - Telpost De Vulkaan (ZH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 51.45902,
+   "lon": 3.53445,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.29,
+   "p_stay": 0.053,
+   "loc": "Vlissingen - Duinen Vijgheter (incl. Telpost De Nolle) (ZL)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 51.54562,
+   "lon": 3.46797,
+   "n": 5,
+   "days": 2,
+   "first": "2026-10-18",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 3,
+   "weight": 1.05,
+   "p_stay": 0.217,
+   "loc": "Domburg - Trommelweg e.o. (ZL)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 51.99406,
+   "lon": 4.57775,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.46,
+   "p_stay": 0.079,
+   "loc": "Zevenhuizen (ZH) - Eendragtspolder - Plasdrasgebied (ZH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.49417,
+   "lon": 4.70021,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.24,
+   "p_stay": 0.053,
+   "loc": "Beverwijk - Sint-Aagtendijk (NH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 51.68068,
+   "lon": 3.92623,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.3,
+   "p_stay": 0.093,
+   "loc": "Kerkwerve - Bartelsweg e.o. (ZL)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  },
+  {
+   "lat": 52.75508,
+   "lon": 4.67801,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.3,
+   "p_stay": 0.093,
+   "loc": "Petten - Polder L (NH)",
+   "sub": [
+    "Zwarte Ibis"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 5,
+  "first": "2026-10-18",
+  "last": "2026-10-22",
+  "n_all_total": 30,
+  "n_new_total": 15,
+  "persist_share": 0.007,
+  "model_all": 0.536,
+  "model_new": 0.067,
+  "new_rank_all": 0.515,
+  "new_rank_new": 0.36,
+  "nowind_all": 0.536,
+  "nowind_new": 0.067,
+  "persist_all": 0.436,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.315,
+  "habitat_only_new": 0.36,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/zwarte-ibis.png",
+  "image_new": "/forecast/zwarte-ibis-nieuw.png"
+ }
+}

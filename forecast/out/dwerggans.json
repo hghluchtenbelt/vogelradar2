@@ -1,0 +1,217 @@
+{
+ "species": "dwerggans",
+ "label": "Dwerggans",
+ "names": [
+  "Dwerggans"
+ ],
+ "sci": "Anser erythropus",
+ "guild": "gans",
+ "guild_label": "Ganzen",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 12,
+ "n_sites": 3,
+ "n_sites_recent": 2,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.85,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "grass": 1.0,
+  "crop": 0.4,
+  "wetland": 0.3,
+  "water": 0.2
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 2,
+  "p1": 3,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Dronten": {
+   "p": 0.042,
+   "expected": 0.043
+  },
+  "Utrecht": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Woerden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Stichtse Vecht": {
+   "p": 0.046,
+   "expected": 0.047
+  },
+  "Hoeksche Waard": {
+   "p": 0.24,
+   "expected": 0.274
+  },
+  "Molenlanden": {
+   "p": 0.005,
+   "expected": 0.005
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   130,
+   162,
+   0.019
+  ],
+  [
+   156,
+   117,
+   0.015
+  ],
+  [
+   157,
+   117,
+   0.019
+  ],
+  [
+   194,
+   88,
+   0.097
+  ],
+  [
+   195,
+   88,
+   0.08
+  ]
+ ],
+ "max_p": 0.097,
+ "expected_reports": 0.73,
+ "expected_new_sites": 0.37,
+ "sites": [
+  {
+   "lat": 52.12986,
+   "lon": 4.96817,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.69,
+   "p_stay": 0.055,
+   "loc": "Kockengen - Polder Portengen (UT)",
+   "sub": [
+    "Dwerggans"
+   ]
+  },
+  {
+   "lat": 51.75011,
+   "lon": 4.52731,
+   "n": 10,
+   "days": 5,
+   "first": "2026-10-18",
+   "last": "2026-10-22",
+   "max_count": 31,
+   "photos": 5,
+   "weight": 5.63,
+   "p_stay": 0.269,
+   "loc": "Oudeland van Strijen - N2000 (ZH)",
+   "sub": [
+    "Dwerggans"
+   ]
+  },
+  {
+   "lat": 52.39773,
+   "lon": 5.64413,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.34,
+   "p_stay": 0.04,
+   "loc": "Biddinghuizen - Kievitslanden (FL)",
+   "sub": [
+    "Dwerggans"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 5,
+  "first": "2026-10-18",
+  "last": "2026-10-22",
+  "n_all_total": 9,
+  "n_new_total": 1,
+  "persist_share": 0.002,
+  "model_all": 1.0,
+  "model_new": 1.0,
+  "new_rank_all": 1.0,
+  "new_rank_new": 1.0,
+  "nowind_all": 1.0,
+  "nowind_new": 1.0,
+  "persist_all": 0.889,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.889,
+  "habitat_only_new": 1.0,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/dwerggans.png",
+  "image_new": "/forecast/dwerggans-nieuw.png"
+ }
+}

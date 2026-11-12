@@ -1,0 +1,1015 @@
+{
+ "species": "bonte-kraai",
+ "label": "Bonte Kraai",
+ "names": [
+  "Bonte Kraai",
+  "Bonte Kraai (ssp cornix)"
+ ],
+ "sci": "Corvus cornix",
+ "guild": "wintergast-territoriaal",
+ "guild_label": "Territoriale wintergasten",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 44,
+ "n_sites": 22,
+ "n_sites_recent": 3,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.9,
+  "sigma_stay_km": 3.0,
+  "scale_move_km": 20.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.0,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "grass": 0.471,
+  "tree": 0.378,
+  "bare": 0.25,
+  "moss": 0.0,
+  "wetland": 0.586,
+  "shrub": 0.5,
+  "built": 0.182,
+  "water": 0.65,
+  "snow": 0.0,
+  "crop": 0.156,
+  "mangrove": 0.0
+ },
+ "learned_weights": {
+  "tree": 0.26,
+  "shrub": 0.0,
+  "grass": 0.34,
+  "crop": 0.21,
+  "built": 0.26,
+  "bare": 0.0,
+  "snow": 0.0,
+  "water": 1.0,
+  "wetland": 0.57,
+  "mangrove": 0.0,
+  "moss": 0.0
+ },
+ "classes": {
+  "p30": 0,
+  "p10": 2,
+  "p3": 20,
+  "p1": 21,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Groningen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Almere": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Stadskanaal": {
+   "p": 0.084,
+   "expected": 0.088
+  },
+  "Zeewolde": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Ameland": {
+   "p": 0.252,
+   "expected": 0.29
+  },
+  "Heerenveen": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Leeuwarden": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Ooststellingwerf": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Opsterland": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Schiermonnikoog": {
+   "p": 0.206,
+   "expected": 0.231
+  },
+  "Smallingerland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Terschelling": {
+   "p": 0.062,
+   "expected": 0.064
+  },
+  "Vlieland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Weststellingwerf": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Coevorden": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Emmen": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hardenberg": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Noordoostpolder": {
+   "p": 0.011,
+   "expected": 0.012
+  },
+  "Apeldoorn": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Barneveld": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Ede": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Dronten": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Leusden": {
+   "p": 0.056,
+   "expected": 0.058
+  },
+  "Alkmaar": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Amsterdam": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Bergen (NH.)": {
+   "p": 0.077,
+   "expected": 0.08
+  },
+  "Castricum": {
+   "p": 0.261,
+   "expected": 0.302
+  },
+  "Haarlemmermeer": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hilversum": {
+   "p": 0.03,
+   "expected": 0.031
+  },
+  "Medemblik": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Schagen": {
+   "p": 0.063,
+   "expected": 0.065
+  },
+  "Texel": {
+   "p": 0.482,
+   "expected": 0.659
+  },
+  "'s-Gravenhage": {
+   "p": 0.114,
+   "expected": 0.121
+  },
+  "Rotterdam": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Terneuzen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Veere": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "De Ronde Venen": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Tytsjerksteradiel": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Oss": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Gennep": {
+   "p": 0.139,
+   "expected": 0.149
+  },
+  "Lelystad": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Horst aan de Maas": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Utrechtse Heuvelrug": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.223,
+   "expected": 0.252
+  },
+  "Aa en Hunze": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Borger-Odoorn": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "De Wolden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Wijdemeren": {
+   "p": 0.115,
+   "expected": 0.122
+  },
+  "Noordenveld": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Westerveld": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Steenwijkerland": {
+   "p": 0.012,
+   "expected": 0.012
+  },
+  "Sluis": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Tynaarlo": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Midden-Drenthe": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Berkelland": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Bronckhorst": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Oldambt": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.112,
+   "expected": 0.119
+  },
+  "Stichtse Vecht": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Hollands Kroon": {
+   "p": 0.019,
+   "expected": 0.019
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Krimpenerwaard": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Fryske Marren": {
+   "p": 0.021,
+   "expected": 0.022
+  },
+  "Meierijstad": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Waadhoeke": {
+   "p": 0.015,
+   "expected": 0.015
+  },
+  "Westerwolde": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Midden-Groningen": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Altena": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "West Betuwe": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Vijfheerenlanden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Hoeksche Waard": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Het Hogeland": {
+   "p": 0.019,
+   "expected": 0.019
+  },
+  "Westerkwartier": {
+   "p": 0.018,
+   "expected": 0.018
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.024,
+   "expected": 0.024
+  },
+  "Molenlanden": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Eemsdelta": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Land van Cuijk": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Voorne aan Zee": {
+   "p": 0.006,
+   "expected": 0.006
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   20,
+   196,
+   0.052
+  ],
+  [
+   21,
+   197,
+   0.011
+  ],
+  [
+   22,
+   197,
+   0.095
+  ],
+  [
+   24,
+   175,
+   0.035
+  ],
+  [
+   24,
+   176,
+   0.056
+  ],
+  [
+   25,
+   161,
+   0.073
+  ],
+  [
+   25,
+   175,
+   0.015
+  ],
+  [
+   25,
+   176,
+   0.02
+  ],
+  [
+   26,
+   161,
+   0.027
+  ],
+  [
+   30,
+   138,
+   0.031
+  ],
+  [
+   52,
+   110,
+   0.04
+  ],
+  [
+   52,
+   111,
+   0.022
+  ],
+  [
+   56,
+   106,
+   0.022
+  ],
+  [
+   56,
+   107,
+   0.018
+  ],
+  [
+   56,
+   110,
+   0.012
+  ],
+  [
+   56,
+   111,
+   0.012
+  ],
+  [
+   56,
+   112,
+   0.04
+  ],
+  [
+   57,
+   110,
+   0.099
+  ],
+  [
+   57,
+   111,
+   0.052
+  ],
+  [
+   62,
+   111,
+   0.063
+  ],
+  [
+   62,
+   142,
+   0.064
+  ],
+  [
+   62,
+   143,
+   0.011
+  ],
+  [
+   64,
+   103,
+   0.034
+  ],
+  [
+   65,
+   255,
+   0.02
+  ],
+  [
+   66,
+   255,
+   0.034
+  ],
+  [
+   69,
+   105,
+   0.037
+  ],
+  [
+   92,
+   99,
+   0.014
+  ],
+  [
+   93,
+   99,
+   0.025
+  ],
+  [
+   108,
+   94,
+   0.036
+  ],
+  [
+   112,
+   93,
+   0.012
+  ],
+  [
+   112,
+   94,
+   0.026
+  ],
+  [
+   113,
+   93,
+   0.014
+  ],
+  [
+   113,
+   94,
+   0.176
+  ],
+  [
+   113,
+   95,
+   0.01
+  ],
+  [
+   147,
+   129,
+   0.089
+  ],
+  [
+   157,
+   145,
+   0.036
+  ],
+  [
+   161,
+   72,
+   0.069
+  ],
+  [
+   197,
+   187,
+   0.096
+  ],
+  [
+   202,
+   33,
+   0.011
+  ],
+  [
+   202,
+   34,
+   0.016
+  ],
+  [
+   202,
+   35,
+   0.011
+  ],
+  [
+   203,
+   34,
+   0.153
+  ],
+  [
+   204,
+   34,
+   0.012
+  ]
+ ],
+ "max_p": 0.176,
+ "expected_reports": 3.73,
+ "expected_new_sites": 1.2,
+ "sites": [
+  {
+   "lat": 53.47675,
+   "lon": 6.16485,
+   "n": 3,
+   "days": 2,
+   "first": "2026-10-18",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 1.36,
+   "p_stay": 0.149,
+   "loc": "Schiermonnikoog - Banckspolder (FR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.49342,
+   "lon": 6.15166,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-23",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.69,
+   "p_stay": 0.079,
+   "loc": "Schiermonnikoog - Opslagterrein Westerhofpad (FR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.1282,
+   "lon": 4.86424,
+   "n": 4,
+   "days": 3,
+   "first": "2026-10-21",
+   "last": "2026-10-23",
+   "max_count": 1,
+   "photos": 3,
+   "weight": 2.84,
+   "p_stay": 0.231,
+   "loc": "Texel - Midden-Eierland (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.45076,
+   "lon": 5.84059,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 1.0,
+   "p_stay": 0.147,
+   "loc": "Ameland - Kooiplaats (FR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 51.72415,
+   "lon": 6.01523,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 1.0,
+   "p_stay": 0.147,
+   "loc": "Milsbeek - Leemput (LI)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 52.22769,
+   "lon": 5.14633,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 2,
+   "weight": 1.0,
+   "p_stay": 0.147,
+   "loc": "Hilversum - Corversbos - Trektelpost (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.44067,
+   "lon": 5.623,
+   "n": 4,
+   "days": 2,
+   "first": "2026-10-19",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.97,
+   "p_stay": 0.138,
+   "loc": "Ameland - Hollum (FR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.07133,
+   "lon": 5.33807,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.71,
+   "p_stay": 0.086,
+   "loc": "Kornwerderzand - IJsselmeerkant (FR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.0719,
+   "lon": 4.872,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.56,
+   "p_stay": 0.101,
+   "loc": "Texel - Lage Veld (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.00543,
+   "lon": 4.77871,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Texel - Veerhaven (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 52.12374,
+   "lon": 5.38028,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Leusden - Den Treek - Hazenwater (UT)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.13206,
+   "lon": 4.88874,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Texel - De Eendracht - zuid (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.05143,
+   "lon": 4.75126,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Texel - Bakkenweg (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 52.08558,
+   "lon": 4.28233,
+   "n": 2,
+   "days": 2,
+   "first": "2026-10-19",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 1.23,
+   "p_stay": 0.118,
+   "loc": "Den Haag - Duinoord (ZH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 52.56862,
+   "lon": 4.61488,
+   "n": 7,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 2,
+   "photos": 0,
+   "weight": 0.87,
+   "p_stay": 0.316,
+   "loc": "Noordhollands Duinreservaat - De Hoge Toren (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 52.61679,
+   "lon": 4.62154,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Egmond aan Zee (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 52.76968,
+   "lon": 4.69048,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Petten - Polder Noorder M en Wester N (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 51.66683,
+   "lon": 3.71701,
+   "n": 4,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 1.07,
+   "p_stay": 0.242,
+   "loc": "Westenschouwen - Kampweg e.o. / duin en strand (ZL)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.39085,
+   "lon": 5.27494,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Terschelling - Koreabos (FR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.13345,
+   "lon": 4.80473,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.057,
+   "loc": "Texel - De Slufter (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.17825,
+   "lon": 4.86429,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.71,
+   "p_stay": 0.086,
+   "loc": "Texel - Robbenjager (NH)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  },
+  {
+   "lat": 53.0397,
+   "lon": 7.03775,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.71,
+   "p_stay": 0.086,
+   "loc": "Onstwedde (GR)",
+   "sub": [
+    "Bonte Kraai ssp cornix"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 5,
+  "first": "2026-10-18",
+  "last": "2026-10-22",
+  "n_all_total": 42,
+  "n_new_total": 32,
+  "persist_share": 0.007,
+  "model_all": 0.31,
+  "model_new": 0.094,
+  "new_rank_all": 0.167,
+  "new_rank_new": 0.094,
+  "nowind_all": 0.31,
+  "nowind_new": 0.094,
+  "persist_all": 0.215,
+  "persist_new": 0.032,
+  "habitat_only_all": 0.167,
+  "habitat_only_new": 0.219,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/bonte-kraai.png",
+  "image_new": "/forecast/bonte-kraai-nieuw.png"
+ }
+}

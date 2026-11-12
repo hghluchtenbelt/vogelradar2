@@ -1,0 +1,339 @@
+{
+ "species": "sneeuwgans",
+ "label": "Sneeuwgans",
+ "names": [
+  "Grote Sneeuwgans",
+  "Kleine Sneeuwgans",
+  "Sneeuwgans"
+ ],
+ "sci": "Anser caerulescens",
+ "guild": "gans",
+ "guild_label": "Ganzen",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:55+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 4,
+ "n_sites": 4,
+ "n_sites_recent": 2,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 7.0,
+  "p_stay": 0.85,
+  "sigma_stay_km": 5.0,
+  "scale_move_km": 30.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "grass": 1.0,
+  "crop": 0.4,
+  "wetland": 0.3,
+  "water": 0.2
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 2,
+  "p1": 3,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Leeuwarden": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Ooststellingwerf": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Opsterland": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Weststellingwerf": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Coevorden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Emmen": {
+   "p": 0.006,
+   "expected": 0.007
+  },
+  "Hardenberg": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Noordoostpolder": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Lochem": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Dronten": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Haarlemmermeer": {
+   "p": 0.043,
+   "expected": 0.044
+  },
+  "Lelystad": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Aa en Hunze": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Borger-Odoorn": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "De Wolden": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerveld": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Steenwijkerland": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Tynaarlo": {
+   "p": 0.059,
+   "expected": 0.061
+  },
+  "Midden-Drenthe": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hof van Twente": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Olst-Wijhe": {
+   "p": 0.042,
+   "expected": 0.043
+  },
+  "Berkelland": {
+   "p": 0.059,
+   "expected": 0.061
+  },
+  "Bronckhorst": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Súdwest-Fryslân": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Hollands Kroon": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "De Fryske Marren": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Waadhoeke": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Westerwolde": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Midden-Groningen": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Het Hogeland": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Westerkwartier": {
+   "p": 0.011,
+   "expected": 0.011
+  },
+  "Noardeast-Fryslân": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Eemsdelta": {
+   "p": 0.007,
+   "expected": 0.007
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   59,
+   234,
+   0.038
+  ],
+  [
+   133,
+   100,
+   0.017
+  ],
+  [
+   133,
+   194,
+   0.025
+  ],
+  [
+   134,
+   100,
+   0.01
+  ],
+  [
+   158,
+   228,
+   0.034
+  ]
+ ],
+ "max_p": 0.038,
+ "expected_reports": 0.82,
+ "expected_new_sites": 0.63,
+ "sites": [
+  {
+   "lat": 52.36028,
+   "lon": 4.70807,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.6,
+   "p_stay": 0.04,
+   "loc": "Amsterdam - Airport Schiphol (NH)",
+   "sub": [
+    "Sneeuwgans"
+   ]
+  },
+  {
+   "lat": 52.11627,
+   "lon": 6.6287,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 3,
+   "photos": 0,
+   "weight": 0.67,
+   "p_stay": 0.053,
+   "loc": "Eibergen - Leugemorsweg e.o. (GE)",
+   "sub": [
+    "Sneeuwgans"
+   ]
+  },
+  {
+   "lat": 53.10435,
+   "lon": 6.71464,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-21",
+   "last": "2026-10-21",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.81,
+   "p_stay": 0.06,
+   "loc": "Hunzedal - Tusschenwater (DR)",
+   "sub": [
+    "Sneeuwgans"
+   ]
+  },
+  {
+   "lat": 52.36628,
+   "lon": 6.12038,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-20",
+   "last": "2026-10-20",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.45,
+   "p_stay": 0.04,
+   "loc": "Wijhe - Duur (OV)",
+   "sub": [
+    "Sneeuwgans"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 2,
+  "first": "2026-10-20",
+  "last": "2026-10-21",
+  "n_all_total": 3,
+  "n_new_total": 3,
+  "persist_share": 0.001,
+  "model_all": 0.0,
+  "model_new": 0.0,
+  "new_rank_all": 0.0,
+  "new_rank_new": 0.0,
+  "nowind_all": 0.0,
+  "nowind_new": 0.0,
+  "persist_all": 0.0,
+  "persist_new": 0.0,
+  "habitat_only_all": 0.0,
+  "habitat_only_new": 0.0,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/sneeuwgans.png",
+  "image_new": "/forecast/sneeuwgans-nieuw.png"
+ }
+}

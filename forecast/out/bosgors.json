@@ -1,0 +1,137 @@
+{
+ "species": "bosgors",
+ "label": "Bosgors",
+ "names": [
+  "Bosgors"
+ ],
+ "sci": "Emberiza rustica",
+ "guild": "zangvogel-doortrekker",
+ "guild_label": "Doortrekkende zangvogels",
+ "rarity_class": "zeer zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 1,
+ "n_sites": 1,
+ "n_sites_recent": 0,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 3.0,
+  "p_stay": 0.6,
+  "sigma_stay_km": 3.0,
+  "scale_move_km": 40.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.6,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": true,
+  "drift": 1.0,
+  "onshore": 0.5,
+  "night": {
+   "speed_ms": 10.6,
+   "from_deg": 209,
+   "from": "ZW"
+  },
+  "day": {
+   "speed_ms": 11.8,
+   "from_deg": 257,
+   "from": "W"
+  }
+ },
+ "habitat_weights": {
+  "shrub": 1.0,
+  "tree": 0.9,
+  "built": 0.5,
+  "grass": 0.4,
+  "crop": 0.3,
+  "bare": 0.3,
+  "wetland": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 0,
+  "p3": 1,
+  "p1": 0,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Hellendoorn": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Wierden": {
+   "p": 0.059,
+   "expected": 0.061
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   132,
+   220,
+   0.041
+  ]
+ ],
+ "max_p": 0.041,
+ "expected_reports": 0.12,
+ "expected_new_sites": 0.06,
+ "sites": [
+  {
+   "lat": 52.37808,
+   "lon": 6.51074,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 1,
+   "weight": 0.24,
+   "p_stay": 0.066,
+   "loc": "Wierdense Veld - N2000 (OV)",
+   "sub": [
+    "Bosgors"
+   ]
+  }
+ ],
+ "backtest": null,
+ "files": {
+  "image": "/forecast/bosgors.png",
+  "image_new": "/forecast/bosgors-nieuw.png"
+ }
+}

@@ -1,0 +1,418 @@
+{
+ "species": "graszanger",
+ "label": "Graszanger",
+ "names": [
+  "Graszanger",
+  "Graszanger ssp cisticola"
+ ],
+ "sci": "Cisticola juncidis",
+ "guild": "standvogel",
+ "guild_label": "Standvogels en zeldzame broedvogels",
+ "rarity_class": "zeldzaam",
+ "source": "export",
+ "as_of": "2026-10-24",
+ "generated_at": "2026-10-24T13:50:51+00:00",
+ "bounds": [
+  [
+   50.7,
+   3.2
+  ],
+  [
+   53.7,
+   7.295
+  ]
+ ],
+ "window_days": 7,
+ "n_reports": 16,
+ "n_sites": 8,
+ "n_sites_recent": 2,
+ "profile": "",
+ "params": {
+  "site_km": 2.0,
+  "decay_days": 10.0,
+  "p_stay": 0.95,
+  "sigma_stay_km": 2.0,
+  "scale_move_km": 10.0,
+  "kernel_gamma": 0.3,
+  "coast_pref": 0.0,
+  "combine": "mult",
+  "anchor_km": 3.0
+ },
+ "wind": {
+  "used": false,
+  "drift": 0.0,
+  "onshore": 0.0,
+  "night": null,
+  "day": null
+ },
+ "habitat_weights": {
+  "shrub": 0.7,
+  "wetland": 0.7,
+  "grass": 0.5,
+  "tree": 0.5,
+  "crop": 0.3
+ },
+ "learned_weights": {},
+ "classes": {
+  "p30": 0,
+  "p10": 1,
+  "p3": 3,
+  "p1": 4,
+  "land_cells": 31589
+ },
+ "new_classes": {
+  "top1": 316,
+  "top5": 1263,
+  "top10": 1580,
+  "top25": 4738,
+  "land_cells": 31589
+ },
+ "areas": {
+  "Zeewolde": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Apeldoorn": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Barneveld": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Buren": {
+   "p": 0.01,
+   "expected": 0.011
+  },
+  "Ede": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Borsele": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Goes": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Hulst": {
+   "p": 0.119,
+   "expected": 0.127
+  },
+  "Middelburg (Z.)": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Reimerswaal": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Terneuzen": {
+   "p": 0.112,
+   "expected": 0.119
+  },
+  "Tholen": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Veere": {
+   "p": 0.139,
+   "expected": 0.15
+  },
+  "Vlissingen": {
+   "p": 0.039,
+   "expected": 0.04
+  },
+  "Bergen op Zoom": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Oss": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Steenbergen": {
+   "p": 0.006,
+   "expected": 0.007
+  },
+  "Woensdrecht": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Zundert": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Utrechtse Heuvelrug": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Roosendaal": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Schouwen-Duiveland": {
+   "p": 0.013,
+   "expected": 0.013
+  },
+  "Noord-Beveland": {
+   "p": 0.007,
+   "expected": 0.007
+  },
+  "Sluis": {
+   "p": 0.174,
+   "expected": 0.191
+  },
+  "Goeree-Overflakkee": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Krimpenerwaard": {
+   "p": 0.006,
+   "expected": 0.006
+  },
+  "Meierijstad": {
+   "p": 0.005,
+   "expected": 0.005
+  },
+  "Altena": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "West Betuwe": {
+   "p": 0.05,
+   "expected": 0.052
+  },
+  "Vijfheerenlanden": {
+   "p": 0.01,
+   "expected": 0.01
+  },
+  "Hoeksche Waard": {
+   "p": 0.008,
+   "expected": 0.008
+  },
+  "Molenlanden": {
+   "p": 0.009,
+   "expected": 0.009
+  },
+  "Land van Cuijk": {
+   "p": 0.007,
+   "expected": 0.007
+  }
+ },
+ "mode": "probability",
+ "thresholds": [
+  0.3,
+  0.1,
+  0.03,
+  0.01
+ ],
+ "grid": {
+  "lat0": 53.7,
+  "lon0": 3.2,
+  "dlat": 0.00999999999999801,
+  "dlon": 0.015000000000000124,
+  "ny": 300,
+  "nx": 273
+ },
+ "cells": [
+  [
+   177,
+   137,
+   0.01
+  ],
+  [
+   215,
+   17,
+   0.06
+  ],
+  [
+   217,
+   16,
+   0.022
+  ],
+  [
+   224,
+   30,
+   0.026
+  ],
+  [
+   230,
+   20,
+   0.101
+  ],
+  [
+   234,
+   65,
+   0.025
+  ],
+  [
+   236,
+   64,
+   0.044
+  ],
+  [
+   237,
+   35,
+   0.058
+  ]
+ ],
+ "max_p": 0.101,
+ "expected_reports": 1.23,
+ "expected_new_sites": 0.66,
+ "sites": [
+  {
+   "lat": 51.39621,
+   "lon": 3.51044,
+   "n": 4,
+   "days": 3,
+   "first": "2026-10-18",
+   "last": "2026-10-22",
+   "max_count": 2,
+   "photos": 2,
+   "weight": 2.87,
+   "p_stay": 0.161,
+   "loc": "Breskens - Waterdunen (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.45703,
+   "lon": 3.65746,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-22",
+   "last": "2026-10-22",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.65,
+   "p_stay": 0.039,
+   "loc": "Ritthem - Schor en slik Sloehaven (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.32778,
+   "lon": 3.73701,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-19",
+   "last": "2026-10-19",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.67,
+   "p_stay": 0.096,
+   "loc": "Braakman Noord - natuurontwikkeling zuid (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.52445,
+   "lon": 3.4412,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.44,
+   "p_stay": 0.039,
+   "loc": "Westkapelle - Opslagterrein Erika (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.35426,
+   "lon": 4.1803,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.44,
+   "p_stay": 0.039,
+   "loc": "Verdronken Land van Saeftinghe - Tweede Platte Plaat e.o. (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.33226,
+   "lon": 4.1653,
+   "n": 2,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.54,
+   "p_stay": 0.069,
+   "loc": "Verdronken Land van Saeftinghe - schor tussen Rijksdam en Gasdam (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.54838,
+   "lon": 3.45895,
+   "n": 3,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.61,
+   "p_stay": 0.096,
+   "loc": "Westkapelle - Zeedijk (ZL)",
+   "sub": [
+    "Graszanger"
+   ]
+  },
+  {
+   "lat": 51.92955,
+   "lon": 5.25506,
+   "n": 1,
+   "days": 1,
+   "first": "2026-10-18",
+   "last": "2026-10-18",
+   "max_count": 1,
+   "photos": 0,
+   "weight": 0.44,
+   "p_stay": 0.039,
+   "loc": "Tricht - De Regulieren (GE)",
+   "sub": [
+    "Graszanger"
+   ]
+  }
+ ],
+ "backtest": {
+  "days": 1,
+  "first": "2026-10-18",
+  "last": "2026-10-18",
+  "n_all_total": 4,
+  "n_new_total": 0,
+  "persist_share": 0.005,
+  "model_all": 1.0,
+  "model_new": null,
+  "new_rank_all": 1.0,
+  "new_rank_new": null,
+  "nowind_all": 1.0,
+  "nowind_new": null,
+  "persist_all": 1.0,
+  "persist_new": null,
+  "habitat_only_all": 0.0,
+  "habitat_only_new": null,
+  "generic_all": null,
+  "generic_new": null
+ },
+ "files": {
+  "image": "/forecast/graszanger.png",
+  "image_new": "/forecast/graszanger-nieuw.png"
+ }
+}
