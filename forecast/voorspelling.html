@@ -1,9 +1,13 @@
 <!--
-  VOGELRADAR · Voorspelling
-  "Kaart": per species (or all rare species combined) the chance of a report per 1 km cell
-  tomorrow (brown) and the ranking of likely new sites (green), on the CARTO basemap.
-  Tap selects the municipality and shows a short summary. Species pages also show the
-  reported sites of the last 7 days. "Uitleg": method, species list, datasets.
+  VOGELRADAR · Voorspelling (test)
+  "Kaart": per species (or all rare species combined) the chance of a report per 1 km cell on the
+  forecast day (brown, absolute classes) and, opt-in, the ranking of likely new sites (green), on the
+  CARTO basemap. The forecast day is the day after the latest archived data (meta.as_of + 1); every
+  label names it relative to the visitor's clock ("vandaag", "morgen") plus the date.
+  Legend swatches carry the same alpha as the PNG layers and the overlays render pixelated, so the
+  colour on the map matches the legend class. "Beste plekken" lists the sites with the highest chance,
+  or the nearest ones after a location request. Tap selects the municipality and shows a summary.
+  Species pages also show the reported sites of the last 7 days. "Uitleg": method, species, datasets.
   Data: /forecast/index.json, /forecast/<slug>.json, /forecast/<slug>.png, -nieuw.png, gemeentes.json
   Query: ?soort=<slug> (default alle) · ?lat=&lng=&z= position · ?tik=lat,lng reopens a selection
   Hash: #uitleg, #soorten, #datasets. UI text is Dutch.
@@ -12,96 +16,159 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Vogelradar · Voorspelling</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
-    --ink:#0f172a; --muted:#64748b; --line:#e7ecf1; --brand:#0d9488; --brand-d:#0f766e;
-    --leaf1:#f2d9a6; --leaf2:#e3a85f; --leaf3:#c9702e; --leaf4:#8a3d12; --paper:#fbf7f0; --rule:#e8dfd0;
+    --ink:#0f172a; --muted:#586579; --line:#e7ecf1; --paper:#fbf7f0; --rule:#e8dfd0; --basemap:#fbf8f3;
+    --leaf1:#f2d9a6; --leaf2:#e3a85f; --leaf3:#c9702e; --leaf4:#8a3d12;
     --moss1:#c6e0c4; --moss2:#8cbe96; --moss3:#509664; --moss4:#1e643c;
+    /* the map layers as drawn: same RGB and alpha as PALETTE / PALETTE_NEW in model.py */
+    --leaf1a:rgba(242,217,166,.412); --leaf2a:rgba(227,168,95,.549); --leaf3a:rgba(201,112,46,.667); --leaf4a:rgba(138,61,18,.784);
+    --moss1a:rgba(198,224,196,.373); --moss2a:rgba(140,190,150,.49); --moss3a:rgba(80,150,100,.588); --moss4a:rgba(30,100,60,.686);
+    --lg-h:0px;
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   html,body{margin:0;padding:0;height:100%;overflow:hidden;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    color:var(--ink);-webkit-font-smoothing:antialiased;background:#cddfea}
+    color:var(--ink);-webkit-font-smoothing:antialiased;background:#cddfea;accent-color:var(--leaf4)}
+  ::selection{background:var(--leaf1);color:var(--ink)}
+  :focus-visible{outline:2px solid var(--leaf4);outline-offset:2px}
+  a{text-underline-offset:2px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   #map{position:fixed;inset:0;z-index:0;background:#cddfea}
+  .leaflet-image-layer{image-rendering:crisp-edges;image-rendering:pixelated}
   .leaflet-bottom.leaflet-right{bottom:4px;right:4px}
-  .leaflet-control-attribution{font-size:8px;background:rgba(255,255,255,.55);padding:1px 4px;border-radius:3px;backdrop-filter:blur(4px)}
+  .leaflet-control-attribution{font-size:11px;line-height:1.35;background:rgba(255,255,255,.72);padding:2px 6px;border-radius:4px;backdrop-filter:blur(4px)}
+  .leaflet-control-attribution a{color:var(--ink)}
   .leaflet-popup-content{margin:10px 12px;font-family:inherit;font-size:12.5px;line-height:1.45}
   .leaflet-popup-content b{font-size:13.5px}
-  .leaflet-popup-content a{color:var(--brand-d);text-decoration:none}
+  .leaflet-popup-content a{color:var(--leaf4);text-decoration:underline}
+  .leaflet-popup-content .mu{color:var(--muted)}
+  .leaflet-popup-content .acts{margin-top:6px;display:flex;gap:12px;flex-wrap:wrap}
+  .leaflet-popup-content .acts a{font-weight:650}
 
   .topbar{position:fixed;top:8px;left:50%;transform:translateX(-50%);width:min(100vw - 16px,600px);z-index:1000;
     background:rgba(255,255,255,.84);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     border:1px solid rgba(255,255,255,.7);border-radius:16px;box-shadow:0 6px 22px rgba(2,6,23,.12);padding:8px 10px}
   .brandrow{display:flex;align-items:center;gap:9px}
   .bt{min-width:0}
-  .bt b{font-size:16px;font-weight:760;letter-spacing:-.3px;display:block;line-height:1.1}
-  .bt span{font-size:10.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ttl{font-size:16px;font-weight:760;letter-spacing:-.3px;line-height:1.1;margin:0;display:flex;align-items:center;gap:6px;min-width:0}
+  .ttl #title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tag{font-size:11px;font-weight:650;letter-spacing:0;color:var(--leaf4);border:1px solid var(--leaf2);border-radius:999px;padding:0 6px;line-height:16px;flex:0 0 auto}
+  .bt #sub{font-size:11.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
   .grow{flex:1}
-  .rf{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);flex:0 0 auto;
-    display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700}
+  .rf{width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:#fff;font-size:15px;cursor:pointer;color:var(--ink);flex:0 0 auto;
+    display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700;font-family:inherit;padding:0}
   .rf:active{transform:scale(.94)}
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:#fff;padding:2px;flex:0 0 auto}
-  .seg button{border:none;background:none;font:inherit;font-size:12px;font-weight:650;color:var(--muted);padding:5px 11px;border-radius:999px;cursor:pointer}
+  .seg button{border:none;background:none;font:inherit;font-size:12.5px;font-weight:650;color:var(--muted);padding:7px 12px;border-radius:999px;cursor:pointer}
   .seg button.on{background:var(--leaf4);color:#fff}
   .chips{display:flex;gap:6px;margin-top:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .chips::-webkit-scrollbar{display:none}
-  .chip{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;flex:0 0 auto;
-    border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:650;color:var(--muted);cursor:pointer;user-select:none;font-family:inherit}
-  .chip.on{color:#fff;background:var(--leaf3);border-color:var(--leaf3)}
-  .chip.green.on{background:#3f8a5a;border-color:#3f8a5a}
-  .chip.sel{appearance:none;-webkit-appearance:none;color:var(--ink);border-color:var(--leaf4);padding-right:22px;
-    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%238a3d12' stroke-width='1.6'/></svg>") no-repeat right 8px center;max-width:46vw}
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;min-height:32px;line-height:1;border-radius:999px;flex:0 0 auto;
+    border:1.5px solid var(--line);background:#fff;font-size:12.5px;font-weight:650;color:var(--muted);cursor:pointer;user-select:none;font-family:inherit}
+  .chip.on{color:#fff;background:var(--leaf4);border-color:var(--leaf4)}
+  .chip.green.on{background:var(--moss4);border-color:var(--moss4)}
+  .chip.best.on{color:var(--leaf4);background:#fff;border-color:var(--leaf4)}
+  .chip svg{flex:0 0 auto;display:block}
+  .cs{width:12px;height:10px;border-radius:2px;flex:0 0 auto;opacity:.5}
+  .cs.leaf{background:linear-gradient(90deg,var(--leaf1) 0 25%,var(--leaf2) 25% 50%,var(--leaf3) 50% 75%,var(--leaf4) 75%)}
+  .cs.moss{background:linear-gradient(90deg,var(--moss1) 0 25%,var(--moss2) 25% 50%,var(--moss3) 50% 75%,var(--moss4) 75%)}
+  .chip.on .cs{opacity:1;box-shadow:0 0 0 1px rgba(255,255,255,.85)}
+  .chip.sel{appearance:none;-webkit-appearance:none;color:var(--ink);border-color:var(--leaf4);padding-right:24px;
+    background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M1 1l4 4 4-4' fill='none' stroke='%238a3d12' stroke-width='1.6'/></svg>") no-repeat right 9px center;flex:1 1 auto;min-width:0;max-width:280px;text-overflow:ellipsis}
 
-  .legend{position:fixed;left:8px;bottom:18px;z-index:900;max-width:min(100vw - 16px,320px);
-    background:rgba(255,255,255,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-    border:1px solid rgba(255,255,255,.7);border-radius:14px;box-shadow:0 6px 22px rgba(2,6,23,.12);padding:9px 12px}
-  .legend .lt{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:5px}
-  .legend .rows{display:flex;gap:6px 12px;flex-wrap:wrap}
+  .legend{position:fixed;left:8px;bottom:18px;z-index:900;max-width:min(100vw - 16px,380px);
+    background:rgba(255,255,255,.9);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.7);border-radius:14px;box-shadow:0 6px 22px rgba(2,6,23,.12);padding:9px 40px 9px 12px}
+  .legend .lt{font-size:12.5px;font-weight:700;line-height:1.3}
+  .legend .when{font-size:12px;color:var(--muted);line-height:1.35;margin-top:1px}
+  .legend .when.stale{color:var(--leaf4);font-weight:650}
+  .legend .rows{display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:5px}
   .legend .row{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink);line-height:1.5;white-space:nowrap}
-  .legend .sw{width:18px;height:11px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(2,6,23,.08)}
-  .legend .ln{font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.35}
-  .legend .sep{margin-top:7px;padding-top:7px;border-top:1px solid var(--line)}
-  .site-dot{width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--leaf4);display:inline-block;vertical-align:-1px}
-  .site-dot.old{opacity:.45}
+  .sw{width:18px;height:11px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(2,6,23,.08);background-color:var(--basemap)}
+  .sw.l1{background-image:linear-gradient(var(--leaf1a),var(--leaf1a))}
+  .sw.l2{background-image:linear-gradient(var(--leaf2a),var(--leaf2a))}
+  .sw.l3{background-image:linear-gradient(var(--leaf3a),var(--leaf3a))}
+  .sw.l4{background-image:linear-gradient(var(--leaf4a),var(--leaf4a))}
+  .sw.m1{background-image:linear-gradient(var(--moss1a),var(--moss1a))}
+  .sw.m2{background-image:linear-gradient(var(--moss2a),var(--moss2a))}
+  .sw.m3{background-image:linear-gradient(var(--moss3a),var(--moss3a))}
+  .sw.m4{background-image:linear-gradient(var(--moss4a),var(--moss4a))}
+  .legend .sec:not([hidden]) ~ .sec:not([hidden]){margin-top:7px;padding-top:7px;border-top:1px solid var(--line)}
+  .legend .lx{position:absolute;top:5px;right:5px;width:30px;height:30px;border:none;background:none;border-radius:8px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;padding:0}
+  .legend .lx svg{transition:transform .2s cubic-bezier(.32,.72,0,1)}
+  .legend.collapsed .lx svg{transform:rotate(180deg)}
+  .legend.collapsed .rows, .legend.collapsed .when, .legend.collapsed .sec:not([hidden]) ~ .sec{display:none}
+  .site-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--leaf4);display:inline-block;vertical-align:-1px}
+  .site-dot.old{border-style:dotted;opacity:.6}
 
-  .panel{position:fixed;inset:0;z-index:950;background:var(--paper);overflow-y:auto;-webkit-overflow-scrolling:touch}
-  .panel .inner{max-width:600px;margin:0 auto;padding:86px 16px 40px;font-size:13.5px;line-height:1.55}
+  .msg{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(100vw - 32px,360px);z-index:950;
+    background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(2,6,23,.16);padding:14px 16px;font-size:13.5px;line-height:1.5}
+  .msg b{display:block;font-size:14.5px;margin-bottom:2px}
+  .msg a{color:var(--leaf4);font-weight:650}
+
+  .sheet{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100vw,600px);max-height:min(64vh,580px);z-index:1100;
+    background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -10px 34px rgba(2,6,23,.18);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+  .sheet .handle{padding:9px 0 4px;display:flex;justify-content:center;flex:0 0 auto}
+  .sheet .grab{width:40px;height:5px;border-radius:999px;background:#cbd5e1}
+  .sheethead{padding:0 12px 10px 16px;border-bottom:1px solid var(--line);flex:0 0 auto}
+  .sh-top{display:flex;align-items:center;gap:8px}
+  .sh-top h2{font-size:15.5px;font-weight:740;letter-spacing:-.2px;margin:0;flex:1}
+  .sh-sub{font-size:12px;color:var(--muted);margin:1px 0 9px}
+  .sh-note{font-size:12px;color:var(--leaf4);margin:8px 0 0}
+  .plist{list-style:none;margin:0;padding:2px 16px 14px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .plist li{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .plist li:last-child{border-bottom:none}
+  .plist .empty{color:var(--muted);font-size:13px}
+  .bp-pct{display:flex;align-items:center;gap:6px;min-width:60px;font-size:16px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.2px}
+  .bp-txt{flex:1;min-width:0}
+  .bp-txt b{display:block;font-size:13.5px;line-height:1.3;overflow-wrap:anywhere}
+  .bp-txt span{display:block;font-size:12px;color:var(--muted);line-height:1.4}
+  .bp-act{display:flex;flex-direction:column;gap:5px;align-items:stretch;flex:0 0 auto}
+  .bp-act button,.bp-act a{font:inherit;font-size:12px;font-weight:650;color:var(--leaf4);background:#fff;border:1.5px solid var(--rule);border-radius:999px;
+    padding:5px 11px;cursor:pointer;text-decoration:none;white-space:nowrap;text-align:center}
+
+  .panel{position:fixed;inset:0;z-index:950;background:var(--paper);overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+  .panel .inner{max-width:600px;margin:0 auto;padding:96px 16px 40px;font-size:13.5px;line-height:1.55}
   .panel h2{font-size:18px;letter-spacing:-.3px;margin:0 0 6px}
-  .panel h3{font-size:12px;color:var(--leaf4);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 6px}
+  .panel h3{font-size:12px;color:var(--leaf4);text-transform:uppercase;letter-spacing:.06em;margin:22px 0 6px}
   .panel h4{font-size:13.5px;margin:16px 0 2px}
   .panel p{margin:6px 0}
   .panel ul{margin:6px 0;padding-left:18px}
   .panel li{margin:4px 0}
   .panel table{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0}
-  .panel th{text-align:left;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:650;padding:6px 6px 4px;border-bottom:1px solid var(--rule)}
-  .panel td{padding:6px;border-bottom:1px solid #efe8dc;vertical-align:top}
+  .panel th{text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:650;padding:6px 6px 4px;border-bottom:1px solid var(--rule)}
+  .panel td{padding:6px;border-bottom:1px solid #efe8dc;vertical-align:top;font-variant-numeric:tabular-nums}
   .panel td:first-child{font-weight:650;white-space:nowrap}
-  .panel td b{font-variant-numeric:tabular-nums}
-  .panel a{color:var(--brand-d);text-decoration:none;overflow-wrap:anywhere}
-  .panel .note{font-size:11.5px;color:var(--muted)}
-  .panel .ver{font-size:11px;color:var(--muted);margin-top:18px;padding-top:10px;border-top:1px solid var(--rule)}
-  .panel .subtabs{display:flex;gap:6px;margin:12px 0 4px;flex-wrap:wrap}
-  .panel .subtabs button{font:inherit;font-size:12.5px;font-weight:650;padding:6px 12px;border-radius:999px;border:1.5px solid var(--rule);background:#fff;color:var(--muted);cursor:pointer}
+  .panel td.n{color:var(--muted)}
+  .panel a{color:var(--leaf4);overflow-wrap:anywhere}
+  .panel .note{font-size:12px;color:var(--muted)}
+  .panel .ver{font-size:11.5px;color:var(--muted);margin-top:18px;padding-top:10px;border-top:1px solid var(--rule)}
+  .panel .subtabs{display:flex;gap:6px;margin:14px 0 4px;flex-wrap:wrap}
+  .panel .subtabs button{font:inherit;font-size:12.5px;font-weight:650;padding:7px 13px;border-radius:999px;border:1.5px solid var(--rule);background:#fff;color:var(--muted);cursor:pointer}
   .panel .subtabs button.on{background:var(--leaf4);border-color:var(--leaf4);color:#fff}
   .box{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:10px 12px;margin:10px 0}
-  .box .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-  .box .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px 14px;margin-top:6px}
+  .box h4{margin:0 0 4px}
+  .box .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .box .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 14px;margin-top:6px}
+  .box .grid .wide{grid-column:1/-1}
   .box .v{font-size:13px;font-weight:650}
-  .box .v small{color:var(--muted);font-weight:500}
+  .box .v small{color:var(--muted);font-weight:500;font-size:12px}
   .score td:nth-child(n+2){text-align:right}
   .sp{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid #efe8dc;flex-wrap:wrap}
   .sp .nm{font-weight:650;min-width:150px}
-  .sp .nm a{color:var(--ink)}
+  .sp .nm a{color:var(--ink);text-decoration:none}
   .sp.cur .nm a{color:var(--leaf4)}
   .sp .m{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .sp .w{font-size:10.5px;color:#fff;background:var(--leaf3);border-radius:999px;padding:1px 7px}
+  .sp .w{font-size:11px;color:#fff;background:var(--leaf4);border-radius:999px;padding:1px 7px}
   .gh h4{margin-top:18px}
+  .gh h4 span{color:var(--muted);font-weight:500}
   .meth{font-size:12.5px;color:var(--muted);margin:2px 0 6px}
-  .zero{display:inline-block;margin-top:8px;font-size:11.5px;color:var(--muted);background:none;border:1px solid var(--rule);border-radius:999px;padding:3px 10px;cursor:pointer;font-family:inherit}
+  .zero{display:inline-block;margin-top:8px;font-size:12px;color:var(--muted);background:none;border:1px solid var(--rule);border-radius:999px;padding:4px 11px;cursor:pointer;font-family:inherit}
   .zl{columns:2;column-gap:18px;font-size:12px;color:var(--muted);margin:6px 0 0;padding-left:0;list-style:none}
   .zl li{break-inside:avoid;padding:1px 0}
   .zl a{color:var(--muted)}
@@ -111,86 +178,116 @@
   @media (max-width:520px){
     .chips{flex-wrap:wrap;overflow:visible}
     .chip.sel{max-width:100%;flex:1 1 100%}
-    .legend{left:8px;right:8px;bottom:14px;max-width:none;padding:8px 10px}
-    .legend .lt{font-size:11.5px;margin-bottom:3px}
-    .legend .row{font-size:11px}
-    .legend .ln{display:none}
+    .legend{left:8px;right:8px;bottom:14px;max-width:none;padding:8px 40px 8px 10px}
+    .legend .lt{font-size:12px}
+    .legend .row{font-size:11.5px}
+    .leaflet-bottom.leaflet-right{bottom:calc(var(--lg-h) + 20px)}
     .panel td:first-child{white-space:normal}
     .panel table.ds, .panel table.ds tbody, .panel table.ds tr, .panel table.ds td{display:block;width:100%}
     .panel table.ds thead{display:none}
     .panel table.ds tr{padding:8px 0;border-bottom:1px solid var(--rule)}
     .panel table.ds td{border:none;padding:2px 0}
     .panel table.ds td:first-child{font-size:13px;color:var(--leaf4)}
-    .panel table.ds td:last-child{font-size:11.5px;color:var(--muted)}
+    .panel table.ds td:last-child{font-size:12px;color:var(--muted)}
     .sp .nm{min-width:0;width:100%}
   }
-  .loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:800;pointer-events:none;color:var(--muted);font-size:13px}
+  @media (max-width:380px){ .cs{display:none} }
+  @media (prefers-reduced-motion:reduce){ .legend .lx svg{transition:none} }
+  .loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:800;pointer-events:none;color:var(--ink);font-size:13px}
 </style>
 </head>
 <body>
-<div id="map"></div>
-
-<div class="topbar">
+<header class="topbar" id="topbar">
   <div class="brandrow">
-    <a class="rf" href="/" title="Terug naar de kaart">←</a>
-    <div class="bt"><b id="title">Voorspelling</b><span id="sub">laden…</span></div>
+    <a class="rf" href="/" title="Terug naar Vogelradar" aria-label="Terug naar Vogelradar">←</a>
+    <div class="bt"><h1 class="ttl"><span id="title">Voorspelling</span><span class="tag" title="Experimentele voorspelling">test</span></h1><span id="sub">laden…</span></div>
     <div class="grow"></div>
-    <div class="seg" id="tabs">
-      <button data-tab="kaart" class="on">Kaart</button>
-      <button data-tab="uitleg">Uitleg</button>
+    <div class="seg" id="tabs" role="tablist" aria-label="Weergave">
+      <button role="tab" data-tab="kaart" class="on" aria-selected="true" aria-controls="map">Kaart</button>
+      <button role="tab" data-tab="uitleg" aria-selected="false" aria-controls="panel">Uitleg</button>
     </div>
   </div>
   <div class="chips" id="chips">
-    <select class="chip sel" id="soort" title="Kies een soort"></select>
-    <button class="chip on" id="chip-model" title="Kans op een melding van vogels die nu bekend zijn">🍂 Bekende vogels</button>
-    <button class="chip on green" id="chip-new" title="Waar nog onbekende vogels het eerst opduiken">🌱 Nieuwe vogels</button>
+    <select class="chip sel" id="soort" aria-label="Soort"></select>
+    <button class="chip on" id="chip-model" aria-pressed="true" title="Kans op een melding per vak"><span class="cs leaf" aria-hidden="true"></span>Kans</button>
+    <button class="chip green" id="chip-new" aria-pressed="false" title="Waar vogels die nog niemand zag het eerst opduiken (rangorde, geen kans)"><span class="cs moss" aria-hidden="true"></span>Nieuwe plekken</button>
+    <button class="chip best" id="chip-best" aria-expanded="false" aria-controls="sheet" hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Beste plekken</span></button>
   </div>
-</div>
+</header>
 
-<div class="legend" id="legend">
-  <div class="lt" id="legend-title">Kans morgen</div>
-  <div class="rows">
-    <div class="row"><span class="sw" style="background:var(--leaf4)"></span>30%+</div>
-    <div class="row"><span class="sw" style="background:var(--leaf3)"></span>10 tot 30%</div>
-    <div class="row"><span class="sw" style="background:var(--leaf2)"></span>3 tot 10%</div>
-    <div class="row"><span class="sw" style="background:var(--leaf1)"></span>1 tot 3%</div>
-  </div>
-  <div id="legend-new" class="sep">
-    <div class="lt" id="legend-new-title">Nieuwe vogels</div>
+<div class="legend" id="legend" role="region" aria-label="Legenda">
+  <button class="lx" id="legend-toggle" aria-expanded="true" aria-controls="legend" title="Legenda inklappen">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+  <div class="sec" id="legend-model">
+    <div class="lt" id="legend-title">Kans</div>
+    <div class="when" id="legend-when"></div>
     <div class="rows">
-      <div class="row"><span class="sw" style="background:var(--moss4)"></span>zeer kansrijk</div>
-      <div class="row"><span class="sw" style="background:var(--moss3)"></span>kansrijk</div>
-      <div class="row"><span class="sw" style="background:var(--moss2)"></span>redelijk</div>
-      <div class="row"><span class="sw" style="background:var(--moss1)"></span>enig</div>
+      <div class="row"><span class="sw l4"></span>30%+</div>
+      <div class="row"><span class="sw l3"></span>10 tot 30%</div>
+      <div class="row"><span class="sw l2"></span>3 tot 10%</div>
+      <div class="row"><span class="sw l1"></span>1 tot 3%</div>
     </div>
   </div>
-  <div id="legend-sites" class="sep rows" hidden>
-    <div class="row"><span class="site-dot"></span>laatste 3 dagen</div>
-    <div class="row"><span class="site-dot old"></span>eerder</div>
+  <div class="sec" id="legend-new" hidden>
+    <div class="lt">Nieuwe plekken</div>
+    <div class="when">rangorde, geen kans: de beste 1, 5, 10 en 25% van Nederland</div>
+    <div class="rows">
+      <div class="row"><span class="sw m4"></span>zeer kansrijk</div>
+      <div class="row"><span class="sw m3"></span>kansrijk</div>
+      <div class="row"><span class="sw m2"></span>redelijk</div>
+      <div class="row"><span class="sw m1"></span>enig</div>
+    </div>
+  </div>
+  <div class="sec" id="legend-sites" hidden>
+    <div class="lt">Gemeld, laatste 7 dagen</div>
+    <div class="rows">
+      <div class="row"><span class="site-dot"></span>laatste 3 dagen</div>
+      <div class="row"><span class="site-dot old"></span>eerder</div>
+    </div>
   </div>
 </div>
 
-<div class="panel" id="panel" hidden><div class="inner">
+<div class="msg" id="msg" role="status" hidden></div>
+
+<section class="sheet" id="sheet" role="dialog" aria-labelledby="sheet-title" hidden>
+  <div class="handle" aria-hidden="true"><span class="grab"></span></div>
+  <div class="sheethead">
+    <div class="sh-top"><h2 id="sheet-title">Beste plekken</h2><button class="rf" id="sheet-close" aria-label="Beste plekken sluiten">×</button></div>
+    <div class="sh-sub" id="sheet-sub"></div>
+    <div class="seg" id="sort" role="group" aria-label="Sorteren">
+      <button data-sort="kans" class="on" aria-pressed="true">Hoogste kans</button>
+      <button data-sort="dichtbij" aria-pressed="false">Dichtbij mij</button>
+    </div>
+    <p class="sh-note" id="sheet-note" hidden></p>
+  </div>
+  <ol class="plist" id="best"></ol>
+</section>
+
+<div class="panel" id="panel" role="tabpanel" hidden><div class="inner">
   <h2>Hoe werkt de voorspelling?</h2>
-  <p><b>Bruin, kans morgen.</b> Per vak de kans dat er morgen een melding komt, op dezelfde schaal voor alle soorten. Die kans komt vooral van vogels die nu al ergens zitten: per plek wordt geschat hoe waarschijnlijk een nieuwe melding is, uit hoe lang de vogel er al zit, hoe recent de laatste melding was, of er een foto is en de soortgroep.</p>
-  <p><b>Groen, nieuwe vogels.</b> Waar vogels opduiken die nu nog nergens gemeld zijn: een rangorde op basis van habitat, afstand tot plekken waar de soort nu zit, de kust en de wind van vannacht. Geen kans, want per vak blijft die onder 1%. Zeer kansrijk is de beste 1% van het land, kansrijk 5%, redelijk 10%, enig 25%.</p>
+  <p><b>Bruin: kans op een melding.</b> Per vak de kans op minstens één melding op de voorspelde dag (de dag na de laatste gegevens), op dezelfde schaal voor alle soorten. Die kans komt vooral van vogels die nu al ergens zitten: per plek wordt geschat hoe waarschijnlijk een nieuwe melding is, uit hoe lang de vogel er al zit, hoe recent de laatste melding was, of er een foto is en de soortgroep.</p>
+  <p><b>Groen: nieuwe plekken.</b> Waar vogels opduiken die nu nog nergens gemeld zijn: een rangorde op basis van habitat, afstand tot plekken waar de soort nu zit, de kust en de wind van vannacht. Geen kans, want per vak blijft die onder 1%. Zeer kansrijk is de beste 1% van het land, kansrijk 5%, redelijk 10%, enig 25%. Deze laag staat standaard uit.</p>
   <h3>Per soort</h3>
-  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-    <select class="chip sel" id="soort2" title="Kies een soort" style="max-width:100%"></select>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <select class="chip sel" id="soort2" aria-label="Soort" style="max-width:100%"></select>
     <a id="toon-kaart" href="?soort=alle" style="font-size:12.5px;font-weight:650">toon op de kaart →</a>
   </div>
   <div class="box" id="curbox"></div>
-  <div class="subtabs" id="subtabs">
-    <button data-sub="methode" class="on">Details</button>
-    <button data-sub="soorten">Soorten</button>
-    <button data-sub="datasets">Datasets</button>
+  <div class="subtabs" id="subtabs" role="tablist" aria-label="Onderdeel">
+    <button role="tab" data-sub="methode" class="on" aria-selected="true" aria-controls="sub-methode">Details</button>
+    <button role="tab" data-sub="soorten" aria-selected="false" aria-controls="sub-soorten">Soorten</button>
+    <button role="tab" data-sub="datasets" aria-selected="false" aria-controls="sub-datasets">Datasets</button>
   </div>
-  <div id="sub-methode"></div>
-  <div id="sub-soorten" hidden></div>
-  <div id="sub-datasets" hidden></div>
+  <div id="sub-methode" role="tabpanel"></div>
+  <div id="sub-soorten" role="tabpanel" hidden></div>
+  <div id="sub-datasets" role="tabpanel" hidden></div>
   <div class="ver" id="ver"></div>
 </div></div>
 <div class="loading" id="loading">kaart laden…</div>
+<div class="sr" id="sr" aria-live="polite"></div>
+<div id="map" role="region" aria-label="Kaart"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -201,10 +298,29 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
-  const fmt = iso => { const d = new Date(iso + 'T12:00:00'); return `${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+  const WD = ['zo','ma','di','wo','do','vr','za'];
+  const dayOf = iso => new Date(iso + 'T12:00:00');
+  const fmt = iso => { const d = dayOf(iso); return `${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+  const fmtDay = d => `${WD[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
   const pct = x => (x == null || Number.isNaN(x)) ? '-' : Math.round(x * 100) + '%';
   const pct1 = x => (x == null) ? '-' : (x < 0.0095 ? (Math.round(x * 1000) / 10) + '%' : Math.round(x * 100) + '%');
   const fmtP = x => x == null ? '-' : x >= 0.995 ? '99%' : x >= 0.0095 ? Math.round(x * 100) + '%' : x >= 0.0005 ? (Math.round(x * 1000) / 10).toLocaleString('nl-NL') + '%' : 'onder 0,1%';
+  const leafClass = p => p >= 0.30 ? 'l4' : p >= 0.10 ? 'l3' : p >= 0.03 ? 'l2' : p >= 0.01 ? 'l1' : '';
+  const routeUrl = (lat, lng) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+  const isPhone = () => window.innerWidth < 520;
+  const store = { get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
+                  set(k, v){ try { localStorage.setItem(k, v); } catch (e) {} } };
+
+  // The forecast day is the day after the latest archived data; name it relative to the visitor's clock.
+  let fc = {label:'', rel:'', stale:false};
+  function forecastDay(asOf){
+    const t = dayOf(asOf); t.setDate(t.getDate() + 1);
+    const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+    const diff = Math.round((t - today) / 86400000);
+    return {label:fmtDay(t), rel: diff === 0 ? 'vandaag' : diff === 1 ? 'morgen' : '', stale: diff < 0};
+  }
+  const when = () => (fc.rel && !fc.stale) ? fc.rel : `op ${fc.label}`;
+
   // contributors of at least 1 percent: top 3, up to 5 when more of them exceed 10 percent, plus the rest as one figure
   function contributors(total, top){
     const eligible = (top || []).filter(t => t[2] >= 0.01);
@@ -215,54 +331,92 @@
     return {shown, rest};
   }
   const NL_CLASS = {tree:'bos', shrub:'struweel', grass:'grasland', crop:'akker', built:'bebouwing', bare:'kaal of strand', water:'water', wetland:'moeras'};
-  const weightsText = w => Object.entries(w || {}).filter(([k, v]) => v > 0.01 && NL_CLASS[k]).sort((a, b) => b[1] - a[1]).slice(0, 4)
-    .map(([k, v]) => `${NL_CLASS[k]} ${Math.round(v * 100) / 100}`).join(', ');
+  const habitatText = w => Object.entries(w || {}).filter(([k, v]) => v > 0.01 && NL_CLASS[k]).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => NL_CLASS[k]).join(', ');
   const windText = w => !w ? 'geen' : [w.drift ? 'nachtwind' : '', w.onshore ? 'aanlandig' : ''].filter(Boolean).join(' + ') || 'geen';
   const calibFor = guild => { const c = index && index.calibration; if (!c) return null;
     if (guild === 'alle') return c.combined ? {c:c.combined, scope:'gecombineerde kaart'} : null;
     return (c.guilds && c.guilds[guild] && c.guilds[guild].n_all >= 30) ? {c:c.guilds[guild], scope:'deze groep'} : (c.all ? {c:c.all, scope:'alle soorten'} : null); };
   const rcDot = e => `<span class="rc ${e.source === 'feed' ? 'f' : (e.rarity_class === 'zeer zeldzaam' ? 'vr' : 'r')}" title="${esc(e.rarity_class || '')}"></span>`;
 
+  // ---- map ----
+  const NL = [[50.75, 3.3], [53.55, 7.2]];
   const map = L.map('map', {zoomControl:false, attributionControl:true});
-  const phone = window.innerWidth < 520;
+  map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  function pads(){
+    const top = Math.round($('topbar').getBoundingClientRect().bottom) + 8;
+    const lg = $('legend');
+    const bottom = (isPhone() && !lg.hidden) ? lg.offsetHeight + 22 : 16;
+    return {top, bottom};
+  }
   if (q.get('lat') && q.get('lng')) map.setView([parseFloat(q.get('lat')), parseFloat(q.get('lng'))], parseInt(q.get('z') || '11', 10));
-  else map.fitBounds([[50.75, 3.3], [53.55, 7.2]], phone ? {paddingTopLeft:[0, 150], paddingBottomLeft:[0, 130]} : {padding:[20, 20]});
+  else { const p = pads(); map.fitBounds(NL, isPhone() ? {paddingTopLeft:[0, p.top], paddingBottomRight:[0, p.bottom]} : {padding:[20, 20]}); }
   L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=cb1_2ku2_1_1aee07ab82ba19b6feb23fd9", {
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a> · landgebruik <a href="https://esa-worldcover.org">ESA WorldCover</a> · wind <a href="https://open-meteo.com">Open-Meteo</a> · meldingen <a href="https://waarneming.nl">waarneming.nl</a>',
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a> · <a href="https://esa-worldcover.org">ESA WorldCover</a> · <a href="https://open-meteo.com">Open-Meteo</a> · <a href="https://waarneming.nl">waarneming.nl</a>',
     subdomains:'abcd', maxZoom:19
   }).addTo(map);
+  const popupOpts = extra => { const p = pads();
+    return Object.assign({maxWidth:280, autoPanPaddingTopLeft:L.point(12, p.top), autoPanPaddingBottomRight:L.point(12, p.bottom)}, extra || {}); };
 
   let meta = null, index = null, overlay = null, overlayNew = null, gemeentes = null, areaLayer = null;
   const sitesLayer = L.layerGroup();
-  const state = {model:true, newLayer:true, tab:'kaart', sub:'methode'};
+  const siteHits = new Map();
+  const state = {model:true, newLayer:false, tab:'kaart', sub:'methode', sheet:false, failed:false};
 
+  // ---- legend, chips, tabs ----
+  const setPressed = (id, on) => { const b = $(id); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); };
+  function syncLegendH(){
+    const lg = $('legend');
+    document.documentElement.style.setProperty('--lg-h', (!lg.hidden && isPhone()) ? lg.offsetHeight + 'px' : '0px');
+  }
+  if (window.ResizeObserver) new ResizeObserver(syncLegendH).observe($('legend'));
+  window.addEventListener('resize', syncLegendH);
   function applyLayers(){
     if (overlayNew) { if (state.newLayer) { if (!map.hasLayer(overlayNew)) overlayNew.addTo(map); } else if (map.hasLayer(overlayNew)) map.removeLayer(overlayNew); }
     if (overlay) { if (state.model) { if (!map.hasLayer(overlay)) overlay.addTo(map); } else if (map.hasLayer(overlay)) map.removeLayer(overlay); }
     if (!isAll && !map.hasLayer(sitesLayer)) sitesLayer.addTo(map);
-    $('chip-model').classList.toggle('on', state.model);
-    $('chip-new').classList.toggle('on', state.newLayer);
-    $('chip-new').hidden = !overlayNew;
+    setPressed('chip-model', state.model); setPressed('chip-new', state.newLayer);
+    $('chip-model').hidden = !overlay; $('chip-new').hidden = !overlayNew;
+    const hasSites = !!(meta && meta.sites && meta.sites.some(s => s.p_stay != null));
+    $('chip-best').hidden = !hasSites;
+    $('legend-model').hidden = !(overlay && state.model);
     $('legend-new').hidden = !(overlayNew && state.newLayer);
+    $('legend-sites').hidden = !(!isAll && meta && meta.sites && meta.sites.length);
+    const any = ['legend-model', 'legend-new', 'legend-sites'].some(id => !$(id).hidden);
+    $('legend').hidden = !any || state.tab !== 'kaart' || state.sheet || state.failed;
+    syncLegendH();
   }
+  function setLegendCollapsed(c){
+    $('legend').classList.toggle('collapsed', c);
+    $('legend-toggle').setAttribute('aria-expanded', String(!c));
+    $('legend-toggle').title = c ? 'Legenda uitklappen' : 'Legenda inklappen';
+    store.set('vr_fc_legend', c ? 'in' : 'uit');
+    syncLegendH();
+  }
+  $('legend-toggle').onclick = () => setLegendCollapsed(!$('legend').classList.contains('collapsed'));
+  if (store.get('vr_fc_legend') === 'in') setLegendCollapsed(true);
+
   function showTab(name){
     state.tab = name;
     const uitleg = name === 'uitleg';
-    $('panel').hidden = !uitleg; $('chips').hidden = uitleg; $('legend').hidden = uitleg;
-    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+    if (uitleg && state.sheet) closeSheet(false);
+    $('panel').hidden = !uitleg; $('chips').hidden = uitleg; $('msg').hidden = uitleg || !$('msg').innerHTML;
+    document.querySelectorAll('#tabs button').forEach(b => { const on = b.dataset.tab === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
     if (history.replaceState) history.replaceState(null, '', uitleg ? '#' + (state.sub === 'methode' ? 'uitleg' : state.sub) : location.pathname + location.search);
     if (uitleg) $('panel').scrollTop = 0;
+    applyLayers();
   }
   function showSub(name){
     state.sub = name;
     ['methode', 'soorten', 'datasets'].forEach(s => { $('sub-' + s).hidden = s !== name; });
-    document.querySelectorAll('#subtabs button').forEach(b => b.classList.toggle('on', b.dataset.sub === name));
+    document.querySelectorAll('#subtabs button').forEach(b => { const on = b.dataset.sub === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
     if (history.replaceState) history.replaceState(null, '', '#' + (name === 'methode' ? 'uitleg' : name));
   }
   document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
   document.querySelectorAll('#subtabs button').forEach(b => b.onclick = () => showSub(b.dataset.sub));
   $('chip-model').onclick = () => { state.model = !state.model; applyLayers(); };
   $('chip-new').onclick = () => { state.newLayer = !state.newLayer; applyLayers(); };
+
+  function showMsg(html){ $('msg').innerHTML = html; $('msg').hidden = !html || state.tab !== 'kaart'; }
 
   // ---- cells and municipalities ----
   function cellAt(lat, lng){
@@ -293,89 +447,165 @@
     }
     return null;
   }
+  function announce(html){ const d = document.createElement('div'); d.innerHTML = html; $('sr').textContent = d.textContent; }
   function selectAt(latlng){
     if (!meta || state.tab !== 'kaart') return;
     const f = gemeenteAt(latlng.lat, latlng.lng);
     const c = cellAt(latlng.lat, latlng.lng);
     const info = c ? cellInfo(c.iy, c.ix) : null;
     if (areaLayer) map.removeLayer(areaLayer);
-    if (f) areaLayer = L.geoJSON(f, {style:{color:'#8a3d12', weight:2, fill:true, fillColor:'#8a3d12', fillOpacity:.06, dashArray:'4 3'}, interactive:false}).addTo(map);
+    areaLayer = f ? L.geoJSON(f, {style:{color:'#8a3d12', weight:2, fill:true, fillColor:'#8a3d12', fillOpacity:.06, dashArray:'4 3'}, interactive:false}).addTo(map) : null;
     const name = f ? (f.properties.statnaam || 'dit gebied') : null;
     const link = t => `<a href="?soort=${encodeURIComponent(t[0])}&lat=${latlng.lat.toFixed(3)}&lng=${latlng.lng.toFixed(3)}&z=${map.getZoom()}">${esc(t[1])}</a> ${fmtP(t[2])}`;
+    const cellLine = info ? `<br><span class="mu">dit vak: ${fmtP(info[2])}${isAll && info[3] && info[3].length ? ' (' + info[3].slice(0, 2).map(t => esc(t[1]) + ' ' + fmtP(t[2])).join(', ') + ')' : ''}</span>` : '';
     let html;
-    if (!name) html = `<b>Buiten Nederland</b>` + (info ? `<br>dit vak: ${pct(info[2])}` : '');
+    if (!gemeentes) html = `<b>Dit vak</b><br>kans op een melding ${when()}: <b>${info ? fmtP(info[2]) : 'onder 1%'}</b><br><span class="mu">gemeentegrenzen niet geladen</span>`;
+    else if (!name) html = `<b>Buiten Nederland</b>` + (info ? `<br>dit vak: ${fmtP(info[2])}` : '<br><span class="mu">geen voorspelling buiten Nederland</span>');
     else if (isAll) {
       const a = (meta.areas || []).find(x => x.name === name);
       const ct = a ? contributors(a.p, a.top) : {shown:[], rest:0};
-      html = `<b>${esc(name)}</b><br>kans op een zeldzame vogel morgen: <b>${a ? fmtP(a.p) : 'onder 0,5%'}</b>` +
+      html = `<b>${esc(name)}</b><br>kans op een melding van een zeldzame soort ${when()}: <b>${a ? fmtP(a.p) : 'onder 0,5%'}</b>` +
         (ct.shown.length ? '<br>' + ct.shown.map(link).join(', ') + (ct.rest >= 0.0005 ? `, overige soorten samen ${fmtP(ct.rest)}` : '')
-                         : (a ? '<br><span style="color:#64748b">geen soort boven 1%</span>' : '')) +
-        (info ? `<br><span style="color:#64748b">dit vak: ${fmtP(info[2])}${info[3] && info[3].length ? ' (' + info[3].slice(0, 2).map(t => esc(t[1]) + ' ' + fmtP(t[2])).join(', ') + ')' : ''}</span>` : '');
+                         : (a ? '<br><span class="mu">geen soort boven 1%</span>' : '')) + cellLine;
     } else {
       const a = meta.areas && meta.areas[name];
-      html = `<b>${esc(name)}</b><br>${esc(meta.label)} morgen: <b>${a ? fmtP(a.p) : 'onder 0,5%'}</b>` + (info ? `<br><span style="color:#64748b">dit vak: ${fmtP(info[2])}</span>` : '');
+      html = `<b>${esc(name)}</b><br>kans op een melding van ${esc(meta.label)} ${when()}: <b>${a ? fmtP(a.p) : 'onder 0,5%'}</b>` + cellLine;
     }
-    L.popup({closeButton:false, maxWidth:280}).setLatLng(latlng).setContent(html).openOn(map);
+    L.popup(popupOpts()).setLatLng(latlng).setContent(html).openOn(map);
+    announce(html);
     if (history.replaceState) { const u = new URL(location.href); u.searchParams.set('tik', `${latlng.lat.toFixed(4)},${latlng.lng.toFixed(4)}`); history.replaceState(null, '', u); }
   }
-  map.on('click', e => selectAt(e.latlng));
-  map.on('popupclose', () => { if (areaLayer) { map.removeLayer(areaLayer); areaLayer = null; } });
+  // A tap while a popup is open only closes it; the next tap selects again.
+  let popupOpen = false, swallow = false;
+  map.on('preclick', () => { swallow = popupOpen; });
+  map.on('popupopen', () => { popupOpen = true; swallow = false; });
+  map.on('popupclose', () => {
+    popupOpen = false;
+    if (areaLayer) { map.removeLayer(areaLayer); areaLayer = null; }
+    if (history.replaceState && new URL(location.href).searchParams.has('tik')) { const u = new URL(location.href); u.searchParams.delete('tik'); history.replaceState(null, '', u); }
+  });
+  map.on('click', e => { if (swallow) { swallow = false; return; } selectAt(e.latlng); });
   function tryInitialTap(){
     const t = q.get('tik'); if (!t || !meta || !gemeentes) return;
     const [la, ln] = t.split(',').map(parseFloat);
     if (Number.isFinite(la) && Number.isFinite(ln)) { selectAt(L.latLng(la, ln)); q.delete('tik'); }
   }
 
-  // ---- reported sites (species pages) ----
-  function drawSites(){
-    sitesLayer.clearLayers();
-    if (isAll || !meta.sites) return;
-    const asOf = new Date(meta.as_of + 'T12:00:00');
-    meta.sites.forEach(s => {
-      const age = Math.round((asOf - new Date(s.last + 'T12:00:00')) / 86400000);
-      const recent = age <= 2;
-      const r = 4 + Math.min(5, Math.sqrt(s.n));
-      const m = L.circleMarker([s.lat, s.lon], {radius:r, color:'#8a3d12', weight:1.5, fillColor:'#fff', fillOpacity: recent ? .92 : .5, opacity: recent ? .95 : .45});
-      const sub = (s.sub || []).filter(x => x !== meta.label);
-      m.bindPopup(`<b>${esc(s.loc || 'plek')}</b><br>${s.n} melding${s.n === 1 ? '' : 'en'} op ${s.days} dag${s.days === 1 ? '' : 'en'}, ${s.first === s.last ? fmt(s.last) : fmt(s.first) + ' tot ' + fmt(s.last)}` +
-        (s.max_count > 1 ? `, max. ${s.max_count} vogels` : '') + (s.photos ? `, ${s.photos} met foto` : ', geen foto') +
-        (s.p_stay != null ? `<br>kans op een melding hier morgen: <b>${pct(s.p_stay)}</b>` : '') +
-        (sub.length ? `<br><span style="color:#64748b">${esc(sub.join(' / '))}</span>` : ''));
-      m.addTo(sitesLayer);
-    });
-    $('legend-sites').hidden = false;
+  // ---- reported sites ----
+  function sitePopupHtml(s, withSpecies){
+    const sub = (s.sub || []).filter(x => x !== (s.label || meta.label));
+    return `<b>${esc(withSpecies && s.label ? s.label : (s.loc || 'plek'))}</b>` + (withSpecies && s.label ? `<br>${esc(s.loc || '')}` : '') +
+      `<br>${s.n} melding${s.n === 1 ? '' : 'en'} op ${s.days} dag${s.days === 1 ? '' : 'en'}, ${s.first === s.last ? fmt(s.last) : fmt(s.first) + ' tot ' + fmt(s.last)}` +
+      (s.max_count > 1 ? `, max. ${s.max_count} vogels` : '') + (s.photos ? `, ${s.photos} met foto` : ', geen foto') +
+      (s.p_stay != null ? `<br>kans op een melding hier ${when()}: <b>${pct(s.p_stay)}</b>` : '') +
+      (sub.length ? `<br><span class="mu">${esc(sub.join(' / '))}</span>` : '') +
+      `<div class="acts"><a href="${routeUrl(s.lat, s.lon)}" target="_blank" rel="noopener">Route ↗</a></div>`;
   }
+  const siteKey = s => `${s.lat},${s.lon},${s.species || ''}`;
+  function drawSites(){
+    sitesLayer.clearLayers(); siteHits.clear();
+    if (isAll || !meta.sites) return;
+    const asOf = dayOf(meta.as_of);
+    meta.sites.forEach(s => {
+      const recent = Math.round((asOf - dayOf(s.last)) / 86400000) <= 2;
+      const r = 4 + Math.min(5, Math.sqrt(s.n));
+      const ll = [s.lat, s.lon];
+      L.circleMarker(ll, {radius:r, color:'#8a3d12', weight: recent ? 2 : 1.6, fill:false, opacity: recent ? .95 : .6, dashArray: recent ? null : '1.5 3', interactive:false}).addTo(sitesLayer);
+      const hit = L.circleMarker(ll, {radius:Math.max(r, 14), stroke:false, fill:true, fillColor:'#8a3d12', fillOpacity:0});
+      hit.bindPopup(() => sitePopupHtml(s, false), popupOpts());
+      hit.on('popupopen', () => announce(sitePopupHtml(s, false)));
+      hit.addTo(sitesLayer);
+      siteHits.set(siteKey(s), hit);
+    });
+  }
+
+  // ---- best places sheet ----
+  let sortMode = 'kans', userPos = null;
+  function km(a, s){
+    const R = 6371, rad = Math.PI / 180, dLat = (s.lat - a.lat) * rad, dLon = (s.lon - a.lng) * rad;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * rad) * Math.cos(s.lat * rad) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function renderSheet(){
+    $('sheet-sub').textContent = `Kans op een melding ${when()}${fc.rel && !fc.stale ? ', ' + fc.label : ''}, per plek met meldingen in de laatste 7 dagen.`;
+    document.querySelectorAll('#sort button').forEach(b => { const on = b.dataset.sort === sortMode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    let items = ((meta && meta.sites) || []).filter(s => s.p_stay != null).map(s => ({s, d: userPos ? km(userPos, s) : null}));
+    const near = sortMode === 'dichtbij' && userPos;
+    // nearby: the highest chances within 50 km; when fewer than 3 are that close, simply the nearest
+    if (near) {
+      const within = items.filter(x => x.d <= 50).sort((a, b) => b.s.p_stay - a.s.p_stay);
+      items = within.length >= 3 ? within : items.sort((a, b) => a.d - b.d);
+      $('sheet-sub').textContent = within.length >= 3 ? `Binnen 50 km van je locatie, hoogste kans ${when()} eerst.` : 'Geen 3 plekken binnen 50 km: de dichtstbijzijnde eerst.';
+    } else items.sort((a, b) => b.s.p_stay - a.s.p_stay);
+    items = items.slice(0, 12);
+    if (!items.length) { $('best').innerHTML = '<li class="empty">Geen plekken met meldingen in de laatste 7 dagen.</li>'; return; }
+    $('best').innerHTML = items.map((x, i) => {
+      const s = x.s, cls = leafClass(s.p_stay);
+      const title = isAll ? s.label : (s.loc || 'plek');
+      const line = [isAll ? s.loc : '', `${s.n} melding${s.n === 1 ? '' : 'en'}, laatst ${fmtDay(dayOf(s.last))}`, x.d != null ? `${x.d < 10 ? x.d.toFixed(1).replace('.', ',') : Math.round(x.d)} km` : ''].filter(Boolean);
+      return `<li><span class="bp-pct">${cls ? `<span class="sw ${cls}"></span>` : ''}${pct(s.p_stay)}</span>
+        <div class="bp-txt"><b>${esc(title)}</b>${line.map(t => `<span>${esc(t)}</span>`).join('')}</div>
+        <div class="bp-act"><button data-i="${i}">Op de kaart</button><a href="${routeUrl(s.lat, s.lon)}" target="_blank" rel="noopener">Route ↗</a></div></li>`;
+    }).join('');
+    $('best').querySelectorAll('button[data-i]').forEach(b => b.onclick = () => openSite(items[+b.dataset.i].s));
+  }
+  function openSite(s){
+    closeSheet(false);
+    const ll = L.latLng(s.lat, s.lon);
+    map.once('moveend', () => {
+      const hit = siteHits.get(siteKey(s));
+      if (hit) hit.openPopup(); else L.popup(popupOpts()).setLatLng(ll).setContent(sitePopupHtml(s, isAll)).openOn(map);
+    });
+    map.flyTo(ll, Math.max(map.getZoom(), 12), {animate: !matchMedia('(prefers-reduced-motion: reduce)').matches, duration: 0.8});
+  }
+  function openSheet(){
+    state.sheet = true; $('sheet').hidden = false; $('sheet-note').hidden = true;
+    $('chip-best').classList.add('on'); $('chip-best').setAttribute('aria-expanded', 'true');
+    applyLayers(); renderSheet(); $('sheet-close').focus();
+  }
+  function closeSheet(refocus){
+    if (!state.sheet) return;
+    state.sheet = false; $('sheet').hidden = true;
+    $('chip-best').classList.remove('on'); $('chip-best').setAttribute('aria-expanded', 'false');
+    applyLayers(); if (refocus) $('chip-best').focus();
+  }
+  $('chip-best').onclick = () => state.sheet ? closeSheet(true) : openSheet();
+  $('sheet-close').onclick = () => closeSheet(true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.sheet) closeSheet(true); });
+  document.querySelectorAll('#sort button').forEach(b => b.onclick = () => {
+    if (b.dataset.sort === 'kans' || userPos) { sortMode = b.dataset.sort; renderSheet(); return; }
+    const note = $('sheet-note');
+    if (!navigator.geolocation) { note.textContent = 'Locatie is niet beschikbaar in deze browser.'; note.hidden = false; return; }
+    note.textContent = 'Locatie bepalen…'; note.hidden = false;
+    navigator.geolocation.getCurrentPosition(p => {
+      userPos = {lat:p.coords.latitude, lng:p.coords.longitude}; sortMode = 'dichtbij'; note.hidden = true; renderSheet();
+    }, () => { note.textContent = 'Geen locatie: sta locatie toe in je browser, of sorteer op hoogste kans.'; }, {enableHighAccuracy:false, timeout:10000, maximumAge:600000});
+  });
 
   // ---- explanation ----
   function curBoxHtml(m){
-    const p = m.params || {}, b = m.backtest, w = m.wind || {};
-    const isAllM = m.species === 'alle';
+    const b = m.backtest, w = m.wind || {};
     const cal = calibFor(m.guild);
-    const control = cal && cal.c.p30 ? `<div class="k" style="margin-top:8px">controle (backtest)</div><div style="font-size:12.5px">Van de vakken in de klasse 30%+ kreeg ${pct1(cal.c.p30.observed)} een melding, 10 tot 30%: ${pct1(cal.c.p10.observed)}, 3 tot 10%: ${pct1(cal.c.p3.observed)}, 1 tot 3%: ${pct1(cal.c.p1.observed)}.${cal.c.new_rank_new != null ? ` De groene top 5% ving ${pct(cal.c.new_rank_new)} van de nieuwe plekken.` : ''}</div>` : '';
-    if (isAllM) return `
-      <div class="k">Alle zeldzame soorten</div>
-      <h4 style="margin:2px 0 4px">Alle zeldzame soorten samen</h4>
+    const control = cal && cal.c.p30 ? `<div class="k" style="margin-top:8px">controle achteraf</div><div style="font-size:12.5px">Van de vakken in de klasse 30%+ kreeg ${pct1(cal.c.p30.observed)} een melding, 10 tot 30%: ${pct1(cal.c.p10.observed)}, 3 tot 10%: ${pct1(cal.c.p3.observed)}, 1 tot 3%: ${pct1(cal.c.p1.observed)}.${cal.c.new_rank_new != null ? ` De groene top 5% ving ${pct(cal.c.new_rank_new)} van de nieuwe plekken.` : ''}</div>` : '';
+    if (m.species === 'alle') return `
+      <h4>Alle zeldzame soorten samen</h4>
       <div class="grid">
         <div><div class="k">soorten met kaart</div><div class="v">${m.n_species}</div></div>
-        <div><div class="k">verwacht morgen</div><div class="v">${Math.round(m.expected_reports)} meldingen <small>waarvan ${Math.round(m.expected_new_sites)} op nieuwe plekken</small></div></div>
-        <div><div class="k">grootste bijdragen</div><div class="v" style="font-weight:500">${(m.top_species || []).slice(0, 5).map(t => `<a href="?soort=${encodeURIComponent(t.species)}">${esc(t.label)}</a> ${Math.round(t.expected_reports)}`).join(', ')}</div></div>
+        <div><div class="k">verwacht ${esc(when())}</div><div class="v">${Math.round(m.expected_reports)} meldingen <small>waarvan ${Math.round(m.expected_new_sites)} op nieuwe plekken</small></div></div>
+        <div class="wide"><div class="k">grootste bijdragen</div><div class="v" style="font-weight:500">${(m.top_species || []).slice(0, 5).map(t => `<a href="?soort=${encodeURIComponent(t.species)}#uitleg">${esc(t.label)}</a>&nbsp;${Math.round(t.expected_reports)}`).join(', ')}</div></div>
       </div>${control}`;
-    if (!m.n_reports) return `
-      <div class="k">Soort</div>
-      <h4 style="margin:2px 0 4px">${esc(m.label)} <small style="color:#64748b;font-weight:500">· ${esc(m.guild_label)}${m.rarity_class ? ' · ' + esc(m.rarity_class) : ''}</small></h4>
-      <p style="margin:0">Geen meldingen in de laatste ${m.window_days} dagen: de kans is overal onder 1%. Zodra er een melding komt, verschijnt de kaart.</p>`;
-    const top = (m.sites || []).filter(x => x.p_stay != null).slice(0, 3).map(x => `${esc(x.loc || 'plek')} ${pct(x.p_stay)}`).join(', ');
-    const windNow = w.used ? `${w.night ? `nacht ${w.night.from} ${w.night.speed_ms} m/s` : ''}${w.night && w.day ? ', ' : ''}${w.day ? `morgen ${w.day.from} ${w.day.speed_ms} m/s` : ''}` : 'niet gebruikt voor deze groep';
-    return `
-      <div class="k">Soort</div>
-      <h4 style="margin:2px 0 4px">${esc(m.label)} <small style="color:#64748b;font-weight:500">· ${esc(m.guild_label)}${m.rarity_class ? ' · ' + esc(m.rarity_class) : ''}</small></h4>
+    const head = `<h4>${esc(m.label)} <small style="color:var(--muted);font-weight:500">· ${esc(m.guild_label)}${m.rarity_class ? ' · ' + esc(m.rarity_class) : ''}</small></h4>`;
+    if (!m.n_reports) return `${head}<p style="margin:0">Geen meldingen in de laatste ${m.window_days} dagen: de kans is overal onder 1%. Zodra er een melding komt, verschijnt de kaart.</p>`;
+    const top = (m.sites || []).filter(x => x.p_stay != null).slice().sort((a, c) => c.p_stay - a.p_stay).slice(0, 3).map(x => `${esc(x.loc || 'plek')} ${pct(x.p_stay)}`).join(', ');
+    const windNow = w.used ? `${w.night ? `nacht ${w.night.from} ${w.night.speed_ms} m/s` : ''}${w.night && w.day ? ', ' : ''}${w.day ? `overdag ${w.day.from} ${w.day.speed_ms} m/s` : ''}` : 'niet gebruikt voor deze groep';
+    return `${head}
       ${m.profile ? `<p style="margin:0 0 6px">${esc(m.profile)}</p>` : ''}
       <div class="grid">
         <div><div class="k">laatste 7 dagen</div><div class="v">${m.n_sites} plekken <small>uit ${m.n_reports} meldingen</small></div></div>
-        <div><div class="k">verwacht morgen</div><div class="v">${Math.round(m.expected_reports)} melding${Math.round(m.expected_reports) === 1 ? '' : 'en'} <small>waarvan ${Math.round(m.expected_new_sites)} op nieuwe plekken</small></div></div>
-        <div><div class="k">beste plekken</div><div class="v" style="font-weight:500">${top || '-'}</div></div>
-        <div><div class="k">wind · habitat</div><div class="v" style="font-weight:500">${esc(windNow)} · ${esc(weightsText(m.habitat_weights))}</div></div>
-        ${b && b.n_new_total ? `<div><div class="k">nieuwe plekken gevonden (backtest)</div><div class="v">${pct(b.new_rank_new != null ? b.new_rank_new : b.model_new)} <small>basislijn ${pct(b.persist_new)} · ${b.n_new_total} meldingen</small></div></div>` : ''}
+        <div><div class="k">verwacht ${esc(when())}</div><div class="v">${Math.round(m.expected_reports)} melding${Math.round(m.expected_reports) === 1 ? '' : 'en'} <small>waarvan ${Math.round(m.expected_new_sites)} op nieuwe plekken</small></div></div>
+        <div class="wide"><div class="k">beste plekken</div><div class="v" style="font-weight:500">${top || '-'}</div></div>
+        <div class="wide"><div class="k">wind · voorkeurshabitat</div><div class="v" style="font-weight:500">${esc(windNow)} · ${esc(habitatText(m.habitat_weights) || '-')}</div></div>
+        ${b && b.n_new_total ? `<div class="wide"><div class="k">nieuwe plekken gevonden (controle)</div><div class="v">${pct(b.new_rank_new != null ? b.new_rank_new : b.model_new)} <small>tegen ${pct(b.persist_new)} met alleen de plekken van gisteren · ${b.n_new_total} meldingen</small></div></div>` : ''}
       </div>${control}`;
   }
 
@@ -383,11 +613,11 @@
     const sm = index && index.stay_model;
     if (!sm || !sm.ok) return '';
     const st = sm.strata || {};
-    const row = (lbl, o) => o && o.n ? `<tr><td>${esc(lbl)}</td><td>${pct(o.rate)}</td><td style="color:#94a3b8">${o.n}</td></tr>` : '';
+    const row = (lbl, o) => o && o.n ? `<tr><td>${esc(lbl)}</td><td>${pct(o.rate)}</td><td class="n">${o.n}</td></tr>` : '';
     return `
       <h3>Blijfkans uit de eigen meldingen</h3>
-      <p class="note">Aandeel plekken dat de volgende dag opnieuw gemeld werd (${sm.n} plek-dagen, gemiddeld ${pct(sm.base_rate)}). Het model combineert deze factoren per plek.</p>
-      <div class="tw"><table class="score"><thead><tr><th>factor</th><th>opnieuw gemeld</th><th>n</th></tr></thead><tbody>
+      <p class="note">Aandeel plekken dat de volgende dag opnieuw gemeld werd (${sm.n} keer een plek op een dag, gemiddeld ${pct(sm.base_rate)}). Het model combineert deze factoren per plek.</p>
+      <div class="tw"><table class="score"><thead><tr><th>factor</th><th>opnieuw gemeld</th><th>aantal</th></tr></thead><tbody>
         ${row('1 dag aanwezig', st.by_days && st.by_days['1'])}${row('2 dagen', st.by_days && st.by_days['2'])}${row('3 tot 4 dagen', st.by_days && st.by_days['3-4'])}${row('5 dagen of meer', st.by_days && st.by_days['5+'])}
         ${row('laatste melding vandaag', st.by_age && st.by_age['0'])}${row('gisteren', st.by_age && st.by_age['1'])}${row('2 tot 3 dagen geleden', st.by_age && st.by_age['2-3'])}
         ${row('met foto', st.by_photo && st.by_photo.met)}${row('zonder foto', st.by_photo && st.by_photo.zonder)}
@@ -397,41 +627,43 @@
   function methodeHtml(){
     const g = (index && index.guilds) || {};
     const rows = Object.entries(g).map(([k, v]) => `<tr><td>${esc(v.label)}</td><td>${v.params.scale_move_km} km</td><td>${v.params.coast_pref ? v.params.coast_pref : '-'}</td><td>${esc(windText(v.wind))}</td></tr>`).join('');
+    const hasControl = !!(index && index.calibration);
     return `
       <h3>Zo werkt het</h3>
       <ul>
         <li><b>Plekken.</b> Meldingen van de laatste 7 dagen; meldingen binnen 2 km zijn één plek.</li>
-        <li><b>Blijfkans.</b> Per plek de kans dat de soort daar morgen opnieuw gemeld wordt, geschat uit dagen aanwezig, hoe recent, foto, aantal en soortgroep (tabel hieronder). Die kans ligt op het vak van de plek en de directe buren.</li>
-        <li><b>Groene laag: nieuwe vogels.</b> Een deel van de meldingen van morgen komt van vogels die nog niemand heeft gezien (ruim een derde in de controle). Waar die opduiken hangt af van habitat, de afstand tot plekken waar de soort nu zit, de kust en de wind van vannacht. Omdat dat over heel Nederland verdeeld is, blijft de kans per vak onder 1%; daarom toont de groene laag geen kans maar een rangorde: "zeer kansrijk" is de 1% van alle vakken in Nederland waar zo'n nieuwe vogel het eerst te verwachten is, "kansrijk" de beste 5%, "redelijk" de beste 10%, "enig" de beste 25%. In de controle vond de groene top 5% ongeveer 30% van de nieuwe plekken (toeval: 5%).</li>
+        <li><b>Blijfkans.</b> Per plek de kans dat de soort daar de volgende dag opnieuw gemeld wordt, geschat uit dagen aanwezig, hoe recent, foto, aantal en soortgroep (tabel hieronder). Die kans ligt op het vak van de plek en de directe buren.</li>
+        <li><b>Groene laag: nieuwe plekken.</b> Een deel van de meldingen van de voorspelde dag komt van vogels die nog niemand heeft gezien (ruim een derde in de controle). Waar die opduiken hangt af van habitat, de afstand tot plekken waar de soort nu zit, de kust en de wind van vannacht. Omdat dat over heel Nederland verdeeld is, blijft de kans per vak onder 1%; daarom toont de groene laag geen kans maar een rangorde: "zeer kansrijk" is de 1% van alle vakken in Nederland waar zo'n nieuwe vogel het eerst te verwachten is, "kansrijk" de beste 5%, "redelijk" de beste 10%, "enig" de beste 25%. In de controle vond de groene top 5% ongeveer 30% van de nieuwe plekken (toeval: 5%).</li>
         <li><b>Kans per vak.</b> Beide delen opgeteld; 30%+, 10 tot 30%, 3 tot 10%, 1 tot 3%; onder 1% blijft het vak leeg. Per gemeente: dezelfde optelling over alle vakken.</li>
-        <li><b>Wind.</b> Doortrekkende zangvogels en roofvogels schuiven met de nachtwind mee; zeevogels en kustsoorten krijgen een opslag op kustvakken in de wind van morgen.</li>
+        <li><b>Wind.</b> Doortrekkende zangvogels en roofvogels schuiven met de nachtwind mee; zeevogels en kustsoorten krijgen een opslag op kustvakken in de wind van de voorspelde dag.</li>
       </ul>
       ${stayHtml()}
       <h3>Soortgroepen</h3>
       <div class="tw"><table class="score"><thead><tr><th>groep</th><th>verplaatsing</th><th>kust</th><th>wind</th></tr></thead><tbody>${rows}</tbody></table></div>
       <h3>Controle</h3>
-      <p>Elke dag wordt de kaart gemaakt met alleen de meldingen tot die dag en vergeleken met de meldingen van de dag erna: klopt de kans per klasse, en hoeveel van de nieuwe plekken vielen in de groene top 5%? De uitkomsten staan in het blok "Deze kaart" en per soort in de tab Soorten.</p>`;
+      <p>Elke dag wordt de kaart gemaakt met alleen de meldingen tot die dag en vergeleken met de meldingen van de dag erna: klopt de kans per klasse, en hoeveel van de nieuwe plekken vielen in de groene top 5%? ${hasControl ? 'De uitkomsten staan in het blok bovenaan en per soort in de tab Soorten.' : 'Zodra die controle beschikbaar is, staan de uitkomsten in het blok bovenaan en per soort in de tab Soorten.'}</p>`;
   }
 
   function soortenHtml(){
     if (!index) return '<p>Geen soortenlijst beschikbaar.</p>';
     const spp = index.species.filter(e => e.species !== 'alle');
     const nAct = spp.filter(e => e.n_sites > 0).length;
+    const anyBt = spp.some(e => e.backtest && e.backtest.n_new_total);
     const byGuild = {};
     spp.forEach(e => { (byGuild[e.guild] = byGuild[e.guild] || []).push(e); });
     const order = Object.keys(index.guilds || {}).filter(g => byGuild[g]).concat(Object.keys(byGuild).filter(g => !(index.guilds || {})[g]));
-    return `<p class="note"><a href="?soort=alle">Alle soorten op één kaart</a>. ${spp.length} zeldzame (<span class="rc r"></span>) en zeer zeldzame (<span class="rc vr"></span>) soorten volgens waarneming.nl, plus ${spp.filter(e => e.source === 'feed').length} die de meldingen zelf als zeldzaam markeren (<span class="rc f"></span>). ${nAct} hebben meldingen in de laatste 7 dagen en dus een kaart. Per soort: plekken, en het aandeel nieuwe plekken dat de groene top 5% vond (basislijn: dezelfde plekken als gisteren).</p>` +
+    return `<p class="note"><a href="?soort=alle">Alle soorten op één kaart</a>. ${spp.length} zeldzame (<span class="rc r"></span>) en zeer zeldzame (<span class="rc vr"></span>) soorten volgens waarneming.nl, plus ${spp.filter(e => e.source === 'feed').length} die de meldingen zelf als zeldzaam markeren (<span class="rc f"></span>). ${nAct} hebben meldingen in de laatste 7 dagen en dus een kaart. Per soort: plekken en de hoogste kans per vak${anyBt ? ', en het aandeel nieuwe plekken dat de groene top 5% vond (tegen alleen de plekken van gisteren)' : ''}.</p>` +
       order.map(g => {
         const gi = (index.guilds || {})[g] || {label:g, method:''};
         const act = byGuild[g].filter(e => e.n_sites > 0).sort((a, b) => b.n_sites - a.n_sites);
         const zero = byGuild[g].filter(e => !e.n_sites).sort((a, b) => a.label.localeCompare(b.label));
         const rows = act.map(e => {
           const b = e.backtest;
-          const bt = b && b.n_new_total ? `nieuw ${pct(b.new_rank_new != null ? b.new_rank_new : b.model_new)} <span style="color:#94a3b8">vs</span> ${pct(b.persist_new)} <span style="color:#94a3b8">(n=${b.n_new_total})</span>` : '';
-          return `<div class="sp${e.species === slug ? ' cur' : ''}"><span class="nm">${rcDot(e)}<a href="?soort=${encodeURIComponent(e.species)}">${esc(e.label)}</a></span><span class="m">${e.n_sites} plek${e.n_sites === 1 ? '' : 'ken'}</span><span class="m">hoogste kans per vak ${pct(e.max_p)}</span><span class="m">${bt}</span>${e.wind_used ? '<span class="w">wind</span>' : ''}</div>`;
+          const bt = b && b.n_new_total ? `nieuw ${pct(b.new_rank_new != null ? b.new_rank_new : b.model_new)} tegen ${pct(b.persist_new)} (n=${b.n_new_total})` : '';
+          return `<div class="sp${e.species === slug ? ' cur' : ''}"><span class="nm">${rcDot(e)}<a href="?soort=${encodeURIComponent(e.species)}">${esc(e.label)}</a></span><span class="m">${e.n_sites} plek${e.n_sites === 1 ? '' : 'ken'}</span><span class="m">hoogste kans per vak ${pct(e.max_p)}</span>${bt ? `<span class="m">${bt}</span>` : ''}${e.wind_used ? '<span class="w">wind</span>' : ''}</div>`;
         }).join('');
-        const zeroHtml = zero.length ? `<button class="zero" data-zero="${esc(g)}">nog ${zero.length} soorten zonder meldingen</button><ul class="zl" id="zero-${esc(g)}" hidden>${zero.map(e => `<li>${rcDot(e)}<a href="?soort=${encodeURIComponent(e.species)}">${esc(e.label)}</a></li>`).join('')}</ul>` : '';
-        return `<div class="gh"><h4>${esc(gi.label)} <span style="color:#64748b;font-weight:500">· ${act.length} met kaart, ${byGuild[g].length} totaal</span></h4></div><div class="meth">${esc(gi.method)}</div>${rows || '<div class="note">geen meldingen in de laatste 7 dagen</div>'}${zeroHtml}`;
+        const zeroHtml = zero.length ? `<button class="zero" data-zero="${esc(g)}" aria-expanded="false">nog ${zero.length} soorten zonder meldingen</button><ul class="zl" id="zero-${esc(g)}" hidden>${zero.map(e => `<li>${rcDot(e)}<a href="?soort=${encodeURIComponent(e.species)}">${esc(e.label)}</a></li>`).join('')}</ul>` : '';
+        return `<div class="gh"><h4>${esc(gi.label)} <span>· ${act.length} met kaart, ${byGuild[g].length} totaal</span></h4></div><div class="meth">${esc(gi.method)}</div>${rows || '<div class="note">geen meldingen in de laatste 7 dagen</div>'}${zeroHtml}`;
       }).join('');
   }
 
@@ -450,38 +682,48 @@
       <p class="note">Niet gebruikt: historische meldingen van GBIF (5 km, twee maanden achter), buurlanden, radar-vogeltrek en gedrag ("overvliegend"), dat laatste omdat de scraper het nog niet uitleest.</p>`;
   }
 
-  let detailMeta = null;
-  function renderBox(m){
-    detailMeta = m;
-    $('curbox').innerHTML = curBoxHtml(m);
-    $('toon-kaart').href = `?soort=${encodeURIComponent(m.species)}`;
-  }
+  // ---- species select ----
   function fillSpeciesSelect(sel, current){
     const idx = index; if (!idx || !idx.species || !idx.species.length) { sel.hidden = true; return; }
+    const opt = (value, text, selected) => { const o = document.createElement('option'); o.value = value; o.textContent = text; if (selected) o.selected = true; return o; };
+    if (!idx.species.some(e => e.species === current)) { const o = opt('', 'Kies een soort', true); o.disabled = true; sel.appendChild(o); }
     const all = idx.species.find(e => e.species === 'alle');
-    if (all) { const o = document.createElement('option'); o.value = 'alle'; o.textContent = `Alle zeldzame soorten · ${all.n_species || ''}`; if (current === 'alle') o.selected = true; sel.appendChild(o); }
+    if (all) sel.appendChild(opt('alle', `Alle zeldzame soorten · ${all.n_species || ''}`, current === 'alle'));
+    const label = e => `${e.label} · ${e.n_sites} plek${e.n_sites === 1 ? '' : 'ken'}`;
+    const active = idx.species.filter(e => e.species !== 'alle' && (e.n_sites > 0 || e.species === current));
+    const top = active.filter(e => e.n_sites > 0).sort((a, b) => b.n_sites - a.n_sites).slice(0, 5);
+    let picked = current === 'alle';
+    if (top.length) {
+      const og = document.createElement('optgroup'); og.label = 'Meeste plekken';
+      top.forEach(e => { const sel_ = !picked && e.species === current; if (sel_) picked = true; og.appendChild(opt(e.species, label(e), sel_)); });
+      sel.appendChild(og);
+    }
     const byGuild = {};
-    idx.species.filter(e => e.species !== 'alle' && (e.n_sites > 0 || e.species === current)).forEach(e => { (byGuild[e.guild] = byGuild[e.guild] || []).push(e); });
-    Object.keys(byGuild).sort((a, b) => byGuild[b].length - byGuild[a].length).forEach(g => {
+    active.forEach(e => { (byGuild[e.guild] = byGuild[e.guild] || []).push(e); });
+    const sites = g => byGuild[g].reduce((n, e) => n + (e.n_sites || 0), 0);
+    Object.keys(byGuild).sort((a, b) => sites(b) - sites(a)).forEach(g => {
       const og = document.createElement('optgroup');
       og.label = ((idx.guilds || {})[g] || {}).label || g;
-      byGuild[g].sort((a, b) => b.n_sites - a.n_sites).forEach(e => {
-        const o = document.createElement('option');
-        o.value = e.species; o.textContent = `${e.label} · ${e.n_sites} plek${e.n_sites === 1 ? '' : 'ken'}`;
-        if (e.species === current) o.selected = true;
-        og.appendChild(o);
-      });
+      byGuild[g].sort((a, b) => b.n_sites - a.n_sites).forEach(e => { const sel_ = !picked && e.species === current; if (sel_) picked = true; og.appendChild(opt(e.species, label(e), sel_)); });
       sel.appendChild(og);
     });
   }
+  // switching species keeps the map position (and the Uitleg tab when it is open)
+  function goSpecies(v, hash){
+    const c = map.getCenter();
+    location.href = `${location.pathname}?soort=${encodeURIComponent(v)}&lat=${c.lat.toFixed(4)}&lng=${c.lng.toFixed(4)}&z=${map.getZoom()}${hash || ''}`;
+  }
+
   function render(){
     if (!meta) return;
-    if (!detailMeta) renderBox(meta);
+    $('curbox').innerHTML = curBoxHtml(meta);
+    $('toon-kaart').href = `?soort=${encodeURIComponent(meta.species)}`;
     $('sub-methode').innerHTML = methodeHtml();
     $('sub-soorten').innerHTML = soortenHtml();
-    document.querySelectorAll('#sub-soorten .zero').forEach(b => b.onclick = () => { const l = $('zero-' + b.dataset.zero); l.hidden = !l.hidden; });
+    document.querySelectorAll('#sub-soorten .zero').forEach(b => b.onclick = () => { const l = $('zero-' + b.dataset.zero); l.hidden = !l.hidden; b.setAttribute('aria-expanded', String(!l.hidden)); });
     $('sub-datasets').innerHTML = datasetsHtml();
-    $('ver').textContent = `Stand ${fmt(meta.as_of)}, berekend ${(meta.generated_at || '').slice(0, 16).replace('T', ' ')} UTC.`;
+    const gen = meta.generated_at ? new Date(meta.generated_at) : null;
+    $('ver').textContent = `Gegevens tot en met ${fmtDay(dayOf(meta.as_of))}` + (gen && !isNaN(gen) ? `, berekend ${gen.toLocaleString('nl-NL', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})}.` : '.');
   }
 
   // ---- data ----
@@ -496,42 +738,47 @@
     });
     gemeentes = g; tryInitialTap();
   }).catch(() => {});
-  const pMeta = fetch(`/forecast/${slug}.json`, {cache:'no-store'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  const pMeta = fetch(`/forecast/${slug}.json`, {cache:'no-store'}).then(r => { if (!r.ok) throw new Error(String(r.status)); return r.json(); });
 
   pIndex.then(idx => {
     index = idx;
-    const sel = $('soort');
-    fillSpeciesSelect(sel, slug);
-    sel.onchange = () => { location.href = `${location.pathname}?soort=${encodeURIComponent(sel.value)}${location.hash}`; };
-    const sel2 = $('soort2');
-    fillSpeciesSelect(sel2, slug);
-    sel2.onchange = () => {
-      const v = sel2.value;
-      if (v === slug && meta) { renderBox(meta); return; }
-      $('curbox').innerHTML = '<div class="note">laden…</div>';
-      fetch(`/forecast/${v}.json`, {cache:'no-store'}).then(r => r.json()).then(renderBox).catch(() => { $('curbox').innerHTML = '<div class="note">geen gegevens</div>'; });
-    };
+    const sel = $('soort'), sel2 = $('soort2');
+    fillSpeciesSelect(sel, slug); fillSpeciesSelect(sel2, slug);
+    sel.onchange = () => { if (sel.value) goSpecies(sel.value, location.hash); };
+    sel2.onchange = () => { if (sel2.value) goSpecies(sel2.value, '#' + (state.sub === 'methode' ? 'uitleg' : state.sub)); };
     render();
   });
 
   pMeta.then(m => {
     meta = m;
+    fc = forecastDay(m.as_of);
     const v = encodeURIComponent(m.generated_at || '');
     if (m.files && m.files.image) overlay = L.imageOverlay(`${m.files.image}?v=${v}`, m.bounds, {opacity:1, interactive:false, zIndex:2});
     if (m.files && m.files.image_new) overlayNew = L.imageOverlay(`${m.files.image_new}?v=${v}`, m.bounds, {opacity:1, interactive:false, zIndex:1});
     $('title').textContent = m.label;
-    $('sub').textContent = isAll ? `${m.n_species} soorten · ${Math.round(m.expected_reports)} meldingen verwacht morgen · stand ${fmt(m.as_of)}`
-      : m.n_reports ? `${m.guild_label.toLowerCase()} · ${m.n_sites} plekken in ${m.window_days} dagen · stand ${fmt(m.as_of)}` : `${m.guild_label.toLowerCase()} · geen meldingen in ${m.window_days} dagen`;
-    $('legend-title').textContent = m.n_reports || isAll ? 'Kans morgen' : 'Geen meldingen';
-    $('legend-new-title').textContent = 'Nieuwe vogels';
+    $('sub').textContent = isAll ? `${Math.round(m.expected_reports)} meldingen verwacht ${when()} · ${m.n_species} soorten`
+      : m.n_reports ? `${m.n_sites} plekken in ${m.window_days} dagen · ${m.guild_label.toLowerCase()}` : `geen meldingen in ${m.window_days} dagen · ${m.guild_label.toLowerCase()}`;
+    $('legend-title').textContent = (fc.rel && !fc.stale) ? `Kans ${fc.rel} · ${fc.label}` : `Kans op ${fc.label}`;
+    $('legend-when').textContent = `${fc.stale ? 'verouderd: ' : ''}gegevens tot en met ${fmtDay(dayOf(m.as_of))}`;
+    $('legend-when').classList.toggle('stale', fc.stale);
     document.title = isAll ? 'Vogelradar · Voorspelling' : `Vogelradar · ${m.label}`;
+    if (!isAll && !m.n_reports) showMsg(`<b>Geen meldingen van ${esc(m.label)}</b>Niet in de laatste ${m.window_days} dagen: de kans is overal onder 1%. Zodra er een melding komt, verschijnt de kaart.<br><a href="${location.pathname}">Toon alle soorten</a>`);
     drawSites(); applyLayers(); render(); tryInitialTap();
     $('loading').hidden = true;
     const h = location.hash.replace('#', '');
     if (h === 'uitleg' || h === 'soorten' || h === 'datasets') { showSub(h === 'uitleg' ? 'methode' : h); showTab('uitleg'); }
   }).catch(err => {
-    $('sub').textContent = 'geen voorspelling beschikbaar';
-    $('loading').textContent = `Geen voorspelling gevonden voor "${slug}" (${err.message}).`;
+    state.failed = true;
+    $('loading').hidden = true;
+    ['chip-model', 'chip-new', 'chip-best'].forEach(id => { $(id).hidden = true; });
+    $('legend').hidden = true; syncLegendH();
+    if (err.message === '404') {
+      $('title').textContent = 'Onbekende soort'; $('sub').textContent = 'geen voorspelling gevonden';
+      showMsg(`<b>Geen voorspelling voor deze soort</b>Misschien is de link oud of is de naam veranderd. Kies een soort in de lijst hierboven.<br><a href="${location.pathname}">Toon alle soorten</a>`);
+    } else {
+      $('sub').textContent = 'voorspelling niet geladen';
+      showMsg(`<b>De voorspelling kon niet geladen worden</b>Controleer je verbinding en probeer het opnieuw.<br><a href="${esc(location.pathname + location.search)}">Opnieuw laden</a>`);
+    }
   });
 })();
 </script>
