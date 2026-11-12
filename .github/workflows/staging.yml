@@ -1,0 +1,56 @@
+# "Deploy staging" button in the Actions tab: deploys the latest dev commit
+# to staging in Coolify and waits for the result. Staging (vogelradar-staging.hermen.dev) is parked
+# (stopped) by default to save memory on the VPS; "Park staging" stops it
+# again, and does so automatically every night.
+#
+# This app is still built by Coolify on the VPS. Moving that build to
+# GitHub Actions follows the pattern in the deschonestad repo.
+#
+# Needs repository secrets COOLIFY_TOKEN (permissions: deploy + read),
+# CF_ACCESS_CLIENT_ID, CF_ACCESS_CLIENT_SECRET, and the repository
+# variable COOLIFY_UUID_STAGING.
+name: Deploy staging
+
+on:
+  workflow_dispatch: {}
+
+permissions: {}
+
+concurrency:
+  group: staging
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      COOLIFY_URL: https://deploy.hermen.dev
+      COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+      CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      UUID: ${{ vars.COOLIFY_UUID_STAGING }}
+    steps:
+      - name: Deploy staging in Coolify and wait for the result
+        run: |
+          set -euo pipefail
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$CF_ACCESS_CLIENT_ID" ] || [ -z "$UUID" ]; then
+            echo "::error::Deploy secrets or COOLIFY_UUID_STAGING not set."
+            exit 1
+          fi
+          api() {
+            curl -fsS --retry 3 -X "$1" "$COOLIFY_URL/api/v1$2" \
+              -H "Authorization: Bearer $COOLIFY_TOKEN" \
+              -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+              -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET"
+          }
+          d=$(api POST "/deploy?uuid=$UUID&force=false" | jq -r '.deployments[0].deployment_uuid')
+          for _ in $(seq 1 120); do
+            status=$(api GET "/deployments/$d" | jq -r '.status')
+            case "$status" in
+              finished) echo "staging deployed"; exit 0 ;;
+              failed|cancelled*) echo "::error::deployment $d $status"; exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "::error::deployment $d still $status after 20 min"; exit 1
