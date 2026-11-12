@@ -8,11 +8,12 @@
 #   Run workflow       -> rebuild and redeploy the selected branch
 #   Deploy staging     -> staging.yml calls this workflow for dev
 #
-# Deploying needs the secrets COOLIFY_TOKEN (permissions deploy + read),
-# CF_ACCESS_CLIENT_ID, CF_ACCESS_CLIENT_SECRET and the variable
-# COOLIFY_UUID_PRODUCTION (and COOLIFY_UUID_STAGING for dev). Until those exist the image is built
+# Deploying needs the secret COOLIFY_TOKEN (permissions deploy + read) and
+# the variable COOLIFY_UUID_PRODUCTION (and COOLIFY_UUID_STAGING for dev). Until those exist the image is built
 # and pushed and the deploy step is skipped.
 # Avoid "Force deploy (without cache)" in Coolify: that builds on the VPS.
+# The Coolify API is not behind Cloudflare Access (only the dashboard is);
+# the CF_ACCESS_CLIENT_ID/SECRET secrets are optional.
 name: Build and deploy
 
 on:
@@ -96,7 +97,7 @@ jobs:
       - name: Deploy in Coolify and wait for the result
         run: |
           set -euo pipefail
-          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$CF_ACCESS_CLIENT_ID" ] || [ -z "$UUID" ]; then
+          if [ -z "$COOLIFY_TOKEN" ] || [ -z "$UUID" ]; then
             echo "::notice::Deploy secrets or Coolify UUID not set yet; image pushed, deploy skipped."
             exit 0
           fi
