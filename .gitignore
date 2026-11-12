@@ -6,7 +6,3 @@ vogelradar.db
 .claude/
 *.log
 firebase-service-account.json
-
-# Forecast test (see forecast/README.md): daily feed snapshots are an archive, not source
-forecast/data/snapshots/
-forecast/data/wind/

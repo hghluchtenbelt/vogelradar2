@@ -50,23 +50,6 @@ app.add_middleware(
 init_db()
 
 
-# Forecast test (forecast/README.md): FORECAST_ENABLED=1 rebuilds the per-species
-# layers from the database after every scrape; FORECAST_OUT_DIR points at a
-# writable folder (a /data subfolder in the container). Needs numpy and Pillow.
-FORECAST_ENABLED = os.environ.get("FORECAST_ENABLED", "0") == "1"
-FORECAST_OUT_DIR = Path(os.environ.get("FORECAST_OUT_DIR") or (Path(__file__).parent / "forecast" / "out"))
-
-
-def _run_forecast() -> None:
-    import sys
-    fdir = str(Path(__file__).parent / "forecast")
-    if fdir not in sys.path:
-        sys.path.insert(0, fdir)
-    import pipeline  # noqa: E402 (forecast/pipeline.py)
-    result = pipeline.run("db")
-    print(f"[forecast] {result}", flush=True)
-
-
 def _background_updater() -> None:
     """Run the updater once per SCRAPE_INTERVAL, forever, in a daemon thread."""
     from updater import run_update
@@ -77,11 +60,6 @@ def _background_updater() -> None:
             print(f"[updater] {new} new / {total} scraped", flush=True)
         except Exception as exc:
             print(f"[updater] error: {exc}", flush=True)
-        if FORECAST_ENABLED:
-            try:
-                _run_forecast()
-            except Exception as exc:
-                print(f"[forecast] error: {exc}", flush=True)
 
 
 # Start background updater when the server starts (daemon=True means it
@@ -229,27 +207,6 @@ def scrape_stats(hours: int = 12):
 @app.get("/stats")
 def stats_page():
     return FileResponse(_HERE / "statistieken.html", media_type="text/html")
-
-
-_FORECAST_DIR = _HERE / "forecast"
-_FORECAST_FILE_RE = re.compile(r"[a-z0-9-]+\.(png|json)")
-
-
-@app.get("/voorspelling")
-def forecast_page():
-    """Test tab: per-species "activity now" map (see forecast/README.md)."""
-    return FileResponse(_FORECAST_DIR / "voorspelling.html", media_type="text/html")
-
-
-@app.get("/forecast/{name}")
-def forecast_file(name: str):
-    """Precomputed forecast layers (PNG overlays and JSON meta) from forecast/out."""
-    if not _FORECAST_FILE_RE.fullmatch(name):
-        raise HTTPException(status_code=404)
-    path = FORECAST_OUT_DIR / name
-    if not path.is_file():
-        raise HTTPException(status_code=404)
-    return FileResponse(path, headers={"Cache-Control": "public, max-age=300"})
 
 
 @app.get("/")

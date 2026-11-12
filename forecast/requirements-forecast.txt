@@ -1,4 +1,0 @@
-# Offline precompute only (laptop or CI), not needed in the web container.
-numpy>=2.0
-scipy>=1.13
-Pillow>=10.0
