@@ -1,13 +1,17 @@
 <!--
   VOGELRADAR · Voorspelling (test)
-  "Kaart": per species (or all rare species combined) the chance of a report per 1 km cell on the
-  forecast day (brown, absolute classes) and, opt-in, the ranking of likely new sites (green), on the
-  CARTO basemap. The forecast day is the day after the latest archived data (meta.as_of + 1); every
-  label names it relative to the visitor's clock ("vandaag", "morgen") plus the date.
-  Legend swatches carry the same alpha as the PNG layers and the overlays render pixelated, so the
-  colour on the map matches the legend class. "Beste plekken" lists the sites with the highest chance,
-  or the nearest ones after a location request. Tap selects the municipality and shows a summary.
-  Species pages also show the reported sites of the last 7 days. "Uitleg": method, species, datasets.
+  Main view ("Beste gebieden", ?soort=alle or no soort): the best areas near the visitor. Recent sites
+  of all rare species within 3 km are merged into one named area; its chance is the chance that at
+  least one of those birds is reported again on the forecast day (1 - product of (1 - p_stay)). The
+  page asks for the location on open and ranks the areas within 25/50/100 km; without a location it
+  ranks all of the Netherlands. The brown all-species chance layer stays on the map as context.
+  Species maps (?soort=<slug>, reached from Uitleg > Soorten): the chance of a report per 1 km cell
+  (brown, absolute classes), opt-in the ranking of likely new sites (green), the reported sites, a
+  "Beste plekken" list, and a municipality summary on tap.
+  The forecast day is the day after the latest archived data (meta.as_of + 1); every label names it
+  relative to the visitor's clock ("vandaag", "morgen") plus the date. Legend swatches carry the same
+  alpha as the PNG layers and the overlays render pixelated, so map colour matches the legend class.
+  "Uitleg": method, species, datasets.
   Data: /forecast/index.json, /forecast/<slug>.json, /forecast/<slug>.png, -nieuw.png, gemeentes.json
   Query: ?soort=<slug> (default alle) · ?lat=&lng=&z= position · ?tik=lat,lng reopens a selection
   Hash: #uitleg, #soorten, #datasets. UI text is Dutch.
@@ -132,6 +136,41 @@
   .bp-act button,.bp-act a{font:inherit;font-size:12px;font-weight:650;color:var(--leaf4);background:#fff;border:1.5px solid var(--rule);border-radius:999px;
     padding:5px 11px;cursor:pointer;text-decoration:none;white-space:nowrap;text-align:center}
 
+  .acard{position:fixed;left:8px;bottom:14px;z-index:900;width:min(100vw - 16px,400px);max-height:min(62vh,600px);display:flex;flex-direction:column;
+    background:rgba(255,255,255,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.7);
+    border-radius:16px;box-shadow:0 8px 28px rgba(2,6,23,.16)}
+  .ac-head{padding:12px 14px 2px;flex:0 0 auto}
+  .ac-head h2{font-size:15.5px;font-weight:740;letter-spacing:-.2px;margin:0;line-height:1.25}
+  .ac-head h2 span{font-weight:600;color:var(--muted)}
+  .ac-sub{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .ac-ctl{display:flex;align-items:center;gap:8px;padding:8px 14px 10px;flex-wrap:wrap;border-bottom:1px solid var(--line);flex:0 0 auto}
+  .ac-ctl .seg button{padding:6px 11px}
+  .ac-note{font-size:12px;color:var(--leaf4);flex:1 1 100%}
+  .alist{list-style:none;margin:0;padding:0 14px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:1 1 auto}
+  .alist .empty{color:var(--muted);font-size:13px;padding:12px 0;line-height:1.5}
+  .ar{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+  .ar:last-child{border-bottom:none}
+  .rk{width:24px;height:24px;border-radius:50%;background:var(--leaf4);color:#fff;font-size:12px;font-weight:760;display:flex;align-items:center;justify-content:center;flex:0 0 auto;margin-top:1px}
+  .ar:nth-child(n+4) .rk{background:#fff;color:var(--leaf4);border:1.5px solid var(--leaf4)}
+  .ar.sel .rk{box-shadow:0 0 0 3px var(--leaf1)}
+  .ar-main{flex:1;min-width:0}
+  .ar-top{display:flex;align-items:baseline;gap:8px}
+  .ar-name{flex:1;min-width:0;background:none;border:none;padding:0;font:inherit;font-size:14px;font-weight:700;line-height:1.3;color:var(--ink);text-align:left;cursor:pointer;overflow-wrap:anywhere}
+  .ar.sel .ar-name{color:var(--leaf4)}
+  .ar-p{display:flex;align-items:center;gap:5px;font-size:16px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.2px;flex:0 0 auto}
+  .ar-sp{font-size:12.5px;line-height:1.4;margin-top:2px}
+  .ar-meta{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:4px 12px;flex-wrap:wrap}
+  .ar-meta a{color:var(--leaf4);font-weight:650}
+  .ac-legend{display:flex;align-items:center;gap:4px 10px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding:7px 14px 9px;border-top:1px solid var(--line);flex:0 0 auto}
+  .ac-legend .it{display:inline-flex;align-items:center;gap:4px;color:var(--ink)}
+  .lnk{background:none;border:none;padding:0;font:inherit;color:var(--leaf4);font-weight:650;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+  .amk{width:28px;height:28px;border-radius:50%;background:var(--leaf4);color:#fff;border:2px solid #fff;box-shadow:0 2px 7px rgba(2,6,23,.32);
+    display:flex;align-items:center;justify-content:center;font:760 12.5px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .amk.minor{width:22px;height:22px;background:#fff;color:var(--leaf4);border-color:var(--leaf4);font-size:11px;box-shadow:0 1px 4px rgba(2,6,23,.2)}
+  .you{width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid #fff;box-shadow:0 0 0 5px rgba(15,23,42,.16)}
+  .leaflet-popup-content ul.pl{margin:4px 0 0;padding-left:16px}
+  .leaflet-popup-content ul.pl li{margin:2px 0}
+
   .panel{position:fixed;inset:0;z-index:950;background:var(--paper);overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
   .panel .inner{max-width:600px;margin:0 auto;padding:96px 16px 40px;font-size:13.5px;line-height:1.55}
   .panel h2{font-size:18px;letter-spacing:-.3px;margin:0 0 6px}
@@ -190,6 +229,7 @@
     .panel table.ds td:first-child{font-size:13px;color:var(--leaf4)}
     .panel table.ds td:last-child{font-size:12px;color:var(--muted)}
     .sp .nm{min-width:0;width:100%}
+    .acard{left:0;right:0;bottom:0;width:auto;max-height:48vh;border-radius:18px 18px 0 0;border-bottom:none;padding-bottom:env(safe-area-inset-bottom)}
   }
   @media (max-width:380px){ .cs{display:none} }
   @media (prefers-reduced-motion:reduce){ .legend .lx svg{transition:none} }
@@ -265,10 +305,30 @@
   <ol class="plist" id="best"></ol>
 </section>
 
+<section class="acard" id="acard" aria-labelledby="ac-title" hidden>
+  <div class="ac-head">
+    <h2 id="ac-title">Beste gebieden <span id="ac-scope"></span></h2>
+    <div class="ac-sub" id="ac-sub"></div>
+  </div>
+  <div class="ac-ctl">
+    <div class="seg" id="radius" role="group" aria-label="Afstand" hidden>
+      <button data-r="25" aria-pressed="false">25 km</button><button data-r="50" aria-pressed="true" class="on">50 km</button><button data-r="100" aria-pressed="false">100 km</button>
+    </div>
+    <button class="chip best" id="locbtn" hidden>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Gebruik mijn locatie</span></button>
+    <span class="ac-note" id="ac-note" role="status" hidden></span>
+  </div>
+  <ol class="alist" id="areas"></ol>
+  <div class="ac-legend">kans per vak:
+    <span class="it"><span class="sw l4"></span>30%+</span><span class="it"><span class="sw l3"></span>10-30%</span><span class="it"><span class="sw l2"></span>3-10%</span><span class="it"><span class="sw l1"></span>1-3%</span>
+  </div>
+</section>
+
 <div class="panel" id="panel" role="tabpanel" hidden><div class="inner">
   <h2>Hoe werkt de voorspelling?</h2>
+  <p><b>Beste gebieden.</b> Plekken met meldingen van zeldzame soorten in de laatste 7 dagen, binnen 3 km samengevoegd tot één gebied. Per gebied de kans dat er op de voorspelde dag minstens één van die vogels opnieuw gemeld wordt, uit de blijfkans per plek (zie hieronder). Vogels die nog nergens gemeld zijn tellen daar niet mee; die zitten wel in de bruine kaart. De gebieden staan op volgorde van kans, binnen de gekozen afstand van je locatie.</p>
   <p><b>Bruin: kans op een melding.</b> Per vak de kans op minstens één melding op de voorspelde dag (de dag na de laatste gegevens), op dezelfde schaal voor alle soorten. Die kans komt vooral van vogels die nu al ergens zitten: per plek wordt geschat hoe waarschijnlijk een nieuwe melding is, uit hoe lang de vogel er al zit, hoe recent de laatste melding was, of er een foto is en de soortgroep.</p>
-  <p><b>Groen: nieuwe plekken.</b> Waar vogels opduiken die nu nog nergens gemeld zijn: een rangorde op basis van habitat, afstand tot plekken waar de soort nu zit, de kust en de wind van vannacht. Geen kans, want per vak blijft die onder 1%. Zeer kansrijk is de beste 1% van het land, kansrijk 5%, redelijk 10%, enig 25%. Deze laag staat standaard uit.</p>
+  <p><b>Groen: nieuwe plekken (kaart per soort).</b> Waar vogels opduiken die nu nog nergens gemeld zijn: een rangorde op basis van habitat, afstand tot plekken waar de soort nu zit, de kust en de wind van vannacht. Geen kans, want per vak blijft die onder 1%. Zeer kansrijk is de beste 1% van het land, kansrijk 5%, redelijk 10%, enig 25%. Deze laag staat standaard uit.</p>
   <h3>Per soort</h3>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
     <select class="chip sel" id="soort2" aria-label="Soort" style="max-width:100%"></select>
@@ -295,7 +355,10 @@
   const q = new URLSearchParams(location.search);
   const slug = (q.get('soort') || 'alle').replace(/[^a-z0-9-]/g, '');
   const isAll = slug === 'alle';
+  const areaMode = isAll;   // the all-species page is the "Beste gebieden" view
   const $ = id => document.getElementById(id);
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (areaMode) $('chips').hidden = true;
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const MONTHS = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
   const WD = ['zo','ma','di','wo','do','vr','za'];
@@ -321,15 +384,6 @@
   }
   const when = () => (fc.rel && !fc.stale) ? fc.rel : `op ${fc.label}`;
 
-  // contributors of at least 1 percent: top 3, up to 5 when more of them exceed 10 percent, plus the rest as one figure
-  function contributors(total, top){
-    const eligible = (top || []).filter(t => t[2] >= 0.01);
-    const shown = eligible.slice(0, 3).concat(eligible.slice(3, 5).filter(t => t[2] >= 0.10));
-    const lamTot = -Math.log(Math.max(1e-9, 1 - total));
-    const lamTop = shown.reduce((acc, t) => acc - Math.log(Math.max(1e-9, 1 - t[2])), 0);
-    const rest = 1 - Math.exp(-Math.max(0, lamTot - lamTop));
-    return {shown, rest};
-  }
   const NL_CLASS = {tree:'bos', shrub:'struweel', grass:'grasland', crop:'akker', built:'bebouwing', bare:'kaal of strand', water:'water', wetland:'moeras'};
   const habitatText = w => Object.entries(w || {}).filter(([k, v]) => v > 0.01 && NL_CLASS[k]).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k]) => NL_CLASS[k]).join(', ');
   const windText = w => !w ? 'geen' : [w.drift ? 'nachtwind' : '', w.onshore ? 'aanlandig' : ''].filter(Boolean).join(' + ') || 'geen';
@@ -342,11 +396,13 @@
   const NL = [[50.75, 3.3], [53.55, 7.2]];
   const map = L.map('map', {zoomControl:false, attributionControl:true});
   map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  // the panel that covers the bottom of the map: the areas card on the main view, else the legend
+  const bottomEl = () => areaMode ? $('acard') : $('legend');
   function pads(){
     const top = Math.round($('topbar').getBoundingClientRect().bottom) + 8;
-    const lg = $('legend');
-    const bottom = (isPhone() && !lg.hidden) ? lg.offsetHeight + 22 : 16;
-    return {top, bottom};
+    const el = bottomEl(), vis = !el.hidden;
+    if (isPhone()) return {top, left: 0, bottom: vis ? el.offsetHeight + (areaMode ? 10 : 22) : 16};
+    return {top, left: (areaMode && vis) ? el.offsetWidth + 24 : 0, bottom: 16};
   }
   if (q.get('lat') && q.get('lng')) map.setView([parseFloat(q.get('lat')), parseFloat(q.get('lng'))], parseInt(q.get('z') || '11', 10));
   else { const p = pads(); map.fitBounds(NL, isPhone() ? {paddingTopLeft:[0, p.top], paddingBottomRight:[0, p.bottom]} : {padding:[20, 20]}); }
@@ -355,7 +411,7 @@
     subdomains:'abcd', maxZoom:19
   }).addTo(map);
   const popupOpts = extra => { const p = pads();
-    return Object.assign({maxWidth:280, autoPanPaddingTopLeft:L.point(12, p.top), autoPanPaddingBottomRight:L.point(12, p.bottom)}, extra || {}); };
+    return Object.assign({maxWidth:280, autoPanPaddingTopLeft:L.point(12 + p.left, p.top), autoPanPaddingBottomRight:L.point(12, p.bottom)}, extra || {}); };
 
   let meta = null, index = null, overlay = null, overlayNew = null, gemeentes = null, areaLayer = null;
   const sitesLayer = L.layerGroup();
@@ -365,10 +421,10 @@
   // ---- legend, chips, tabs ----
   const setPressed = (id, on) => { const b = $(id); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); };
   function syncLegendH(){
-    const lg = $('legend');
-    document.documentElement.style.setProperty('--lg-h', (!lg.hidden && isPhone()) ? lg.offsetHeight + 'px' : '0px');
+    const el = bottomEl();
+    document.documentElement.style.setProperty('--lg-h', (!el.hidden && isPhone()) ? el.offsetHeight + 'px' : '0px');
   }
-  if (window.ResizeObserver) new ResizeObserver(syncLegendH).observe($('legend'));
+  if (window.ResizeObserver) { const ro = new ResizeObserver(syncLegendH); ro.observe($('legend')); ro.observe($('acard')); }
   window.addEventListener('resize', syncLegendH);
   function applyLayers(){
     if (overlayNew) { if (state.newLayer) { if (!map.hasLayer(overlayNew)) overlayNew.addTo(map); } else if (map.hasLayer(overlayNew)) map.removeLayer(overlayNew); }
@@ -382,7 +438,7 @@
     $('legend-new').hidden = !(overlayNew && state.newLayer);
     $('legend-sites').hidden = !(!isAll && meta && meta.sites && meta.sites.length);
     const any = ['legend-model', 'legend-new', 'legend-sites'].some(id => !$(id).hidden);
-    $('legend').hidden = !any || state.tab !== 'kaart' || state.sheet || state.failed;
+    $('legend').hidden = areaMode || !any || state.tab !== 'kaart' || state.sheet || state.failed;
     syncLegendH();
   }
   function setLegendCollapsed(c){
@@ -399,7 +455,8 @@
     state.tab = name;
     const uitleg = name === 'uitleg';
     if (uitleg && state.sheet) closeSheet(false);
-    $('panel').hidden = !uitleg; $('chips').hidden = uitleg; $('msg').hidden = uitleg || !$('msg').innerHTML;
+    $('panel').hidden = !uitleg; $('chips').hidden = areaMode || uitleg; $('msg').hidden = uitleg || !$('msg').innerHTML;
+    $('acard').hidden = !areaMode || uitleg || !meta || state.failed;
     document.querySelectorAll('#tabs button').forEach(b => { const on = b.dataset.tab === name; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
     if (history.replaceState) history.replaceState(null, '', uitleg ? '#' + (state.sub === 'methode' ? 'uitleg' : state.sub) : location.pathname + location.search);
     if (uitleg) $('panel').scrollTop = 0;
@@ -456,18 +513,11 @@
     if (areaLayer) map.removeLayer(areaLayer);
     areaLayer = f ? L.geoJSON(f, {style:{color:'#8a3d12', weight:2, fill:true, fillColor:'#8a3d12', fillOpacity:.06, dashArray:'4 3'}, interactive:false}).addTo(map) : null;
     const name = f ? (f.properties.statnaam || 'dit gebied') : null;
-    const link = t => `<a href="?soort=${encodeURIComponent(t[0])}&lat=${latlng.lat.toFixed(3)}&lng=${latlng.lng.toFixed(3)}&z=${map.getZoom()}">${esc(t[1])}</a> ${fmtP(t[2])}`;
-    const cellLine = info ? `<br><span class="mu">dit vak: ${fmtP(info[2])}${isAll && info[3] && info[3].length ? ' (' + info[3].slice(0, 2).map(t => esc(t[1]) + ' ' + fmtP(t[2])).join(', ') + ')' : ''}</span>` : '';
+    const cellLine = info ? `<br><span class="mu">dit vak: ${fmtP(info[2])}</span>` : '';
     let html;
     if (!gemeentes) html = `<b>Dit vak</b><br>kans op een melding ${when()}: <b>${info ? fmtP(info[2]) : 'onder 1%'}</b><br><span class="mu">gemeentegrenzen niet geladen</span>`;
     else if (!name) html = `<b>Buiten Nederland</b>` + (info ? `<br>dit vak: ${fmtP(info[2])}` : '<br><span class="mu">geen voorspelling buiten Nederland</span>');
-    else if (isAll) {
-      const a = (meta.areas || []).find(x => x.name === name);
-      const ct = a ? contributors(a.p, a.top) : {shown:[], rest:0};
-      html = `<b>${esc(name)}</b><br>kans op een melding van een zeldzame soort ${when()}: <b>${a ? fmtP(a.p) : 'onder 0,5%'}</b>` +
-        (ct.shown.length ? '<br>' + ct.shown.map(link).join(', ') + (ct.rest >= 0.0005 ? `, overige soorten samen ${fmtP(ct.rest)}` : '')
-                         : (a ? '<br><span class="mu">geen soort boven 1%</span>' : '')) + cellLine;
-    } else {
+    else {
       const a = meta.areas && meta.areas[name];
       html = `<b>${esc(name)}</b><br>kans op een melding van ${esc(meta.label)} ${when()}: <b>${a ? fmtP(a.p) : 'onder 0,5%'}</b>` + cellLine;
     }
@@ -484,7 +534,7 @@
     if (areaLayer) { map.removeLayer(areaLayer); areaLayer = null; }
     if (history.replaceState && new URL(location.href).searchParams.has('tik')) { const u = new URL(location.href); u.searchParams.delete('tik'); history.replaceState(null, '', u); }
   });
-  map.on('click', e => { if (swallow) { swallow = false; return; } selectAt(e.latlng); });
+  map.on('click', e => { if (swallow) { swallow = false; return; } if (!areaMode) selectAt(e.latlng); });
   function tryInitialTap(){
     const t = q.get('tik'); if (!t || !meta || !gemeentes) return;
     const [la, ln] = t.split(',').map(parseFloat);
@@ -492,9 +542,9 @@
   }
 
   // ---- reported sites ----
-  function sitePopupHtml(s, withSpecies){
-    const sub = (s.sub || []).filter(x => x !== (s.label || meta.label));
-    return `<b>${esc(withSpecies && s.label ? s.label : (s.loc || 'plek'))}</b>` + (withSpecies && s.label ? `<br>${esc(s.loc || '')}` : '') +
+  function sitePopupHtml(s){
+    const sub = (s.sub || []).filter(x => x !== meta.label);
+    return `<b>${esc(s.loc || 'plek')}</b>` +
       `<br>${s.n} melding${s.n === 1 ? '' : 'en'} op ${s.days} dag${s.days === 1 ? '' : 'en'}, ${s.first === s.last ? fmt(s.last) : fmt(s.first) + ' tot ' + fmt(s.last)}` +
       (s.max_count > 1 ? `, max. ${s.max_count} vogels` : '') + (s.photos ? `, ${s.photos} met foto` : ', geen foto') +
       (s.p_stay != null ? `<br>kans op een melding hier ${when()}: <b>${pct(s.p_stay)}</b>` : '') +
@@ -512,8 +562,8 @@
       const ll = [s.lat, s.lon];
       L.circleMarker(ll, {radius:r, color:'#8a3d12', weight: recent ? 2 : 1.6, fill:false, opacity: recent ? .95 : .6, dashArray: recent ? null : '1.5 3', interactive:false}).addTo(sitesLayer);
       const hit = L.circleMarker(ll, {radius:Math.max(r, 14), stroke:false, fill:true, fillColor:'#8a3d12', fillOpacity:0});
-      hit.bindPopup(() => sitePopupHtml(s, false), popupOpts());
-      hit.on('popupopen', () => announce(sitePopupHtml(s, false)));
+      hit.bindPopup(() => sitePopupHtml(s), popupOpts());
+      hit.on('popupopen', () => announce(sitePopupHtml(s)));
       hit.addTo(sitesLayer);
       siteHits.set(siteKey(s), hit);
     });
@@ -541,8 +591,8 @@
     if (!items.length) { $('best').innerHTML = '<li class="empty">Geen plekken met meldingen in de laatste 7 dagen.</li>'; return; }
     $('best').innerHTML = items.map((x, i) => {
       const s = x.s, cls = leafClass(s.p_stay);
-      const title = isAll ? s.label : (s.loc || 'plek');
-      const line = [isAll ? s.loc : '', `${s.n} melding${s.n === 1 ? '' : 'en'}, laatst ${fmtDay(dayOf(s.last))}`, x.d != null ? `${x.d < 10 ? x.d.toFixed(1).replace('.', ',') : Math.round(x.d)} km` : ''].filter(Boolean);
+      const title = s.loc || 'plek';
+      const line = [`${s.n} melding${s.n === 1 ? '' : 'en'}, laatst ${fmtDay(dayOf(s.last))}`, x.d != null ? `${x.d < 10 ? x.d.toFixed(1).replace('.', ',') : Math.round(x.d)} km` : ''].filter(Boolean);
       return `<li><span class="bp-pct">${cls ? `<span class="sw ${cls}"></span>` : ''}${pct(s.p_stay)}</span>
         <div class="bp-txt"><b>${esc(title)}</b>${line.map(t => `<span>${esc(t)}</span>`).join('')}</div>
         <div class="bp-act"><button data-i="${i}">Op de kaart</button><a href="${routeUrl(s.lat, s.lon)}" target="_blank" rel="noopener">Route ↗</a></div></li>`;
@@ -554,9 +604,9 @@
     const ll = L.latLng(s.lat, s.lon);
     map.once('moveend', () => {
       const hit = siteHits.get(siteKey(s));
-      if (hit) hit.openPopup(); else L.popup(popupOpts()).setLatLng(ll).setContent(sitePopupHtml(s, isAll)).openOn(map);
+      if (hit) hit.openPopup(); else L.popup(popupOpts()).setLatLng(ll).setContent(sitePopupHtml(s)).openOn(map);
     });
-    map.flyTo(ll, Math.max(map.getZoom(), 12), {animate: !matchMedia('(prefers-reduced-motion: reduce)').matches, duration: 0.8});
+    map.flyTo(ll, Math.max(map.getZoom(), 12), {animate: !reduced(), duration: 0.8});
   }
   function openSheet(){
     state.sheet = true; $('sheet').hidden = false; $('sheet-note').hidden = true;
@@ -581,6 +631,129 @@
       userPos = {lat:p.coords.latitude, lng:p.coords.longitude}; sortMode = 'dichtbij'; note.hidden = true; renderSheet();
     }, () => { note.textContent = 'Geen locatie: sta locatie toe in je browser, of sorteer op hoogste kans.'; }, {enableHighAccuracy:false, timeout:10000, maximumAge:600000});
   });
+
+  // ---- best areas near the visitor (main view) ----
+  const RADII = [25, 50, 100];
+  let areas = [], areaPos = null, shown = [];
+  let radius = RADII.includes(+store.get('vr_fc_radius')) ? +store.get('vr_fc_radius') : 50;
+  const areasLayer = L.layerGroup(), youLayer = L.layerGroup();
+  const fmtKm = d => d < 10 ? d.toFixed(1).replace('.', ',') + ' km' : Math.round(d) + ' km';
+  function areaName(sites){
+    const base = l => String(l || '').replace(/\s*\([^)]*\)/g, '').trim();
+    const main = l => base(l).split(' - ')[0].trim();
+    if (sites.length > 1 && sites.filter(s => main(s.loc) === main(sites[0].loc)).length > 1) return main(sites[0].loc);
+    return base(sites[0].loc) || 'Gebied';
+  }
+  // Sites of all species within 3 km of an area's best site form one area; per species the chance that it is
+  // reported there again, per area the chance that at least one of them is.
+  function buildAreas(sites){
+    const out = [];
+    sites.filter(s => s.p_stay != null).slice().sort((a, b) => b.p_stay - a.p_stay).forEach(s => {
+      let c = out.find(a => km({lat:a.lat, lng:a.lon}, s) <= 3);
+      if (!c) { c = {lat:s.lat, lon:s.lon, sites:[]}; out.push(c); }
+      c.sites.push(s);
+    });
+    out.forEach(c => {
+      const bySp = new Map();
+      c.sites.forEach(s => {
+        const k = s.species || s.label;
+        const e = bySp.get(k) || {species:s.species, label:s.label, q:1, n:0, last:s.last};
+        e.q *= 1 - s.p_stay; e.n += s.n; if (s.last > e.last) e.last = s.last;
+        bySp.set(k, e);
+      });
+      c.species = [...bySp.values()].map(e => Object.assign(e, {p: 1 - e.q})).sort((a, b) => b.p - a.p);
+      c.p = 1 - c.species.reduce((q, e) => q * (1 - e.p), 1);
+      c.name = areaName(c.sites);
+    });
+    return out;
+  }
+  function areaPopupHtml(x){
+    const c = x.c;
+    return `<b>${esc(c.name)}</b>${x.d != null ? ` <span class="mu">· ${fmtKm(x.d)}</span>` : ''}` +
+      `<br>kans op minstens één zeldzame soort ${when()}: <b>${fmtP(c.p)}</b>` +
+      `<ul class="pl">${c.species.map(e => `<li><a href="?soort=${encodeURIComponent(e.species)}&lat=${c.lat.toFixed(4)}&lng=${c.lon.toFixed(4)}&z=12">${esc(e.label)}</a> ${pct(e.p)} <span class="mu">· laatst ${fmtDay(dayOf(e.last))}</span></li>`).join('')}</ul>` +
+      `<div class="acts"><a href="${routeUrl(c.lat, c.lon)}" target="_blank" rel="noopener">Route ↗</a></div>`;
+  }
+  function renderAreas(){
+    const scope = areaPos ? `binnen ${radius} km` : 'in Nederland';
+    $('ac-scope').textContent = scope;
+    $('ac-sub').textContent = `Kans op een melding van minstens één zeldzame soort ${when()}${fc.rel && !fc.stale ? ', ' + fc.label : ''}.` + (fc.stale ? ' Let op: verouderde gegevens.' : '');
+    $('radius').hidden = !areaPos;
+    $('locbtn').hidden = !!areaPos || !navigator.geolocation;
+    document.querySelectorAll('#radius button').forEach(b => { const on = +b.dataset.r === radius; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    let list = areas.map(c => ({c, d: areaPos ? km(areaPos, c) : null}));
+    if (areaPos) list = list.filter(x => x.d <= radius);
+    shown = list.sort((a, b) => b.c.p - a.c.p).slice(0, 10);
+    areasLayer.clearLayers();
+    if (!shown.length) {
+      const next = RADII.find(r => r > radius);
+      $('areas').innerHTML = `<li class="empty">${areas.length ? `Geen gebieden met recente meldingen ${scope}.` : 'Geen recente meldingen van zeldzame soorten.'}${areaPos && next ? ` <button class="lnk" id="widen">Zoek binnen ${next} km</button>` : ''}</li>`;
+      if ($('widen')) $('widen').onclick = () => setRadius(next);
+      syncLegendH(); return;
+    }
+    $('areas').innerHTML = shown.map((x, k) => {
+      const c = x.c, n = c.species.length, cls = leafClass(c.p);
+      const sp = c.species.slice(0, 3).map(e => `${esc(e.label)} ${pct(e.p)}`).join(' · ') + (n > 3 ? ` · nog ${n - 3}` : '');
+      return `<li class="ar" data-k="${k}"><span class="rk" aria-hidden="true">${k + 1}</span><div class="ar-main">
+        <div class="ar-top"><button class="ar-name" data-k="${k}">${esc(c.name)}</button><span class="ar-p">${cls ? `<span class="sw ${cls}"></span>` : ''}${fmtP(c.p)}</span></div>
+        <div class="ar-sp">${sp}</div>
+        <div class="ar-meta">${x.d != null ? `<span>${fmtKm(x.d)}</span>` : ''}<span>${n} soort${n === 1 ? '' : 'en'}</span><a href="${routeUrl(c.lat, c.lon)}" target="_blank" rel="noopener">Route ↗</a></div>
+      </div></li>`;
+    }).join('');
+    $('areas').querySelectorAll('.ar').forEach(li => li.addEventListener('click', e => { if (!e.target.closest('a')) selectArea(+li.dataset.k, true); }));
+    shown.forEach((x, k) => {
+      const minor = k >= 3;
+      const icon = L.divIcon({className:'', html:`<div class="amk${minor ? ' minor' : ''}">${k + 1}</div>`, iconSize: minor ? [22, 22] : [28, 28]});
+      L.marker([x.c.lat, x.c.lon], {icon, title:`${k + 1}. ${x.c.name}, ${fmtP(x.c.p)}`, alt:x.c.name, zIndexOffset:1000 - k}).on('click', () => selectArea(k, false)).addTo(areasLayer);
+    });
+    syncLegendH();
+  }
+  function selectArea(k, fly){
+    const x = shown[k]; if (!x) return;
+    $('areas').querySelectorAll('.ar').forEach(li => li.classList.toggle('sel', +li.dataset.k === k));
+    const li = $('areas').querySelector(`.ar[data-k="${k}"]`); if (li) li.scrollIntoView({block:'nearest'});
+    const ll = L.latLng(x.c.lat, x.c.lon);
+    const open = () => L.popup(popupOpts()).setLatLng(ll).setContent(areaPopupHtml(x)).openOn(map);
+    if (fly && !map.getBounds().pad(-0.15).contains(ll)) { map.once('moveend', open); map.flyTo(ll, Math.max(map.getZoom(), 10), {animate: !reduced(), duration: 0.6}); }
+    else open();
+    announce(areaPopupHtml(x));
+  }
+  function fitAreas(){
+    const p = pads(), opts = {paddingTopLeft:[p.left + 8, p.top], paddingBottomRight:[8, p.bottom], animate:false};
+    if (areaPos) map.fitBounds(L.latLng(areaPos.lat, areaPos.lng).toBounds(radius * 2000), opts);
+    else map.fitBounds(NL, opts);
+  }
+  function drawYou(){
+    youLayer.clearLayers(); if (!areaPos) return;
+    L.circle([areaPos.lat, areaPos.lng], {radius: radius * 1000, color:'#8a3d12', weight:1.2, opacity:.55, dashArray:'4 5', fill:false, interactive:false}).addTo(youLayer);
+    L.marker([areaPos.lat, areaPos.lng], {icon:L.divIcon({className:'', html:'<div class="you"></div>', iconSize:[16, 16]}), interactive:false, keyboard:false}).addTo(youLayer);
+  }
+  function setRadius(r){ radius = r; store.set('vr_fc_radius', String(r)); map.closePopup(); drawYou(); renderAreas(); requestAnimationFrame(fitAreas); }
+  function requestLocation(prompted){
+    const note = $('ac-note');
+    if (prompted) { note.textContent = 'Locatie bepalen…'; note.hidden = false; }
+    navigator.geolocation.getCurrentPosition(p => {
+      const next = {lat:p.coords.latitude, lng:p.coords.longitude};
+      const moved = !areaPos || km(areaPos, {lat:next.lat, lon:next.lng}) > 2;
+      areaPos = next; note.hidden = true;
+      store.set('vr_fc_pos', JSON.stringify({lat:+next.lat.toFixed(3), lng:+next.lng.toFixed(3), t:Date.now()}));
+      drawYou(); renderAreas(); if (moved) requestAnimationFrame(fitAreas);
+    }, () => {
+      if (prompted) { note.textContent = 'Geen locatie: sta locatie toe in je browser. Je ziet nu de beste gebieden in heel Nederland.'; note.hidden = false; }
+      renderAreas();
+    }, {enableHighAccuracy:false, timeout:10000, maximumAge:600000});
+  }
+  function initLocation(){
+    areasLayer.addTo(map); youLayer.addTo(map);
+    try { const s = JSON.parse(store.get('vr_fc_pos') || 'null'); if (s && Date.now() - s.t < 12 * 3600e3) areaPos = {lat:s.lat, lng:s.lng}; } catch (e) {}
+    drawYou(); renderAreas(); requestAnimationFrame(fitAreas);
+    if (!navigator.geolocation) return;
+    const ask = () => requestLocation(false);
+    if (navigator.permissions && navigator.permissions.query) navigator.permissions.query({name:'geolocation'}).then(r => { if (r.state !== 'denied') ask(); }).catch(ask);
+    else ask();
+  }
+  $('locbtn').onclick = () => requestLocation(true);
+  document.querySelectorAll('#radius button').forEach(b => b.onclick = () => setRadius(+b.dataset.r));
 
   // ---- explanation ----
   function curBoxHtml(m){
@@ -688,7 +861,7 @@
     const opt = (value, text, selected) => { const o = document.createElement('option'); o.value = value; o.textContent = text; if (selected) o.selected = true; return o; };
     if (!idx.species.some(e => e.species === current)) { const o = opt('', 'Kies een soort', true); o.disabled = true; sel.appendChild(o); }
     const all = idx.species.find(e => e.species === 'alle');
-    if (all) sel.appendChild(opt('alle', `Alle zeldzame soorten · ${all.n_species || ''}`, current === 'alle'));
+    if (all) sel.appendChild(opt('alle', 'Beste gebieden (alle soorten)', current === 'alle'));
     const label = e => `${e.label} · ${e.n_sites} plek${e.n_sites === 1 ? '' : 'ken'}`;
     const active = idx.species.filter(e => e.species !== 'alle' && (e.n_sites > 0 || e.species === current));
     const top = active.filter(e => e.n_sites > 0).sort((a, b) => b.n_sites - a.n_sites).slice(0, 5);
@@ -728,7 +901,7 @@
 
   // ---- data ----
   const pIndex = fetch('/forecast/index.json', {cache:'no-store'}).then(r => r.ok ? r.json() : null).catch(() => null);
-  fetch('/forecast/gemeentes.json').then(r => r.ok ? r.json() : null).then(g => {
+  if (!areaMode) fetch('/forecast/gemeentes.json').then(r => r.ok ? r.json() : null).then(g => {
     if (!g) return;
     g.features.forEach(f => {
       let minx = 180, miny = 90, maxx = -180, maxy = -90;
@@ -762,6 +935,14 @@
     $('legend-when').textContent = `${fc.stale ? 'verouderd: ' : ''}gegevens tot en met ${fmtDay(dayOf(m.as_of))}`;
     $('legend-when').classList.toggle('stale', fc.stale);
     document.title = isAll ? 'Vogelradar · Voorspelling' : `Vogelradar · ${m.label}`;
+    if (areaMode) {
+      $('title').textContent = 'Voorspelling';
+      $('sub').textContent = `zeldzame vogels · ${when()}${fc.rel && !fc.stale ? ', ' + fc.label : ''}`;
+      document.title = 'Vogelradar · Voorspelling';
+      areas = buildAreas(m.sites || []);
+      $('acard').hidden = false;
+      initLocation();
+    }
     if (!isAll && !m.n_reports) showMsg(`<b>Geen meldingen van ${esc(m.label)}</b>Niet in de laatste ${m.window_days} dagen: de kans is overal onder 1%. Zodra er een melding komt, verschijnt de kaart.<br><a href="${location.pathname}">Toon alle soorten</a>`);
     drawSites(); applyLayers(); render(); tryInitialTap();
     $('loading').hidden = true;
