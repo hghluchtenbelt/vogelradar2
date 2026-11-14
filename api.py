@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import os
 import re
@@ -15,7 +16,7 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, Response
 from pydantic import BaseModel, Field, StringConstraints, ValidationError
 
 _rate_limit: dict[str, list[float]] = defaultdict(list)
@@ -58,7 +59,7 @@ def _allow_rate(ip: str) -> bool:
     return True
 
 from database import (
-    get_sightings, get_latest_update, init_db,
+    get_sightings, get_sighting, get_latest_update, init_db,
     upsert_push_subscriber, delete_push_subscriber,
     get_daily_stats,
     get_gemeente_ranking, get_hotspot_ranking,
@@ -415,6 +416,76 @@ def forecast_file(name: str):
     if not path.is_file():
         raise HTTPException(status_code=404)
     return FileResponse(path, headers={"Cache-Control": "public, max-age=300"})
+
+
+# Public address of the site, for absolute URLs in link previews.
+SITE_URL = os.environ.get("SITE_URL", "https://vogel-radar.nl").rstrip("/")
+
+_OBS_ID_RE = re.compile(r"\d{1,12}")
+_META_BLOCK_RE = re.compile(r"<!-- meta:start.*?<!-- meta:end -->", re.DOTALL)
+_RARITY_NL = {1: "Algemeen", 2: "Vrij zeldzaam", 3: "Zeldzaam", 4: "Zeer zeldzaam"}
+_MONTHS_NL = ("januari", "februari", "maart", "april", "mei", "juni", "juli",
+              "augustus", "september", "oktober", "november", "december")
+
+
+def _date_nl(date: str, obs_time: str) -> str:
+    """'2026-11-13', '11:31' -> '13 november 2026 om 11:31'."""
+    m = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", date or "")
+    if not m or not 1 <= int(m.group(2)) <= 12:
+        return ""
+    text = f"{int(m.group(3))} {_MONTHS_NL[int(m.group(2)) - 1]} {m.group(1)}"
+    return f"{text} om {obs_time}" if obs_time else text
+
+
+def _share_meta(obs_id: str, row: dict | None) -> str:
+    """The <head> block for a shared sighting link. Link-preview crawlers do
+    not run JavaScript, so the title and preview tags have to be in the
+    HTML. Every value comes from scraped free text and is escaped."""
+    e = html.escape
+    url = f"{SITE_URL}/waarneming/{obs_id}"
+    if row is None:
+        title = "Waarneming niet meer beschikbaar | Vogelradar"
+        desc = ("Deze waarneming staat niet meer op Vogelradar. Bekijk welke "
+                "zeldzame vogels er nu bij jou in de buurt zijn gezien.")
+        image = f"{SITE_URL}/icon.png"
+    else:
+        name, loc = row["bird_name"], row.get("location") or ""
+        title = f"{name} · {loc} | Vogelradar" if loc else f"{name} | Vogelradar"
+        when = _date_nl(row.get("date") or "", row.get("obs_time") or "")
+        desc = _RARITY_NL.get(row["rarity"], "Zeldzaam") + (
+            f", gezien op {when}" if when else "") + (
+            ". Bekijk de plek op de kaart van Vogelradar.")
+        photo = row.get("photo_url") or ""
+        image = (f"{photo}?w=600" if photo.startswith("https://")
+                 else f"{SITE_URL}/icon.png")
+    # Sightings disappear after a week: previews yes, search index no.
+    return (
+        f"<title>{e(title)}</title>\n"
+        f'<meta name="description" content="{e(desc)}">\n'
+        '<meta name="robots" content="noindex">\n'
+        f'<link rel="canonical" href="{e(url)}">\n'
+        '<meta property="og:type" content="article">\n'
+        f'<meta property="og:title" content="{e(title)}">\n'
+        f'<meta property="og:description" content="{e(desc)}">\n'
+        f'<meta property="og:url" content="{e(url)}">\n'
+        f'<meta property="og:image" content="{e(image)}">'
+    )
+
+
+@app.get("/waarneming/{obs_id}")
+def shared_sighting(obs_id: str):
+    """A shareable link to one sighting: the normal page, with a head that
+    describes that sighting. The page itself opens it on the map."""
+    if not _OBS_ID_RE.fullmatch(obs_id):
+        raise HTTPException(status_code=404)
+    row = get_sighting(f"https://waarneming.nl/observation/{obs_id}/")
+    page = (_HERE / "vogelradar.html").read_text(encoding="utf-8")
+    meta = _share_meta(obs_id, row)
+    page = _META_BLOCK_RE.sub(lambda _m: meta, page, count=1)
+    # Still the working app when the sighting is gone (it explains itself),
+    # but a 404 so previews and crawlers do not treat it as live content.
+    return HTMLResponse(page, status_code=200 if row else 404,
+                        headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/")

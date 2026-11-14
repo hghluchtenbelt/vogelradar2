@@ -100,3 +100,9 @@ def test_location_can_be_chosen_by_hand_and_radius_filtered():
 def test_fallback_location_is_never_presented_as_the_visitors_position():
     assert "Geen locatie bekend: afstanden gelden vanaf" in HTML
     assert 'if(state.user.source!=="default") markers["__user"]' in HTML
+
+
+def test_sightings_are_addressable_and_shareable():
+    assert '"/waarneming/"+encodeURIComponent(id)' in HTML
+    assert 'data-share="${esc(s.id)}"' in HTML
+    assert 'window.addEventListener("popstate"' in HTML

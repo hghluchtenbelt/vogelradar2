@@ -268,6 +268,21 @@ def get_sightings(days_back: int = 7) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def get_sighting(url: str) -> dict | None:
+    """One stored sighting by its waarneming.nl URL (for shared links)."""
+    with _connect() as conn:
+        row = conn.execute(
+            """
+            SELECT url, bird_name, location, date, obs_time,
+                   COALESCE(photo_url, '') AS photo_url,
+                   COALESCE(rarity, 3) AS rarity
+            FROM   sightings WHERE url = ?
+            """,
+            (url,),
+        ).fetchone()
+    return dict(row) if row else None
+
+
 def get_all_urls() -> set[str]:
     with _connect() as conn:
         rows = conn.execute("SELECT url FROM sightings").fetchall()

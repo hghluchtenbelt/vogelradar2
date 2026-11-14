@@ -76,6 +76,12 @@
   .pop .pmeta{font-size:12px;color:#0f172a;line-height:1.5}
   .pop a{color:var(--brand-d);font-weight:650;font-size:12px;text-decoration:none}
   .pop .pothers{margin-top:5px;font-size:11px;color:#64748b}
+  .pop .plinks{margin-top:6px;line-height:1.9}
+  .pop .pshare{border:none;background:none;padding:0;color:var(--brand-d);font-weight:650;font-size:12px;cursor:pointer;font-family:inherit}
+  .toast{position:fixed;left:50%;bottom:calc(74vh + 10px);transform:translateX(-50%);z-index:3000;background:var(--ink);color:#fff;
+    font-size:13px;font-weight:650;padding:9px 15px;border-radius:999px;box-shadow:0 6px 22px rgba(2,6,23,.3);white-space:nowrap;
+    opacity:0;pointer-events:none;transition:opacity .2s}
+  .toast.on{opacity:1}
   .pop .pimg{display:block;width:248px;max-width:100%;height:150px;object-fit:cover;border-radius:10px;margin-bottom:8px;background:#f1f5f9}
 
   /* Markers */
@@ -178,8 +184,8 @@
     font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer;font-family:inherit}
   .notice{display:flex;align-items:center;gap:8px;background:#fffbeb;border:1px solid #fde68a;color:#78350f;
     border-radius:11px;padding:8px 11px;margin-bottom:8px;font-size:12px;line-height:1.4}
-  .notice button{margin-left:auto;flex:0 0 auto;border:1px solid #d97706;background:#fff;color:#78350f;font-weight:700;
-    font-size:11.5px;padding:5px 9px;border-radius:8px;cursor:pointer;font-family:inherit}
+  .notice button,.notice a{margin-left:auto;flex:0 0 auto;border:1px solid #d97706;background:#fff;color:#78350f;font-weight:700;
+    font-size:11.5px;padding:5px 9px;border-radius:8px;cursor:pointer;font-family:inherit;text-decoration:none}
 
   /* ── Splash ── */
   #splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,var(--brand),var(--brand-d));
@@ -348,6 +354,8 @@
   </div>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <div class="pickbar" id="pickbar" hidden>
   <span>Tik op de kaart om je locatie te kiezen</span>
   <button id="pick-cancel">Annuleren</button>
@@ -428,7 +436,8 @@ const state = {
   data: [], lastUpdated: null, selected: null,
   // "loading" until the first answer, then "ok" or "error"; a failed load must
   // never look like "there are no birds".
-  status: "loading"
+  status: "loading",
+  missing: null            // id from a shared link that is no longer in the feed
 };
 
 
@@ -516,12 +525,12 @@ function updateWensBell(){
 function getWensDist(){ return parseInt(localStorage.getItem(_DK)||'50'); }
 
 function openWensModal(){
-  $('#wmod').hidden=false;
+  showModal('#wmod');
   $('#wens-dist').value=String(getWensDist());
   if('Notification' in window && Notification.permission==='default') $('#wmod-notif').hidden=false;
   renderWensList();
 }
-function closeWensModal(){ $('#wmod').hidden=true; }
+function closeWensModal(){ hideModal('#wmod'); }
 
 function renderWensList(){
   const wish=getWishlist();
@@ -664,8 +673,8 @@ function introHtml(){
     </div></div>`;
 }
 function dismissIntro(){ try{ localStorage.setItem(_IK,'1'); }catch{} const el=$("#intro"); if(el) el.remove(); }
-function openAbout(){ $('#amod').hidden=false; }
-function closeAbout(){ $('#amod').hidden=true; }
+function openAbout(){ showModal('#amod'); }
+function closeAbout(){ hideModal('#amod'); }
 $('#about-btn').addEventListener('click',openAbout);
 $('#amod-close').addEventListener('click',closeAbout);
 $('#amod').addEventListener('click',e=>{ if(e.target===$('#amod')) closeAbout(); });
@@ -703,7 +712,10 @@ function renderCards(){
   // No location known: distances are measured from the default place. Say so, and offer the way out.
   const noLoc = state.user.source==="default"
     ? `<div class="notice">📍 Geen locatie bekend: afstanden gelden vanaf ${esc(state.user.name)}.<button id="pick-loc">Kies locatie</button></div>` : "";
-  const top = stale+noLoc;
+  // A shared link to a sighting that has left the feed (older than a week, or removed).
+  const gone = state.missing
+    ? `<div class="notice">Deze waarneming staat niet meer op Vogelradar.<a href="https://waarneming.nl/observation/${encodeURIComponent(state.missing)}/" target="_blank" rel="noopener">waarneming.nl ↗</a></div>` : "";
+  const top = gone+stale+noLoc;
   if(!items.length){
     const wider = state.maxDist ? `<button id="widen">Toon heel Nederland</button>` : "";
     box.innerHTML = top + (state.wishOnly
@@ -769,6 +781,20 @@ function initMap(){
     attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains:"abcd", maxZoom:19
   }).addTo(map);
+  map.getContainer().addEventListener("click",e=>{
+    const b=e.target.closest("[data-share]"); if(b) shareSighting(b.dataset.share); });
+  // The visitor closed the popup (not a redraw, and not a switch to another marker):
+  // the sighting is no longer selected, and its address leaves the address bar.
+  map.on("popupclose",()=>{
+    if(_redrawing||_routing) return;
+    const closed=state.selected;
+    setTimeout(()=>{
+      if(state.selected!==closed) return;                              // another sighting was opened
+      if(closed && markers[closed] && markers[closed].isPopupOpen()) return;
+      state.selected=null; updateSel(); updateTitle(); routeHome();
+      if(started && curY>=maxHidden-1) snapSheet(midHidden,true);     // bring the list back
+    },0);
+  });
 }
 function makeIcon(s,sel){
   const r=RARITY[s.rarity];
@@ -780,6 +806,9 @@ function makeIcon(s,sel){
 }
 function drawMarkers(){
   if(!map) return;
+  // Redrawing removes the open popup; that is not the visitor closing it.
+  const reopen = state.selected && markers[state.selected] && markers[state.selected].isPopupOpen();
+  _redrawing=true;
   Object.values(markers).forEach(m=>map.removeLayer(m));
   if(_clusterLayer){ map.removeLayer(_clusterLayer); _clusterLayer=null; }
   if(_radiusLayer){ map.removeLayer(_radiusLayer); _radiusLayer=null; }
@@ -810,14 +839,18 @@ function drawMarkers(){
       <div class="pen">${esc(s.en||s.sci||"")}</div>
       <div class="pmeta">📍 ${esc(s.loc)}<br>${ago(s)} · ${fmtDist(haversine(state.user,s))} ${esc(originLabel())}</div>
       ${others}
-      <div style="margin-top:6px"><a href="${esc(mapsUrl(s))}" target="_blank" rel="noopener">Routebeschrijving</a> &nbsp;·&nbsp;
-      <a href="${esc(obsUrl(s))}" target="_blank" rel="noopener">waarneming.nl ↗</a></div></div>`);
-    m.on("click",()=>{ state.selected=s.id; updateSel(); });
+      <div class="plinks"><a href="${esc(mapsUrl(s))}" target="_blank" rel="noopener">Routebeschrijving</a> &nbsp;·&nbsp;
+      <a href="${esc(obsUrl(s))}" target="_blank" rel="noopener">waarneming.nl ↗</a> &nbsp;·&nbsp;
+      <button class="pshare" data-share="${esc(s.id)}">Delen</button></div></div>`);
+    m.on("click",()=>selectSighting(s.id));
     markers[s.id]=m;
     if(s.rarity==="rare"||s.rarity==="very_rare") m.addTo(map);
     else _clusterLayer.addLayer(m);
   });
   _clusterLayer.addTo(map);
+  _redrawing=false;
+  if(reopen && markers[state.selected]) markers[state.selected].openPopup();
+  else if(reopen){ state.selected=null; routeHome(); updateTitle(); }   // filtered away
 }
 function updateSel(){
   visible().forEach(s=>{ if(markers[s.id]) markers[s.id].setIcon(makeIcon(s,state.selected===s.id)); });
@@ -825,11 +858,106 @@ function updateSel(){
   const sc=document.querySelector(".card.sel"); if(sc) sc.scrollIntoView({block:"nearest",behavior:"smooth"});
 }
 function selectFromCard(id){
-  state.selected=id; updateSel();
+  selectSighting(id);
   const s=state.data.find(x=>x.id===id);
   if(s&&map){ snapSheet(maxHidden,true); map.flyTo([s.lat,s.lng],13,{duration:.6});
-    setTimeout(()=>markers[id]&&markers[id].openPopup(),250); }
+    setTimeout(()=>openMarkerPopup(id),250); }
 }
+function openMarkerPopup(id){
+  const m=markers[id]; if(!m) return;
+  if(_clusterLayer && _clusterLayer.hasLayer(m)) _clusterLayer.zoomToShowLayer(m,()=>m.openPopup());
+  else m.openPopup();
+}
+
+/* ===== SHARE LINKS + BACK BUTTON ===== */
+// Every sighting has an address, /waarneming/<id>. Selecting one puts that address in
+// the address bar (so it can be copied or shared) and adds a history entry, so the back
+// button returns to the list instead of leaving the site. The same goes for the sheets.
+const BASE_TITLE="Vogelradar: zeldzame vogels bij jou in de buurt", _LINK_RE=/^\/waarneming\/(\d+)\/?$/;
+let _redrawing=false, _routing=false;
+function linkedId(){ const m=location.pathname.match(_LINK_RE); return m?m[1]:null; }
+function sightingPath(id){ return "/waarneming/"+encodeURIComponent(id); }
+function updateTitle(){
+  const s=state.selected && state.data.find(x=>x.id===state.selected);
+  document.title = s ? `${s.nl} · Vogelradar` : BASE_TITLE;
+}
+function setRoute(id){
+  if(linkedId()===String(id)) return;
+  if(linkedId()) history.replaceState(history.state,"",sightingPath(id));   // keep how we got here
+  else history.pushState({pushed:true},"",sightingPath(id));
+}
+function routeHome(){
+  if(!linkedId()) return;
+  if(history.state && history.state.pushed) history.back();
+  else history.replaceState(null,"","/");                // arrived here directly: nothing to go back to
+}
+function selectSighting(id){
+  state.selected=id; state.missing=null; updateSel(); setRoute(id); updateTitle();
+}
+function deselect(){
+  _routing=true; state.selected=null; if(map) map.closePopup(); updateSel(); _routing=false;
+  updateTitle();
+}
+// Open a sighting from its address: make sure no filter hides it, then show it on the map.
+function openSighting(id){
+  const s=state.data.find(x=>x.id===id);
+  if(!s){ state.selected=null; state.missing=id; render(); revealCards(150); return; }
+  state.missing=null; state.wishOnly=false; state.active.add(s.rarity);
+  if(!timePass(s)){ state.win=7; $("#win").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.w===7)); }
+  if(state.maxDist && haversine(state.user,s)>state.maxDist){ state.maxDist=0; $("#radius").value="0"; }
+  render();
+  // Repeat reports of one bird are shown as a single marker: select the one that represents it.
+  const rep=visible().find(g=>g.id===id || (g._others||[]).some(o=>o.id===id));
+  if(!rep){ state.missing=id; render(); return; }
+  state.selected=rep.id; updateSel(); updateTitle();
+  if(started) snapSheet(maxHidden,true);
+  map.flyTo([rep.lat,rep.lng],13,{duration:.6});
+  setTimeout(()=>openMarkerPopup(rep.id),700);
+}
+function toast(msg){
+  const el=$("#toast"); el.textContent=msg; el.classList.add("on");
+  clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("on"),2200);
+}
+async function shareSighting(id){
+  const s=state.data.find(x=>x.id===id); if(!s) return;
+  const url=location.origin+sightingPath(id);
+  const data={title:`${s.nl} · Vogelradar`, text:`${s.nl} gezien bij ${s.loc}`, url};
+  if(navigator.share){
+    try{ await navigator.share(data); return; }
+    catch(e){ if(e && e.name==="AbortError") return; }       // closed the share sheet: fine
+  }
+  try{ await navigator.clipboard.writeText(url); toast("Link gekopieerd"); }
+  catch(e){ window.prompt("Kopieer deze link:",url); }
+}
+// Sheets: opening adds a history entry, so the back button closes the sheet.
+const MODALS=["#wmod","#lmod","#amod"];
+function showModal(sel){
+  if(!$(sel).hidden) return;
+  $(sel).hidden=false;
+  history.pushState({...(history.state||{}),modal:sel},"");
+}
+function hideModal(sel){
+  if($(sel).hidden) return;
+  $(sel).hidden=true;
+  if(history.state && history.state.modal===sel) history.back();
+}
+window.addEventListener("popstate",()=>{
+  MODALS.forEach(m=>{ $(m).hidden=true; });
+  const id=linkedId();
+  if(id){
+    const shown = state.selected && (state.selected===id ||
+      (visible().find(g=>g.id===state.selected)||{_others:[]})._others.some(o=>o.id===id));
+    if(!shown && state.data.length) openSighting(id);
+  } else {
+    state.missing=null;
+    if(state.selected){ deselect(); if(started) snapSheet(midHidden,true); }
+  }
+});
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape") return;
+  const open=MODALS.find(m=>!$(m).hidden);
+  if(open) hideModal(open);
+});
 
 /* ===== BOTTOM SHEET (drag + 3 snap points) ===== */
 const sheet=$("#sheet"), handleEl=$("#handle"), headEl=$(".sheethead");
@@ -887,7 +1015,9 @@ async function loadData(){
   }catch(e){ state.status="error"; }
   clearTimeout(timer);
   $("#refresh").classList.remove("spin"); render();
+  if(state.status==="ok" && _pendingLink){ const id=_pendingLink; _pendingLink=null; openSighting(id); }
 }
+let _pendingLink=linkedId();          // arrived through a shared link
 
 /* ===== LOCATION ===== */
 // GPS when allowed; otherwise the visitor can search a municipality or tap a point on the
@@ -900,7 +1030,7 @@ function savedLoc(){
 }
 function setUser(u){
   state.user=u;
-  if(map) map.flyTo([u.lat,u.lng],10,{duration:.8});
+  if(map && !state.selected && !_pendingLink) map.flyTo([u.lat,u.lng],10,{duration:.8});
   if(LOC_QUERY) loadData(); else render();              // refetch by GPS if the URL wants coordinates
 }
 function setManual(lat,lng,name){
@@ -957,7 +1087,7 @@ async function renderPlaces(){
     : `<p>Geen gemeente gevonden. Kies anders een punt op de kaart.</p>`;
 }
 function openLoc(){
-  $("#lmod").hidden=false;
+  showModal("#lmod");
   $("#radius").value=String(state.maxDist);
   $("#loc-search").value=""; $("#loc-results").innerHTML="";
   const u=state.user;
@@ -966,7 +1096,7 @@ function openLoc(){
        : `Er is geen locatie bekend. Afstanden gelden nu vanaf ${u.name}.`, u.source==="default");
   loadPlaces();
 }
-function closeLoc(){ $("#lmod").hidden=true; }
+function closeLoc(){ hideModal("#lmod"); }
 
 // Pick a point: the sheet steps aside and the next tap on the map becomes the location.
 let _pickHandler=null;
@@ -1022,7 +1152,8 @@ if(_saved) state.user={lat:_saved.lat,lng:_saved.lng,name:_saved.name,precise:fa
 loadData();
 if(!_saved) locate(false);                      // a place chosen by hand wins over asking for GPS again
 setTimeout(()=>{ map.invalidateSize();
-  if(state.user.source==="manual") map.setView([state.user.lat,state.user.lng],10);
+  if(state.selected){ /* a shared sighting is already on screen */ }
+  else if(state.user.source==="manual") map.setView([state.user.lat,state.user.lng],10);
   else if(NL_BOUNDS && state.user.source==="default") map.fitBounds(NL_BOUNDS,{padding:[16,16]});
   measure(); },120);
 window.addEventListener("resize",()=>{ map.invalidateSize(); measure(); });
