@@ -71,3 +71,18 @@ def test_scraped_text_is_escaped_before_it_reaches_the_dom():
 def test_no_em_dash_in_visible_page_text():
     body = HTML[HTML.index("<body>"):HTML.index("<script src=")]
     assert "—" not in body
+
+
+def test_page_explains_itself_and_links_onwards():
+    about = HTML[HTML.index('id="amod"'):HTML.index('<script src="/species_data.js">')]
+    assert 'href="https://waarneming.nl"' in about            # source credit
+    assert "geen onderdeel van waarneming.nl" in about
+    for href in ("/privacy", "/stats", "/voorspelling",
+                 "https://play.google.com/store/apps/details?id=com.vogelradar.app"):
+        assert f'href="{href}"' in about
+
+
+def test_website_wish_list_does_not_promise_background_alerts():
+    wish = HTML[HTML.index('id="wmod"'):HTML.index('id="amod"')]
+    assert "zolang deze pagina open staat" in wish
+    assert "Android-app" in wish

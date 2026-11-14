@@ -96,8 +96,9 @@
   .brandrow{display:flex;align-items:center;gap:9px}
   .logo{width:30px;height:30px;border-radius:9px;overflow:hidden;flex:0 0 auto}
   .logo img{width:100%;height:100%;display:block}
+  .bt{min-width:0}
   .bt b{font-size:16px;font-weight:760;letter-spacing:-.3px;display:block;line-height:1.1}
-  .bt span{font-size:10.5px;color:var(--muted)}
+  .bt span{font-size:10.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .grow{flex:1}
   .loc{display:inline-flex;align-items:center;gap:5px;border:1px solid #cde8e3;background:#e8f3f1;color:var(--brand-d);
     font-weight:650;font-size:11.5px;padding:6px 9px;border-radius:999px;cursor:pointer;max-width:150px}
@@ -219,6 +220,26 @@
     font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .12s;white-space:nowrap}
   .wqbtn.on{background:var(--qc);border-color:var(--qc);color:#fff}
   .wqbtn:active{transform:scale(.96)}
+  .wmod-hint a{color:var(--brand-d);font-weight:650}
+
+  /* ── About sheet and first-visit intro ── */
+  .about{overflow-y:auto;padding:4px 16px 22px;font-size:13.5px;line-height:1.55;color:var(--ink)}
+  .about p{margin:10px 0}
+  .about a{color:var(--brand-d);font-weight:650}
+  .about-links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  .about-links a{display:flex;flex-direction:column;gap:1px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;
+    text-decoration:none;font-size:13.5px;color:var(--ink);font-weight:680}
+  .about-links a small{font-weight:500;font-size:11.5px;color:var(--muted)}
+  .about-links a.wide{grid-column:1/-1;border-color:#99f6e4;background:#f0fdfa}
+  .about-links a:active{background:#f8fafc}
+  .intro{position:relative;background:#f0fdfa;border:1px solid #99f6e4;border-radius:13px;padding:11px 40px 11px 13px;margin-bottom:8px}
+  .intro b{font-size:14px;letter-spacing:-.2px}
+  .intro p{font-size:12.5px;line-height:1.45;margin:3px 0 8px;color:#134e4a}
+  .intro-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .intro-actions button,.intro-actions a{border:1.5px solid var(--brand);background:#fff;color:var(--brand-d);font-weight:700;
+    font-size:12px;padding:6px 11px;border-radius:9px;cursor:pointer;font-family:inherit;text-decoration:none}
+  .intro-actions button.primary{background:var(--brand);color:#fff}
+  .intro-x{position:absolute;top:4px;right:4px;width:34px;height:34px;border:none;background:none;color:#0f766e;font-size:17px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -233,6 +254,7 @@
     <button class="loc" id="loc" aria-label="Locatie">📍 <span id="locname">locatie bepalen…</span></button>
     <button class="rf" id="wens-btn" title="Wensvogels" aria-label="Wensvogels">🔔</button>
     <a class="rf" href="/voorspelling" title="Voorspelling (test)" aria-label="Voorspelling (test)">🍂</a>
+    <button class="rf" id="about-btn" title="Over Vogelradar" aria-label="Over Vogelradar">ℹ️</button>
   </div>
   <div class="chips" id="chips"></div>
 </div>
@@ -277,6 +299,7 @@
         <option value="0">heel Nederland</option>
       </select>
     </div>
+    <p class="wmod-hint">Je wensvogels vind je terug met de knop <b>★ Wensvogels</b> boven de kaart. Een melding krijg je op de website alleen zolang deze pagina open staat; voor meldingen op de achtergrond is er de <a href="https://play.google.com/store/apps/details?id=com.vogelradar.app" target="_blank" rel="noopener">Android-app</a>.</p>
     <div class="wmod-quick">
       <button class="wqbtn" data-key="__very_rare__" style="--qc:#ef4444">🔴 Alle zeer zeldzame vogels</button>
       <button class="wqbtn" data-key="__rare__" style="--qc:#f59e0b">🟡 Alle zeldzame vogels</button>
@@ -284,9 +307,30 @@
     <input id="wens-search" type="search" placeholder="Zoek soort…" autocomplete="off">
     <div id="wens-list"></div>
     <div class="wmod-notif" id="wmod-notif" hidden>
-      <p>Sta meldingen toe om een notificatie te ontvangen als een wensvogel gespot wordt.</p>
+      <p>Sta meldingen toe voor een seintje bij een wensvogel, zolang deze pagina open staat.</p>
       <button id="wmod-later" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px;white-space:nowrap">Later</button>
       <button id="wmod-allow">Toestaan</button>
+    </div>
+  </div>
+</div>
+
+<div class="wmod" id="amod" hidden>
+  <div class="wmod-box">
+    <div class="wmod-head">
+      <h2>Over Vogelradar</h2>
+      <button class="wmod-x" id="amod-close" aria-label="Sluiten">✕</button>
+    </div>
+    <div class="about">
+      <p>Vogelradar laat op de kaart zien welke zeldzame vogels er de afgelopen dagen in Nederland zijn gezien, met de dichtstbijzijnde bovenaan. Tik op een vogel voor de plek, een foto en een routebeschrijving.</p>
+      <p><b>Waar komen de gegevens vandaan?</b><br>
+      Alle waarnemingen komen van <a href="https://waarneming.nl" target="_blank" rel="noopener">waarneming.nl</a>, waar vogelaars ze invoeren. Vogelradar haalt ze elk uur op en is geen onderdeel van waarneming.nl. Bij elke vogel staat een link naar de oorspronkelijke waarneming.</p>
+      <div class="about-links">
+        <a class="wide" href="https://play.google.com/store/apps/details?id=com.vogelradar.app" target="_blank" rel="noopener">📱 Android-app<small>Met meldingen voor je wensvogels, ook als de app dicht is</small></a>
+        <a href="/stats">📊 Statistieken<small>Soorten per dag en per gemeente</small></a>
+        <a href="/voorspelling">🍂 Voorspelling<small>Test: beste gebieden</small></a>
+        <a href="/privacy">🔒 Privacy<small>Wat we wel en niet bewaren</small></a>
+        <a href="mailto:vogelradar.app@gmail.com">✉️ Contact<small>Vragen of ideeën</small></a>
+      </div>
     </div>
   </div>
 </div>
@@ -538,6 +582,28 @@ function renderChips(){
   }
 }
 
+/* ===== INTRO + ABOUT ===== */
+const _IK='vr_intro_seen';
+function introSeen(){ try{ return localStorage.getItem(_IK)==='1'; }catch{ return true; } }
+// First visit: one card that says what this is and where the data comes from.
+function introHtml(){
+  if(introSeen()) return "";
+  return `<div class="intro" id="intro">
+    <button class="intro-x" id="intro-x" aria-label="Sluiten">✕</button>
+    <b>Welkom bij Vogelradar</b>
+    <p>Zeldzame vogels bij jou in de buurt, elk uur bijgewerkt met waarnemingen van waarneming.nl.</p>
+    <div class="intro-actions">
+      <button class="primary" id="intro-more">Meer info</button>
+      <a href="https://play.google.com/store/apps/details?id=com.vogelradar.app" target="_blank" rel="noopener">Android-app</a>
+    </div></div>`;
+}
+function dismissIntro(){ try{ localStorage.setItem(_IK,'1'); }catch{} const el=$("#intro"); if(el) el.remove(); }
+function openAbout(){ $('#amod').hidden=false; }
+function closeAbout(){ $('#amod').hidden=true; }
+$('#about-btn').addEventListener('click',openAbout);
+$('#amod-close').addEventListener('click',closeAbout);
+$('#amod').addEventListener('click',e=>{ if(e.target===$('#amod')) closeAbout(); });
+
 /* ===== CARDS ===== */
 function renderCards(){
   const items=visible(), box=$("#cards");
@@ -578,7 +644,7 @@ function renderCards(){
     if(stale) $("#retry").addEventListener("click",loadData);
     return;
   }
-  box.innerHTML=stale+items.map(s=>{
+  box.innerHTML=stale+introHtml()+items.map(s=>{
     const r=RARITY[s.rarity];
     const tag = s.rarity==="very_rare"?`<span class="mega">Zeer zeldzaam</span>`
              : s.rarity==="rare"?`<span class="rar">Zeldzaam</span>`:"";
@@ -595,6 +661,7 @@ function renderCards(){
     </div>`;
   }).join("");
   if(stale) $("#retry").addEventListener("click",loadData);
+  if($("#intro")) revealCards(250);       // intro plus the first bird, not the intro alone
 }
 
 /* ===== STATUS ===== */
@@ -751,7 +818,10 @@ $("#sort-seg").querySelectorAll("button").forEach(b=>b.addEventListener("click",
   state.sortBy=b.dataset.s; $("#sort-seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); render(); }));
 $("#refresh").addEventListener("click",loadData);
 $("#loc").addEventListener("click",locate);
-$("#cards").addEventListener("click",e=>{ const c=e.target.closest(".card"); if(c) selectFromCard(c.dataset.id); });
+$("#cards").addEventListener("click",e=>{
+  if(e.target.closest("#intro-x")){ dismissIntro(); return; }
+  if(e.target.closest("#intro-more")){ dismissIntro(); openAbout(); return; }
+  const c=e.target.closest(".card"); if(c) selectFromCard(c.dataset.id); });
 
 /* ===== GO ===== */
 setTimeout(()=>{ const sp=$('#splash'); if(sp){sp.classList.add('out');setTimeout(()=>sp.remove(),450);} },1400);
