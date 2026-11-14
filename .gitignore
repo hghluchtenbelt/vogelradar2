@@ -7,6 +7,11 @@ vogelradar.db
 *.log
 firebase-service-account.json
 
+# Infra runbooks (server addresses, tunnel and Access IDs) are kept outside
+# this public repository. These patterns stop them from coming back.
+NEW-VPS-COOLIFY.md
+*-vps-migration-design.md
+
 # Forecast test (see forecast/README.md): daily feed snapshots are an archive, not source
 forecast/data/snapshots/
 forecast/data/wind/

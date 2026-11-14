@@ -1,6 +1,8 @@
 # TODO
 
-Infra/migration state lives in NEW-VPS-COOLIFY.md; this is the loose-ends list.
+Infra/migration state lives in private notes outside this repository
+(the repo is public; server addresses and tunnel IDs do not belong in
+it); this is the loose-ends list.
 
 - [x] **Vogelradar: cluster repeat sightings of the same rarity**
   (website done on dev/staging 2026-07-23; app port pending): a
@@ -94,4 +96,4 @@ reach app users after a new versionCode + Play Store upload.
   timeline as an Android widget; requires native widget code outside
   the webview.
 - [ ] **R2 offsite backups**: deferred until a bigger-than-hobby
-  project needs it; steps are in NEW-VPS-COOLIFY.md.
+  project needs it; steps are in the private infra notes.
