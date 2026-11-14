@@ -366,8 +366,7 @@ def _parse_observation(soup: BeautifulSoup, url: str) -> dict | None:
     except (ValueError, IndexError):
         return None
 
-    title_tag = soup.find("title")
-    bird_name = title_tag.text.split("-")[0].strip() if title_tag else "Onbekend"
+    bird_name = _extract_bird_name(soup)
 
     location = _text_after_icon(soup, "fas fa-map-marker-alt fa-fw") or "Onbekend"
 
@@ -407,6 +406,29 @@ def _parse_observation(soup: BeautifulSoup, url: str) -> dict | None:
 
 
 # ── Helpers ───────────────────────────────────────────────────────
+
+
+_TITLE_SEP_RE = re.compile(r"\s+-\s+")
+
+
+def _extract_bird_name(soup: BeautifulSoup) -> str:
+    """Dutch species name of an observation page.
+
+    The page title reads "Jan-van-gent - Morus bassanus - Waarneming.nl".
+    Names can contain hyphens themselves (Jan-van-gent, Zwarte Zee-eend),
+    so the name element is preferred, and the title is only ever split on
+    a hyphen that has whitespace on both sides.
+    """
+    for el in (soup.find("span", class_="species-common-name"),
+               soup.find("title"), soup.find("h1")):
+        if el is None:
+            continue
+        text = " ".join(el.get_text(" ", strip=True).split())
+        if el.name == "title":
+            text = _TITLE_SEP_RE.split(text)[0].strip()
+        if text:
+            return text
+    return "Onbekend"
 
 
 def _parse_date_time(raw: str) -> tuple[str, str]:
