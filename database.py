@@ -372,6 +372,13 @@ def prune_subscribers(max_idle_days: int = SUBSCRIBER_MAX_IDLE_DAYS) -> int:
             "DELETE FROM sent_notifications WHERE token NOT IN"
             " (SELECT fcm_token FROM push_subscribers)"
         )
+        # The privacy page says this history is wiped after the dedupe
+        # window. record_notification() only prunes when a push is sent,
+        # so do it here as well: this runs on every scrape.
+        sent_cutoff = (datetime.utcnow() - timedelta(hours=NOTIFY_DEDUPE_HOURS)).isoformat(timespec="seconds")
+        conn.execute(
+            "DELETE FROM sent_notifications WHERE sent_at < ?", (sent_cutoff,)
+        )
         conn.commit()
     return removed
 

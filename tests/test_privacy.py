@@ -84,6 +84,24 @@ def test_privacy_page_states_the_retention_the_code_applies(db):
     assert f"na {db.NOTIFY_DEDUPE_HOURS} uur gewist" in text
 
 
+def test_sent_alert_history_is_wiped_even_when_no_new_push_is_sent(db):
+    # The page says "na 24 uur gewist"; that must not depend on another push.
+    db.upsert_push_subscriber(TOKEN, 52.09, 5.12, '["Kuifmees"]', 50)
+    db.record_notification(TOKEN, "Kuifmees", 52.1, 5.1)
+    db.record_notification(TOKEN, "Kwak", 52.2, 5.2)
+    old = (datetime.utcnow() - timedelta(hours=db.NOTIFY_DEDUPE_HOURS + 1)).isoformat(timespec="seconds")
+    with db._connect() as conn:
+        conn.execute("UPDATE sent_notifications SET sent_at = ? WHERE bird_name = 'Kuifmees'", (old,))
+        conn.commit()
+
+    db.prune_subscribers()
+
+    with db._connect() as conn:
+        left = [r[0] for r in conn.execute("SELECT bird_name FROM sent_notifications")]
+    assert left == ["Kwak"]
+    assert _tokens(db) == {TOKEN}
+
+
 def test_privacy_page_does_not_promise_what_the_server_cannot_see():
     text = _privacy_text()
     # Switching notifications off in the phone settings never reaches the
@@ -91,3 +109,7 @@ def test_privacy_page_does_not_promise_what_the_server_cannot_see():
     assert "kan onze server dat niet zien" in text
     assert "je gegevens worden dan automatisch verwijderd" not in text
     assert "periodiek opgeschoond" not in text
+    # Clearing the wishes only reaches the server while the app still has a
+    # push token, so the page ties "direct" to notifications being on.
+    assert "terwijl meldingen voor de app aan staan" in text
+    assert "wis dan eerst je wensvogels in de app en zet daarna pas de meldingen uit" in text

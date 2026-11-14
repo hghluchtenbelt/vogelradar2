@@ -164,7 +164,10 @@ def run_update(
         progress_callback=progress_callback,
     )
     prune_old_sightings()
-    prune_subscribers()
+    removed = prune_subscribers()
+    if removed:
+        # Empty wish lists, unusable rows, or idle for too long.
+        print(f"[subscribers] {removed} registrations removed", flush=True)
     map_unmapped_locations()
     record_daily_stats()
     record_gemeente_daily()

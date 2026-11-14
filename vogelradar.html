@@ -78,7 +78,7 @@
   .pop .pothers{margin-top:5px;font-size:11px;color:#64748b}
   .pop .plinks{margin-top:6px;line-height:1.9}
   .pop .pshare{border:none;background:none;padding:0;color:var(--brand-d);font-weight:650;font-size:12px;cursor:pointer;font-family:inherit}
-  .toast{position:fixed;left:50%;bottom:calc(74vh + 10px);transform:translateX(-50%);z-index:3000;background:var(--ink);color:#fff;
+  .toast{position:fixed;left:50%;top:112px;transform:translateX(-50%);z-index:3000;background:var(--ink);color:#fff;
     font-size:13px;font-weight:650;padding:9px 15px;border-radius:999px;box-shadow:0 6px 22px rgba(2,6,23,.3);white-space:nowrap;
     opacity:0;pointer-events:none;transition:opacity .2s}
   .toast.on{opacity:1}
@@ -231,7 +231,8 @@
   .wmod-notif button{border:1.5px solid var(--brand);background:#fff;color:var(--brand-d);
     font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap}
   .wmod-distrow{display:flex;align-items:center;gap:8px;padding:10px 16px 4px;font-size:13px;color:var(--ink);flex:0 0 auto}
-  .wmod-distrow select{border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;font-size:13px;font-family:inherit;background:#fff;color:var(--ink);cursor:pointer}
+  /* 16px: iOS Safari zooms the page when a smaller form control gets focus. */
+  .wmod-distrow select{border:1.5px solid var(--line);border-radius:8px;padding:5px 8px;font-size:16px;font-family:inherit;background:#fff;color:var(--ink);cursor:pointer}
   .wmod-quick{display:flex;gap:8px;padding:8px 16px 2px;flex:0 0 auto;flex-wrap:wrap}
   .wqbtn{flex:1;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:#fff;
     font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .12s;white-space:nowrap}
