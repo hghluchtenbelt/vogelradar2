@@ -10,6 +10,7 @@ from database import (
     get_push_subscribers, delete_push_subscriber,
     already_notified, record_notification,
 )
+from species import wish_keys
 
 # Override with FIREBASE_CREDENTIALS when the file is mounted elsewhere
 # (e.g. a secret mount in a container). Push is skipped if the file is absent.
@@ -102,7 +103,9 @@ def _parse_subscriber(sub: dict) -> tuple[set[str], float, float, int]:
 def _matches(s: dict, wishlist: set[str]) -> bool:
     rarity = s.get("rarity", 3)
     return (
-        s["bird_name"] in wishlist
+        # A wish for a species also covers its subspecies: "Notenkraker"
+        # matches a report named "Dunsnavelnotenkraker".
+        not wishlist.isdisjoint(wish_keys(s["bird_name"]))
         or (rarity >= 4 and "__very_rare__" in wishlist)
         or (rarity >= 3 and "__rare__" in wishlist)
     )

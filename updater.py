@@ -33,11 +33,12 @@ from database import (
     record_daily_stats, map_unmapped_locations, record_gemeente_daily,
     record_scrape_run,
     get_meta, set_meta, get_revalidation_candidates,
-    delete_sighting, update_sighting,
+    delete_sighting, update_sighting, rename_bird_names,
 )
 from scraper import (
     fetch_rare_birds, check_observation, _make_authenticated_session,
 )
+from species import truncated_name_fixes
 
 REVALIDATE_EVERY_H = 24
 
@@ -96,11 +97,24 @@ def run_revalidation(
     return len(urls), updated, deleted
 
 
+def repair_truncated_names() -> int:
+    """One-off: rows scraped before the name parser was fixed carry names
+    cut at their first hyphen ("Jan" for Jan-van-gent). Rename them once,
+    so the feed is right immediately instead of after those rows expire."""
+    if get_meta("truncated_names_repaired"):
+        return 0
+    changed = rename_bird_names(truncated_name_fixes())
+    set_meta("truncated_names_repaired", "1")
+    print(f"[repair] {changed} truncated species names restored", flush=True)
+    return changed
+
+
 def run_update(
     progress_callback: Callable[[float, str], None] | None = None,
 ) -> tuple[int, int]:
     """Scrape and persist new sightings. Returns (new_count, total_scraped)."""
     init_db()
+    repair_truncated_names()
     first_run = is_empty()
     known_urls: set[str] = set() if first_run else get_all_urls()
     days_back_by_rarity = (

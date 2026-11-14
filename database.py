@@ -342,6 +342,20 @@ def delete_sighting(url: str) -> None:
         conn.commit()
 
 
+def rename_bird_names(renames: dict[str, str]) -> int:
+    """Rename stored sightings (old name -> new name). Returns rows changed."""
+    changed = 0
+    with _connect() as conn:
+        for old, new in renames.items():
+            cur = conn.execute(
+                "UPDATE sightings SET bird_name = ? WHERE bird_name = ?",
+                (new, old),
+            )
+            changed += cur.rowcount
+        conn.commit()
+    return changed
+
+
 _REVAL_FIELDS = ("bird_name", "location", "date", "obs_time", "count",
                  "photo", "photo_url", "latitude", "longitude", "rarity")
 
