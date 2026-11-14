@@ -99,7 +99,7 @@ def test_healthz_fails_when_the_database_is_unusable(client, db, monkeypatch, tm
     import pytest
 
     monkeypatch.setattr(db, "DB_PATH", tmp_path / "missing-dir" / "x.db")
-    with pytest.raises(Exception):  # noqa: B017, PT011 (any failure marks the container unhealthy)
+    with pytest.raises(Exception):  # noqa: B017 (any failure marks the container unhealthy)
         client.get("/healthz")
 
 

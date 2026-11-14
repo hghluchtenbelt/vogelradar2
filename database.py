@@ -24,6 +24,11 @@ _PROV_RE = re.compile(r"\(([A-Z]{2})\)\s*$")
 # staked-out rarity was announced again on each new report.
 NOTIFY_DEDUPE_HOURS = 24
 
+# A registration is refreshed every time the app is opened (also via a tap
+# on a notification). One that has not been refreshed for this long is
+# treated as unused and deleted; the privacy page states this number.
+SUBSCRIBER_MAX_IDLE_DAYS = 180
+
 
 def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
@@ -326,11 +331,13 @@ def get_push_subscribers() -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def prune_subscribers() -> int:
+def prune_subscribers(max_idle_days: int = SUBSCRIBER_MAX_IDLE_DAYS) -> int:
     """Delete registrations that cannot or should not receive pushes:
-    an empty wish list, or coordinates that are missing or off the globe
-    (SQLite stores NaN as NULL, so a NaN that slipped in looks like this).
+    an empty wish list, coordinates that are missing or off the globe
+    (SQLite stores NaN as NULL, so a NaN that slipped in looks like this),
+    or no sign of the app for `max_idle_days`.
     Returns the number of rows removed."""
+    idle_cutoff = (datetime.utcnow() - timedelta(days=max_idle_days)).isoformat(timespec="seconds")
     with _connect() as conn:
         cur = conn.execute(
             """
@@ -340,7 +347,9 @@ def prune_subscribers() -> int:
                OR  typeof(lng) NOT IN ('real', 'integer')
                OR  lat NOT BETWEEN -90 AND 90
                OR  lng NOT BETWEEN -180 AND 180
-            """
+               OR  updated_at < ?
+            """,
+            (idle_cutoff,),
         )
         removed = cur.rowcount
         # Dedupe rows of tokens that no longer exist are personal data too.

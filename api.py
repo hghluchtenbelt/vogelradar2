@@ -276,6 +276,12 @@ async def register_token(request: Request):
             detail=exc.errors(include_url=False, include_context=False,
                               include_input=False),
         ) from None
+    if not body.wishlist:
+        # Nothing to notify about, so nothing is kept: no token, no
+        # location. Released app versions post at startup before any wish
+        # is chosen, and post an empty list when the last wish is removed.
+        await run_in_threadpool(delete_push_subscriber, body.token)
+        return {"ok": True}
     await run_in_threadpool(
         upsert_push_subscriber,
         body.token, body.lat, body.lng,

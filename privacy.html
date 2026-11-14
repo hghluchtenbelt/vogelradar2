@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacybeleid — Vogelradar</title>
+  <title>Privacybeleid | Vogelradar</title>
   <style>
     body { font-family: sans-serif; max-width: 680px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.7; }
     h1 { color: #0d9488; }
@@ -13,30 +13,41 @@
 </head>
 <body>
   <h1>Privacybeleid</h1>
-  <p>Laatst bijgewerkt: juli 2026</p>
+  <p>Laatst bijgewerkt: november 2026</p>
 
   <p>Vogelradar is een app waarmee je recente zeldzame vogelwaarnemingen in Nederland kunt bekijken op een kaart. De verantwoordelijke voor de verwerking van je gegevens is Hermen Luchtenbelt (contact: <a href="mailto:vogelradar.app@gmail.com">vogelradar.app@gmail.com</a>).</p>
 
   <h2>Locatiegegevens</h2>
-  <p>De app vraagt toegang tot je locatie (GPS) om vogels bij jou in de buurt te kunnen tonen en om de afstand tot waarnemingen te berekenen. Je locatie wordt op je eigen apparaat verwerkt. Als je pushmeldingen inschakelt, wordt je locatie ook op onze server opgeslagen — zie de sectie Pushmeldingen hieronder.</p>
+  <p>De app vraagt toegang tot je locatie (GPS) om vogels bij jou in de buurt te kunnen tonen en om de afstand tot waarnemingen te berekenen. Dat gebeurt op je eigen apparaat. Alleen als je meldingen toestaat en wensvogels kiest, wordt je locatie ook op onze server opgeslagen: zie de sectie Pushmeldingen hieronder.</p>
 
   <h2>Pushmeldingen</h2>
-  <p>Als je pushmeldingen inschakelt in de app, worden de volgende gegevens op onze server opgeslagen om je meldingen te kunnen sturen:</p>
+  <p>Als je in de app meldingen toestaat en minstens één wensvogel kiest, slaan we de volgende gegevens op onze server op om je meldingen te kunnen sturen:</p>
   <ul>
-    <li><strong>Apparaat-token</strong> — een anonieme identificatiecode van je apparaat, aangemaakt door Google Firebase. Bevat geen naam of e-mailadres.</li>
-    <li><strong>Locatie</strong> — je GPS-coördinaten, zodat we alleen meldingen sturen voor vogels binnen jouw gekozen afstand.</li>
-    <li><strong>Vogelvoorkeuren</strong> — de vogelsoorten of zeldzaamheidscategorieën die je hebt geselecteerd.</li>
+    <li><strong>Apparaat-token:</strong> een willekeurige code van Google Firebase waarmee een melding bij jouw apparaat wordt afgeleverd. Bevat geen naam of e-mailadres.</li>
+    <li><strong>Locatie:</strong> je GPS-coördinaten, zodat we alleen meldingen sturen voor vogels binnen jouw gekozen afstand.</li>
+    <li><strong>Vogelvoorkeuren:</strong> de vogelsoorten of zeldzaamheidscategorieën die je hebt gekozen, en de gekozen afstand.</li>
+    <li><strong>Verstuurde meldingen:</strong> welke soort we je op welke plek hebben gemeld, zodat je dezelfde vogel niet steeds opnieuw gemeld krijgt. Dit wordt na 24 uur gewist.</li>
   </ul>
-  <p>Deze gegevens worden uitsluitend gebruikt om pushmeldingen te sturen en worden niet verkocht of gedeeld met derden. Meldingen worden verzorgd via <strong>Google Firebase Cloud Messaging (FCM)</strong>. Door meldingen in te schakelen ga je akkoord met de <a href="https://firebase.google.com/support/privacy">privacyvoorwaarden van Google Firebase</a>. Je kunt je afmelden door meldingen uit te schakelen in de app-instellingen van je telefoon; je gegevens worden dan automatisch verwijderd.</p>
+  <p>Heb je geen wensvogels gekozen, dan bewaren we niets van je. De gegevens worden uitsluitend gebruikt om pushmeldingen te sturen en worden niet verkocht of gedeeld met derden. Meldingen worden verzorgd via <strong>Google Firebase Cloud Messaging (FCM)</strong>. Door meldingen in te schakelen ga je akkoord met de <a href="https://firebase.google.com/support/privacy">privacyvoorwaarden van Google Firebase</a>.</p>
 
-  <h2>Beveiliging en bewaren</h2>
-  <p>Alle communicatie tussen de app en onze server verloopt versleuteld via HTTPS. We bewaren je gegevens niet langer dan nodig is voor de meldingen: schakel je meldingen uit, dan worden ze automatisch verwijderd, en ongebruikte aanmeldingen worden periodiek opgeschoond. Wil je je gegevens direct laten verwijderen, stuur dan een e-mail naar <a href="mailto:vogelradar.app@gmail.com">vogelradar.app@gmail.com</a> en we verwijderen ze zo snel mogelijk.</p>
+  <h2>Bewaren en verwijderen</h2>
+  <p>We bewaren je gegevens niet langer dan nodig is voor de meldingen. Ze worden verwijderd:</p>
+  <ul>
+    <li><strong>direct</strong>, zodra je in de app al je wensvogels wist (de knop "Wis alles" in het wensvogelscherm);</li>
+    <li><strong>automatisch</strong>, zodra Google ons bij het versturen van een melding laat weten dat de app van je apparaat is verwijderd;</li>
+    <li><strong>automatisch na 180 dagen</strong> waarin de app niet is geopend;</li>
+    <li><strong>op verzoek</strong>: stuur een e-mail naar <a href="mailto:vogelradar.app@gmail.com">vogelradar.app@gmail.com</a> en we verwijderen ze zo snel mogelijk.</li>
+  </ul>
+  <p>Let op: zet je meldingen alleen uit in de instellingen van je telefoon, dan kan onze server dat niet zien. Wis in dat geval ook je wensvogels in de app, dan zijn je gegevens direct weg.</p>
+
+  <h2>Beveiliging</h2>
+  <p>Alle communicatie tussen de app en onze server verloopt versleuteld via HTTPS.</p>
 
   <h2>Gegevens van derden</h2>
   <p>Waarnemingsdata is afkomstig van <a href="https://waarneming.nl">waarneming.nl</a>. Vogelradar slaat geen persoonsgegevens op van waarnemers.</p>
 
   <h2>Analytische gegevens</h2>
-  <p>De app verzamelt geen analytische gegevens, maakt geen gebruik van tracking en plaatst geen cookies.</p>
+  <p>De app verzamelt geen analytische gegevens, maakt geen gebruik van tracking en plaatst geen cookies. Je instellingen, zoals je wensvogels, staan alleen op je eigen apparaat.</p>
 
   <h2>Contact</h2>
   <p>Vragen over dit privacybeleid? Stuur een e-mail naar <a href="mailto:vogelradar.app@gmail.com">vogelradar.app@gmail.com</a>.</p>
