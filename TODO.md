@@ -57,10 +57,12 @@ it); this is the loose-ends list.
   infra), and SCRAPE_INTERVAL_MIN=0 disables the in-process thread
   (small api.py change). Test on staging first; statusbot needs no
   change (it reads scrape_runs from the DB via the API).
-- [ ] **Vogelradar: highlight sightings new since last visit**:
-  remember the newest seen sighting ids in localStorage and mark
-  anything newer with a "nieuw" accent on card + marker. Pure
-  client-side, no server change.
+- [x] **Vogelradar: highlight sightings new since last visit**
+  (website done on dev 2026-11-14; app port pending): the newest
+  observation number seen is kept in localStorage; on the next visit
+  (more than 30 minutes later) anything with a higher number gets a
+  "nieuw" label on the card, a ring on the marker and a count in the
+  header. Pure client-side, no server change.
 - [ ] **Vogelradar: species mini-history**: tap a rare or very rare
   species to see its recent reports (locations, "al X dagen ter
   plaatse"). Scoped to zeldzaam/zeer zeldzaam only. Builds directly
@@ -76,6 +78,25 @@ it); this is the loose-ends list.
 All frontend items above must be applied to both vogelradar.html and
 www/index.html (ported by hand, the files differ on purpose) and only
 reach app users after a new versionCode + Play Store upload.
+
+- [ ] **Vogelradar app: port the November 2026 website work**
+  (website on dev since 2026-11-14): loading and error states, manual
+  location (municipality search or a tap on the map) with the "no
+  location known" notice, radius filter, "nieuw" since last visit,
+  share link in the popup, and the about sheet with source credit.
+  Not needed in the app: preview tags, manifest, back-button handling.
+  Already in the app release branch `review-fixes`: Capacitor 8.6.2,
+  the privacy fixes and subspecies-aware wish matching.
+- [ ] **Vogelradar: landing pages per species and gemeente** (idea
+  from the November 2026 review, for search traffic). Deliberately not
+  built yet: it would republish scraped waarneming.nl data as
+  indexable pages, which is a different relationship with the source
+  than a map of recent sightings. Decide that first.
+- [ ] **Vogelradar: traffic numbers**: the site is proxied by
+  Cloudflare, whose zone analytics already show requests and unique
+  visitors per day without any code or privacy-page change. Check
+  there first; a self-hosted counter only if app versus website needs
+  to be split.
 
 - [ ] **Natwacht: own KNMI API key**: add `KNMI_API_KEY` to the
   natwacht-api app via the Coolify UI (deploy.hermen.dev, project

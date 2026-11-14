@@ -106,3 +106,11 @@ def test_sightings_are_addressable_and_shareable():
     assert '"/waarneming/"+encodeURIComponent(id)' in HTML
     assert 'data-share="${esc(s.id)}"' in HTML
     assert 'window.addEventListener("popstate"' in HTML
+
+
+def test_new_since_last_visit_stays_on_the_device():
+    assert "const _SK='vr_seen'" in HTML
+    assert "function isNew(s)" in HTML and 'class="nw">nieuw</span>' in HTML
+    # Remembered in localStorage only; nothing about visits is sent to the server.
+    js = HTML[HTML.index("/* ===== NEW SINCE LAST VISIT ====="):HTML.index("/* ===== WENSVOGELS =====")]
+    assert "fetch(" not in js and "localStorage" in js

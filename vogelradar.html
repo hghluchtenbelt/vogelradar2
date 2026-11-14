@@ -89,6 +89,8 @@
   .mk-pulse{animation:pulse 1.9s infinite}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.55)}70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
   .mk-sel{box-shadow:0 0 0 4px rgba(13,148,136,.9),0 2px 8px rgba(2,6,23,.45);border-width:3px}
+  /* New since the previous visit: a dark ring, distinct from the teal selection ring. */
+  .mk-new{outline:2px solid var(--ink);outline-offset:1.5px}
   /* User location: emerald teardrop pin, tip on the exact spot */
   .me{display:block;width:26px;height:32px;position:relative;filter:drop-shadow(0 2px 3px rgba(2,6,23,.4))}
   .me::before{content:"";position:absolute;box-sizing:border-box;left:2.5px;top:4.5px;width:21px;height:21px;background:#059669;border:2.5px solid #fff;border-radius:50% 50% 50% 0;transform:rotate(-45deg)}
@@ -142,7 +144,8 @@
   .summary{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .sumtxt{min-width:0}
   .summary .big{font-size:15px;font-weight:740;letter-spacing:-.2px;display:block}
-  .summary .sm{font-size:11px;color:var(--muted);display:block;margin-top:1px}
+  .summary .sm{font-size:11px;color:var(--muted);display:block;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .summary .sm b{color:var(--ink);font-weight:700}
   .listfoot{text-align:center;font-size:11.5px;color:var(--muted);padding:10px 8px 4px;line-height:1.7}
   .listfoot a,.listfoot button{color:var(--brand-d);font-weight:650;text-decoration:none;border:none;background:none;padding:0;
     font-size:inherit;font-family:inherit;cursor:pointer}
@@ -167,6 +170,7 @@
   .cmeta .w{color:var(--ink);font-weight:600}
   .mega{font-size:9.5px;font-weight:800;color:#fff;background:#dc2626;padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
   .rar{font-size:9.5px;font-weight:800;color:#fff;background:#b45309;padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
+  .nw{font-size:9.5px;font-weight:800;color:#fff;background:var(--ink);padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
   .xn{font-size:9.5px;font-weight:800;color:#475569;background:#f1f5f9;border:1px solid #cbd5e1;padding:1px 6px;border-radius:999px;letter-spacing:.3px}
   .ph{font-size:11px}
   .cright{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto}
@@ -397,6 +401,8 @@
       <p>Vogelradar laat op de kaart zien welke zeldzame vogels er de afgelopen dagen in Nederland zijn gezien, met de dichtstbijzijnde bovenaan. Tik op een vogel voor de plek, een foto en een routebeschrijving.</p>
       <p><b>Waar komen de gegevens vandaan?</b><br>
       Alle waarnemingen komen van <a href="https://waarneming.nl" target="_blank" rel="noopener">waarneming.nl</a>, waar vogelaars ze invoeren. Vogelradar haalt ze elk uur op en is geen onderdeel van waarneming.nl. Bij elke vogel staat een link naar de oorspronkelijke waarneming.</p>
+      <p><b>Wat betekent "nieuw"?</b><br>
+      Het label <span class="nw">nieuw</span> staat bij waarnemingen die er bij je vorige bezoek nog niet waren. Dat wordt alleen op je eigen apparaat bijgehouden.</p>
       <div class="about-links">
         <a class="wide" href="https://play.google.com/store/apps/details?id=com.vogelradar.app" target="_blank" rel="noopener">📱 Android-app<small>Met meldingen voor je wensvogels, ook als de app dicht is</small></a>
         <a href="/stats">📊 Statistieken<small>Soorten per dag en per gemeente</small></a>
@@ -470,7 +476,7 @@ function clusterSightings(items){
     if(g) g.others.push(s);
     else{ const ng={rep:s,others:[]}; list.push(ng); groups.push(ng); }
   }
-  return groups.map(g=>({...g.rep,_n:1+g.others.length,_others:g.others}));
+  return groups.map(g=>({...g.rep,_n:1+g.others.length,_others:g.others,_new:isNew(g.rep)||g.others.some(isNew)}));
 }
 function baseVisible(){
   return state.data.map(s=>({...s,_d:haversine(state.user,s)}))
@@ -487,6 +493,25 @@ function visible(){
 }
 function counts(){ const c={common:0,uncommon:0,rare:0,very_rare:0};
   clusterSightings(baseVisible()).forEach(s=>c[s.rarity]++); return c; }
+
+/* ===== NEW SINCE LAST VISIT ===== */
+// waarneming.nl numbers observations in the order they are entered, so "new" is simply
+// "a higher number than the newest one seen on the previous visit". A visit ends after
+// 30 minutes without a data load, so reloading the page does not wipe the labels.
+// Kept in localStorage: it never leaves the device.
+const _SK='vr_seen', VISIT_GAP_MS=30*60*1000;
+let _seenBase=null;
+try{
+  const v=JSON.parse(localStorage.getItem(_SK)||'null');
+  if(v && typeof v.max==='number')
+    _seenBase = (Date.now()-v.ts > VISIT_GAP_MS) ? v.max : (typeof v.base==='number' ? v.base : null);
+}catch{}
+function isNew(s){ return _seenBase!==null && Number(s.id)>_seenBase; }
+function rememberSeen(){
+  const max=state.data.reduce((m,s)=>{ const n=Number(s.id); return n>m?n:m; },0);
+  if(!max) return;
+  try{ localStorage.setItem(_SK,JSON.stringify({base:_seenBase,max,ts:Date.now()})); }catch{}
+}
 
 /* ===== WENSVOGELS ===== */
 const _WK='vr_wens', _NK='vr_notified', _DK='vr_dist';
@@ -682,6 +707,7 @@ $('#amod').addEventListener('click',e=>{ if(e.target===$('#amod')) closeAbout();
 /* ===== CARDS ===== */
 function renderCards(){
   const items=visible(), box=$("#cards");
+  state.newCount=items.filter(s=>s._new).length;
   // Nothing loaded (yet): say so, instead of "0 zeldzame vogels" and "Niets gevonden".
   if(!state.data.length && state.status!=="ok"){
     if(state.status==="loading"){
@@ -736,11 +762,12 @@ function renderCards(){
              : s.rarity==="rare"?`<span class="rar">Zeldzaam</span>`:"";
     const ph = s.photo?`<span class="ph">📷</span>`:"";
     const xn = s._n>1?`<span class="xn">${s._n}× waargenomen</span>`:"";
+    const nw = s._new?`<span class="nw">nieuw</span>`:"";
     const cnt = s.count>1?`· ×${s.count}`:"";
     const near = s._d<=10?`<span class="near">dichtbij</span>`:"";
     return `<div class="card${state.selected===s.id?" sel":""}" data-id="${esc(s.id)}" style="border-left-color:${r.hex}">
       <div class="cbody">
-        <div class="cname"><b>${esc(s.nl)}</b> ${tag}${xn}<span class="en">${esc(s.en||s.sci||"")}</span></div>
+        <div class="cname"><b>${esc(s.nl)}</b> ${nw}${tag}${xn}<span class="en">${esc(s.en||s.sci||"")}</span></div>
         <div class="cmeta"><span class="w">📍 ${esc(s.loc)}</span> ${ph} <span>${ago(s)} ${cnt}</span></div>
       </div>
       <div class="cright"><div class="cdist">${fmtDist(s._d)}<small>${origin}</small></div>${near}</div>
@@ -768,6 +795,7 @@ function renderStatus(){
     txt = m<1?"zojuist bijgewerkt":m<60?`${m} min geleden bijgewerkt`:`${Math.round(m/60)} uur geleden bijgewerkt`; }
   else if(state.status==="error") txt = "geen verbinding";
   $("#sub").textContent = txt;
+  if(state.newCount){ const b=document.createElement("b"); b.textContent=` · ${state.newCount} nieuw sinds je vorige bezoek`; $("#sub").appendChild(b); }
 }
 
 /* ===== MAP ===== */
@@ -800,7 +828,7 @@ function makeIcon(s,sel){
   const r=RARITY[s.rarity];
   let size = s.rarity==="very_rare"?20:s.rarity==="rare"?18:s.rarity==="uncommon"?14:12;
   if(sel) size+=4;
-  const cls="mk"+(s.rarity==="very_rare"?" mk-pulse":"")+(sel?" mk-sel":"");
+  const cls="mk"+(s.rarity==="very_rare"?" mk-pulse":"")+(sel?" mk-sel":"")+(s._new&&!sel?" mk-new":"");
   return L.divIcon({className:"",iconSize:[size,size],iconAnchor:[size/2,size/2],
     html:`<span class="${cls}" style="--c:${r.hex};width:${size}px;height:${size}px"></span>`});
 }
@@ -991,7 +1019,7 @@ handleEl.addEventListener("pointermove",e=>{ if(!drag)return; const dy=e.clientY
 handleEl.addEventListener("pointerup",e=>{ if(!drag)return; if(drag.moved<6) toggleSheet(); else snapSheet(snapNearest(curY),true); drag=null; });
 
 /* ===== RENDER ===== */
-function render(){ renderChips(); renderStatus(); renderCards(); drawMarkers(); }
+function render(){ renderChips(); renderCards(); renderStatus(); drawMarkers(); }
 
 /* ===== DATA ===== */
 function buildUrl(){
@@ -1011,6 +1039,7 @@ async function loadData(){
     const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date&&RARITY[s.rarity]);
     state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
     state.status="ok";
+    rememberSeen();
     checkWensvogels(state.data);
   }catch(e){ state.status="error"; }
   clearTimeout(timer);
