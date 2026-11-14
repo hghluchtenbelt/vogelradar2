@@ -18,6 +18,12 @@ _PROVINCES = {
 }
 _PROV_RE = re.compile(r"\(([A-Z]{2})\)\s*$")
 
+# A subscriber hears about the same species at the same place (5 km) at most
+# once per this many hours. It has to be well above the scrape interval:
+# with the old 1 hour window every hourly run saw an empty history and a
+# staked-out rarity was announced again on each new report.
+NOTIFY_DEDUPE_HOURS = 24
+
 
 def _connect() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
@@ -53,7 +59,8 @@ def init_db() -> None:
                 latitude   REAL NOT NULL,
                 longitude  REAL NOT NULL,
                 scraped_at TEXT NOT NULL,
-                rarity     INTEGER DEFAULT 3
+                rarity     INTEGER DEFAULT 3,
+                push_pending INTEGER DEFAULT 0
             )
             """
         )
@@ -67,6 +74,9 @@ def init_db() -> None:
             ("count", "INTEGER DEFAULT 1"),
             ("photo", "INTEGER DEFAULT 0"),
             ("photo_url", "TEXT DEFAULT ''"),
+            # 1 = stored but not yet offered to the push loop. Existing rows
+            # get 0, so adding the column never re-announces old sightings.
+            ("push_pending", "INTEGER DEFAULT 0"),
         ]:
             if col not in existing:
                 conn.execute(f"ALTER TABLE sightings ADD COLUMN {col} {defn}")
@@ -144,26 +154,67 @@ def init_db() -> None:
         conn.commit()
 
 
-def insert_sightings(sightings: list[dict]) -> int:
+def insert_sightings(sightings: list[dict], push_pending: bool = False) -> int:
+    """Store new sightings (known URLs are left untouched). With
+    push_pending the new rows are marked as still to be announced, in the
+    same transaction, so a process that dies before the push loop runs
+    does not lose them."""
     if not sightings:
         return 0
     now = datetime.utcnow().isoformat(timespec="seconds")
-    rows = [{"photo_url": "", **s, "scraped_at": now} for s in sightings]
+    rows = [{"photo_url": "", **s, "scraped_at": now,
+             "push_pending": int(push_pending)} for s in sightings]
     with _connect() as conn:
         cur = conn.executemany(
             """
             INSERT OR IGNORE INTO sightings
                 (url, bird_name, location, date, obs_time, count,
-                 photo, photo_url, latitude, longitude, scraped_at, rarity)
+                 photo, photo_url, latitude, longitude, scraped_at, rarity,
+                 push_pending)
             VALUES
                 (:url, :bird_name, :location, :date, :obs_time, :count,
                  :photo, :photo_url, :latitude, :longitude, :scraped_at,
-                 :rarity)
+                 :rarity, :push_pending)
             """,
             rows,
         )
         conn.commit()
         return cur.rowcount
+
+
+def get_pending_pushes(max_age_hours: float) -> list[dict]:
+    """Sightings stored in the last `max_age_hours` that the push loop has
+    not handled yet, oldest first."""
+    cutoff = (datetime.utcnow() - timedelta(hours=max_age_hours)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        rows = conn.execute(
+            """
+            SELECT url, bird_name, location, date, obs_time, count,
+                   latitude, longitude, COALESCE(rarity, 3) AS rarity
+            FROM   sightings
+            WHERE  push_pending = 1 AND scraped_at >= ?
+            ORDER  BY scraped_at, url
+            """,
+            (cutoff,),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def clear_pending_pushes(urls: list[str], max_age_hours: float) -> None:
+    """Mark the given sightings as handled, and give up on anything older
+    than `max_age_hours` (an alert that late is no longer useful)."""
+    cutoff = (datetime.utcnow() - timedelta(hours=max_age_hours)).isoformat(timespec="seconds")
+    with _connect() as conn:
+        conn.executemany(
+            "UPDATE sightings SET push_pending = 0 WHERE url = ?",
+            [(u,) for u in urls],
+        )
+        conn.execute(
+            "UPDATE sightings SET push_pending = 0"
+            " WHERE push_pending = 1 AND scraped_at < ?",
+            (cutoff,),
+        )
+        conn.commit()
 
 
 def get_sightings(days_back: int = 7) -> list[dict]:
@@ -419,7 +470,8 @@ def get_scrape_runs_since(hours: int = 12) -> list[dict]:
 
 
 def already_notified(token: str, bird_name: str, lat: float, lng: float,
-                     radius_km: float = 5.0, window_hours: float = 1.0) -> bool:
+                     radius_km: float = 5.0,
+                     window_hours: float = NOTIFY_DEDUPE_HOURS) -> bool:
     import math
     cutoff = (datetime.utcnow() - timedelta(hours=window_hours)).isoformat(timespec="seconds")
     with _connect() as conn:
@@ -438,7 +490,8 @@ def already_notified(token: str, bird_name: str, lat: float, lng: float,
 
 def record_notification(token: str, bird_name: str, lat: float, lng: float) -> None:
     now = datetime.utcnow().isoformat(timespec="seconds")
-    cutoff = (datetime.utcnow() - timedelta(hours=2)).isoformat(timespec="seconds")
+    # Keep the history exactly as long as already_notified() looks back.
+    cutoff = (datetime.utcnow() - timedelta(hours=NOTIFY_DEDUPE_HOURS)).isoformat(timespec="seconds")
     with _connect() as conn:
         conn.execute(
             "INSERT INTO sent_notifications (token, bird_name, lat, lng, sent_at) VALUES (?,?,?,?,?)",

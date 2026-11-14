@@ -29,6 +29,7 @@ from typing import Callable
 
 from database import (
     init_db, insert_sightings, is_empty,
+    get_pending_pushes, clear_pending_pushes,
     get_all_urls, prune_old_sightings, prune_subscribers,
     record_daily_stats, map_unmapped_locations, record_gemeente_daily,
     record_scrape_run,
@@ -41,6 +42,10 @@ from scraper import (
 from species import truncated_name_fixes
 
 REVALIDATE_EVERY_H = 24
+
+# A sighting that could not be announced (process restarted mid-scrape, FCM
+# down) is retried on later runs until it is this old.
+PUSH_MAX_AGE_H = 6
 
 
 def _revalidation_due() -> bool:
@@ -109,6 +114,27 @@ def repair_truncated_names() -> int:
     return changed
 
 
+def send_pending_pushes() -> int:
+    """Announce every stored sighting that has not been offered to the push
+    loop yet. That includes rows left behind by a run that was interrupted
+    (a deploy restarts the process mid-scrape): they are in the database,
+    so the next scrape no longer sees them as new. Returns the number of
+    sightings handled."""
+    pending = get_pending_pushes(PUSH_MAX_AGE_H)
+    if pending:
+        try:
+            from notifications import send_push_notifications
+            send_push_notifications(pending)
+        except Exception as exc:
+            # Leave them pending: the next run retries, and the per-token
+            # dedupe keeps anyone from being told twice.
+            print(f"[fcm] notification error: {exc}", flush=True)
+            clear_pending_pushes([], PUSH_MAX_AGE_H)
+            return 0
+    clear_pending_pushes([s["url"] for s in pending], PUSH_MAX_AGE_H)
+    return len(pending)
+
+
 def run_update(
     progress_callback: Callable[[float, str], None] | None = None,
 ) -> tuple[int, int]:
@@ -123,15 +149,13 @@ def run_update(
 
     total_new = 0
     total_scraped = 0
-    new_sightings: list[dict] = []
 
     def _flush(batch: list[dict]) -> None:
         nonlocal total_new, total_scraped
         total_scraped += len(batch)
-        inserted = [s for s in batch if s["url"] not in known_urls]
-        total_new += insert_sightings(batch)
-        if not first_run:
-            new_sightings.extend(inserted)
+        # On the very first run everything is "new"; announcing it all
+        # would flood every subscriber.
+        total_new += insert_sightings(batch, push_pending=not first_run)
 
     fetch_rare_birds(
         days_back_by_rarity=days_back_by_rarity,
@@ -145,12 +169,7 @@ def run_update(
     record_daily_stats()
     record_gemeente_daily()
 
-    if new_sightings:
-        try:
-            from notifications import send_push_notifications
-            send_push_notifications(new_sightings)
-        except Exception as exc:
-            print(f"[fcm] notification error: {exc}", flush=True)
+    send_pending_pushes()
 
     record_scrape_run(total_new, total_scraped)
 

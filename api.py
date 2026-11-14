@@ -101,7 +101,15 @@ def _run_forecast() -> None:
 
 def _background_updater() -> None:
     """Run the updater once per SCRAPE_INTERVAL, forever, in a daemon thread."""
-    from updater import run_update
+    from updater import run_update, send_pending_pushes
+    try:
+        # A restart in the middle of a scrape leaves stored sightings that
+        # were never announced; send those now instead of an interval later.
+        handled = send_pending_pushes()
+        if handled:
+            print(f"[updater] {handled} pending sightings announced", flush=True)
+    except Exception as exc:
+        print(f"[updater] pending push error: {exc}", flush=True)
     while True:
         time.sleep(SCRAPE_INTERVAL)
         try:
