@@ -20,9 +20,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-
-import species
 
 CODE_ORDER = "vruc"
 _SSP_WORD_RE = re.compile(r"\bssp\b")   # not the "ssp" inside Glansspreeuw
@@ -38,6 +35,10 @@ def _has_own_dutch_name(row: dict) -> bool:
 
 
 def build() -> list[list[str]]:
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    import species
+
     rows = species.export_rows()
     by_id = {r["id"]: r for r in rows}
     entries: list[list[str]] = []

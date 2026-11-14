@@ -70,7 +70,7 @@ def test_scraped_text_is_escaped_before_it_reaches_the_dom():
 
 def test_no_em_dash_in_visible_page_text():
     body = HTML[HTML.index("<body>"):HTML.index("<script src=")]
-    assert "—" not in body
+    assert "\u2014" not in body
 
 
 def test_page_explains_itself_and_links_onwards():
