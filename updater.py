@@ -29,7 +29,7 @@ from typing import Callable
 
 from database import (
     init_db, insert_sightings, is_empty,
-    get_all_urls, prune_old_sightings, prune_empty_subscribers,
+    get_all_urls, prune_old_sightings, prune_subscribers,
     record_daily_stats, map_unmapped_locations, record_gemeente_daily,
     record_scrape_run,
     get_meta, set_meta, get_revalidation_candidates,
@@ -126,7 +126,7 @@ def run_update(
         progress_callback=progress_callback,
     )
     prune_old_sightings()
-    prune_empty_subscribers()
+    prune_subscribers()
     map_unmapped_locations()
     record_daily_stats()
     record_gemeente_daily()

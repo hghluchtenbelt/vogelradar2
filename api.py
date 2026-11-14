@@ -8,10 +8,13 @@ import time
 from collections import defaultdict
 from pathlib import Path
 
+from typing import Annotated
+
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, StringConstraints, ValidationError
 
 _rate_limit: dict[str, list[float]] = defaultdict(list)
 _RATE_WINDOW = 3600
@@ -37,6 +40,8 @@ from database import (
 # How often to re-scrape waarneming.nl in the background (seconds).
 # Override with SCRAPE_INTERVAL_MIN (minutes); staging uses a longer
 # interval so the extra instance stays polite towards waarneming.nl.
+# 0 (or less) switches the in-process scraper off, e.g. for tests or when
+# a scheduled task runs updater.py instead.
 SCRAPE_INTERVAL = int(os.environ.get("SCRAPE_INTERVAL_MIN", "60")) * 60
 
 app = FastAPI(title="Vogelradar", docs_url=None, redoc_url=None,
@@ -86,8 +91,9 @@ def _background_updater() -> None:
 
 # Start background updater when the server starts (daemon=True means it
 # won't block a clean shutdown).
-_t = threading.Thread(target=_background_updater, daemon=True)
-_t.start()
+if SCRAPE_INTERVAL > 0:
+    _t = threading.Thread(target=_background_updater, daemon=True)
+    _t.start()
 
 _HERE = Path(__file__).parent
 
@@ -144,21 +150,54 @@ def icon():
     return FileResponse(_HERE / "icon.png", media_type="image/png")
 
 
+# Limits for POST /register-token. The wish list holds species names plus
+# the two "all rare" keys, so 2000 entries is far above anything the app can
+# send; world bounds (not just the Netherlands) because users travel.
+_MAX_REGISTER_BODY = 128 * 1024
+_WishName = Annotated[str, StringConstraints(min_length=1, max_length=120)]
+
+
 class PushSubscriber(BaseModel):
-    token: str
-    lat: float
-    lng: float
-    wishlist: list[str] = []
-    max_dist: int = 50
+    token: str = Field(min_length=20, max_length=4096)
+    lat: float = Field(ge=-90, le=90, allow_inf_nan=False)
+    lng: float = Field(ge=-180, le=180, allow_inf_nan=False)
+    wishlist: list[_WishName] = Field(default_factory=list, max_length=2000)
+    max_dist: int = Field(default=50, ge=0, le=20000)
+
+
+async def _read_body(request: Request, limit: int) -> bytes:
+    """Read the request body, refusing anything larger than `limit` bytes
+    (also when the client lies about, or omits, Content-Length)."""
+    declared = request.headers.get("content-length", "")
+    if declared.isdigit() and int(declared) > limit:
+        raise HTTPException(status_code=413, detail="Request body too large")
+    chunks: list[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            raise HTTPException(status_code=413, detail="Request body too large")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 @app.post("/register-token")
-def register_token(body: PushSubscriber, request: Request):
+async def register_token(request: Request):
     import json
     ip = request.client.host if request.client else "unknown"
     if not _allow_rate(ip):
         raise HTTPException(status_code=429, detail="Too many requests")
-    upsert_push_subscriber(
+    raw = await _read_body(request, _MAX_REGISTER_BODY)
+    try:
+        body = PushSubscriber.model_validate_json(raw)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=exc.errors(include_url=False, include_context=False,
+                              include_input=False),
+        ) from None
+    await run_in_threadpool(
+        upsert_push_subscriber,
         body.token, body.lat, body.lng,
         json.dumps(body.wishlist), body.max_dist,
     )

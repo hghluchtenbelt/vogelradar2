@@ -252,9 +252,13 @@ def upsert_push_subscriber(
 
 
 def delete_push_subscriber(token: str) -> None:
+    """Remove a subscriber and everything stored under its token."""
     with _connect() as conn:
         conn.execute(
             "DELETE FROM push_subscribers WHERE fcm_token = ?", (token,)
+        )
+        conn.execute(
+            "DELETE FROM sent_notifications WHERE token = ?", (token,)
         )
         conn.commit()
 
@@ -271,10 +275,30 @@ def get_push_subscribers() -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def prune_empty_subscribers() -> None:
+def prune_subscribers() -> int:
+    """Delete registrations that cannot or should not receive pushes:
+    an empty wish list, or coordinates that are missing or off the globe
+    (SQLite stores NaN as NULL, so a NaN that slipped in looks like this).
+    Returns the number of rows removed."""
     with _connect() as conn:
-        conn.execute("DELETE FROM push_subscribers WHERE wishlist = '[]'")
+        cur = conn.execute(
+            """
+            DELETE FROM push_subscribers
+            WHERE  wishlist = '[]'
+               OR  typeof(lat) NOT IN ('real', 'integer')
+               OR  typeof(lng) NOT IN ('real', 'integer')
+               OR  lat NOT BETWEEN -90 AND 90
+               OR  lng NOT BETWEEN -180 AND 180
+            """
+        )
+        removed = cur.rowcount
+        # Dedupe rows of tokens that no longer exist are personal data too.
+        conn.execute(
+            "DELETE FROM sent_notifications WHERE token NOT IN"
+            " (SELECT fcm_token FROM push_subscribers)"
+        )
         conn.commit()
+    return removed
 
 
 def get_meta(key: str) -> str | None:
