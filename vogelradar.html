@@ -31,11 +31,27 @@
   zeldzaamheid mapping: Algemeen->common, Vrij zeldzaam->uncommon, Zeldzaam->rare, Zeer zeldzaam->very_rare.
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Vogelradar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- meta:start (api.py replaces this block when a shared sighting link is opened) -->
+<title>Vogelradar: zeldzame vogels bij jou in de buurt</title>
+<meta name="description" content="Bekijk op de kaart welke zeldzame vogels er de afgelopen dagen in Nederland zijn gezien, gesorteerd op afstand tot jou. Elk uur bijgewerkt met waarnemingen van waarneming.nl.">
+<link rel="canonical" href="https://vogel-radar.nl/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vogelradar: zeldzame vogels bij jou in de buurt">
+<meta property="og:description" content="Bekijk op de kaart welke zeldzame vogels er de afgelopen dagen in Nederland zijn gezien, gesorteerd op afstand tot jou.">
+<meta property="og:url" content="https://vogel-radar.nl/">
+<meta property="og:image" content="https://vogel-radar.nl/icon.png">
+<!-- meta:end -->
+<meta property="og:site_name" content="Vogelradar">
+<meta property="og:locale" content="nl_NL">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0d9488">
+<link rel="icon" type="image/png" href="/icon.png">
+<link rel="apple-touch-icon" href="/icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
   :root{
@@ -44,6 +60,8 @@
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
+  /* Page zoom stays available (accessibility); this only removes the double-tap delay on controls. */
+  button,a,select,.chip,.card,.wi{touch-action:manipulation}
   html,body{margin:0;padding:0;height:100%;overflow:hidden;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);-webkit-font-smoothing:antialiased}
@@ -51,7 +69,7 @@
   /* Full-screen map */
   #map{position:fixed;inset:0;z-index:0;background:#cddfea}   /* sea colour */
   .leaflet-bottom.leaflet-right{bottom:4px;right:4px}
-  .leaflet-control-attribution{font-size:8px;background:rgba(255,255,255,.55);padding:1px 4px;border-radius:3px;backdrop-filter:blur(4px)}
+  .leaflet-control-attribution{font-size:10px;background:rgba(255,255,255,.55);padding:1px 4px;border-radius:3px;backdrop-filter:blur(4px)}
   .leaflet-popup-content{margin:10px 12px;font-family:inherit}
   .pop .pnl{font-weight:730;font-size:14px}
   .pop .pen{color:#64748b;font-size:11.5px;margin:1px 0 4px}
@@ -96,10 +114,14 @@
     border:1.5px solid var(--line);background:#fff;font-size:12px;font-weight:650;color:var(--muted);cursor:pointer;user-select:none}
   .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--pc)}
   .chip .ck{width:12px;height:12px;display:none;color:#fff}
-  .chip .n{font-size:10.5px;font-weight:750;opacity:.85}
-  .chip.on{color:#fff;background:var(--pc);border-color:var(--pc)}
-  .chip.on .dot{background:#fff}.chip.on .ck{display:block}
+  .chip .n{font-size:10.5px;font-weight:750}
+  /* Selected: the marker colour stays as border and dot (the chips are the map legend),
+     the label is dark on a light tint. White on these colours was 2.2:1 to 3.8:1. */
+  .chip.on{color:var(--ink);background:var(--pt);border-color:var(--pc)}
+  .chip.on .ck{display:block;color:var(--ink)}
   .chip:active{transform:scale(.95)}
+  .chip.dim{opacity:.45}
+  .wishchip .wstar{color:var(--brand-d);font-size:13px;line-height:1}
 
   /* Bottom sheet */
   .sheet{position:fixed;left:50%;bottom:0;width:min(100vw,600px);height:74vh;z-index:1100;
@@ -108,7 +130,7 @@
   .handle{padding:9px 0 6px;display:flex;justify-content:center;cursor:grab;flex:0 0 auto;touch-action:none}
   .grab{width:40px;height:5px;border-radius:999px;background:#cbd5e1}
   .sheethead{padding:2px 16px 10px;border-bottom:1px solid var(--line);flex:0 0 auto}
-  .summary{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .summary{display:flex;align-items:center;justify-content:space-between;gap:8px}
   .summary .big{font-size:15px;font-weight:740;letter-spacing:-.2px}
   .summary .sm{font-size:11px;color:var(--muted)}
   .filters{display:flex;gap:8px;margin-top:9px;align-items:center}
@@ -130,8 +152,8 @@
   .cname .en{font-size:11.5px;color:var(--muted)}
   .cmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:3px;font-size:11.5px;color:var(--muted)}
   .cmeta .w{color:var(--ink);font-weight:600}
-  .mega{font-size:9.5px;font-weight:800;color:#fff;background:var(--c-very_rare);padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
-  .rar{font-size:9.5px;font-weight:800;color:#fff;background:var(--c-rare);padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
+  .mega{font-size:9.5px;font-weight:800;color:#fff;background:#dc2626;padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
+  .rar{font-size:9.5px;font-weight:800;color:#fff;background:#b45309;padding:1.5px 6px;border-radius:999px;letter-spacing:.3px}
   .xn{font-size:9.5px;font-weight:800;color:#475569;background:#f1f5f9;border:1px solid #cbd5e1;padding:1px 6px;border-radius:999px;letter-spacing:.3px}
   .ph{font-size:11px}
   .cright{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto}
@@ -142,6 +164,14 @@
   .empty{text-align:center;color:var(--muted);padding:40px 20px}
   .empty .e{font-size:32px;margin-bottom:6px}
   .empty p{font-size:13px;margin:3px 0}
+  /* Loading and error messages must fit in the part of the sheet that is visible at rest. */
+  .empty.compact{padding:14px 20px 20px}
+  .empty button{margin-top:10px;border:1.5px solid var(--brand);background:var(--brand);color:#fff;font-weight:700;
+    font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer;font-family:inherit}
+  .notice{display:flex;align-items:center;gap:8px;background:#fffbeb;border:1px solid #fde68a;color:#78350f;
+    border-radius:11px;padding:8px 11px;margin-bottom:8px;font-size:12px;line-height:1.4}
+  .notice button{margin-left:auto;flex:0 0 auto;border:1px solid #d97706;background:#fff;color:#78350f;font-weight:700;
+    font-size:11.5px;padding:5px 9px;border-radius:8px;cursor:pointer;font-family:inherit}
 
   /* ── Splash ── */
   #splash{position:fixed;inset:0;z-index:9999;background:linear-gradient(145deg,var(--brand),var(--brand-d));
@@ -150,7 +180,7 @@
   .sl{width:90px;height:90px;border-radius:20px;overflow:hidden;margin-bottom:14px}
   .sl img{width:100%;height:100%;display:block}
   .sn{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.4px}
-  .ss{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:5px}
+  .ss{font-size:12.5px;color:rgba(255,255,255,.9);margin-top:5px}
 
   /* ── Wensvogel modal ── */
   .wmod{position:fixed;inset:0;z-index:2000;background:rgba(2,6,23,.45);
@@ -163,7 +193,7 @@
   .wmod-x{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:2px 6px;line-height:1}
   .wmod-hint{font-size:12px;color:var(--muted);padding:10px 16px 4px;margin:0;flex:0 0 auto}
   #wens-search{display:block;margin:6px 16px 8px;padding:8px 12px;border:1.5px solid var(--line);
-    border-radius:9px;font-size:14px;font-family:inherit;width:calc(100% - 32px);
+    border-radius:9px;font-size:16px;font-family:inherit;width:calc(100% - 32px);
     outline:none;flex:0 0 auto;box-sizing:border-box}
   #wens-search:focus{border-color:var(--brand)}
   #wens-list{overflow-y:auto;flex:1;padding:0 16px 20px;-webkit-overflow-scrolling:touch}
@@ -192,18 +222,17 @@
 </style>
 </head>
 <body>
-<div id="splash"><div class="sl"><img src="icon.png" alt=""></div><div class="sn">Vogelradar</div><div class="ss">vogels bij jou in de buurt!</div></div>
+<div id="splash"><div class="sl"><img src="/icon.png" alt=""></div><div class="sn">Vogelradar</div><div class="ss">vogels bij jou in de buurt!</div></div>
 <div id="map"></div>
 
 <div class="topbar">
   <div class="brandrow">
-    <div class="logo"><img src="icon.png" alt=""></div>
+    <div class="logo"><img src="/icon.png" alt=""></div>
     <div class="bt"><b>Vogelradar</b><span id="sub">zeldzame vogels bij jou</span></div>
     <div class="grow"></div>
-    <button class="loc" id="loc">📍 <span id="locname">locatie bepalen…</span></button>
-    <button class="rf" id="wens-btn" title="Wensvogels">🔔</button>
-    <a class="rf" href="/voorspelling" title="Voorspelling (test)">🍂</a>
-    <button class="rf" id="refresh" title="Verversen">⟳</button>
+    <button class="loc" id="loc" aria-label="Locatie">📍 <span id="locname">locatie bepalen…</span></button>
+    <button class="rf" id="wens-btn" title="Wensvogels" aria-label="Wensvogels">🔔</button>
+    <a class="rf" href="/voorspelling" title="Voorspelling (test)" aria-label="Voorspelling (test)">🍂</a>
   </div>
   <div class="chips" id="chips"></div>
 </div>
@@ -212,8 +241,8 @@
   <div class="handle" id="handle"><span class="grab"></span></div>
   <div class="sheethead">
     <div class="summary">
-      <span class="big" id="sumbig">…</span>
-
+      <span class="big" id="sumbig" aria-live="polite">Waarnemingen laden…</span>
+      <button class="rf" id="refresh" title="Verversen" aria-label="Verversen">⟳</button>
     </div>
     <div class="filters">
       <div class="seg" id="win">
@@ -235,7 +264,7 @@
       <h2>🔔 Wensvogels</h2>
       <div style="display:flex;align-items:center;gap:8px">
         <button id="wens-clear" style="display:none;font-size:12px;color:var(--muted);background:none;border:1px solid var(--line);border-radius:20px;padding:3px 10px;cursor:pointer">Wis alles</button>
-        <button class="wmod-x" id="wmod-close">✕</button>
+        <button class="wmod-x" id="wmod-close" aria-label="Sluiten">✕</button>
       </div>
     </div>
     <div class="wmod-distrow">
@@ -275,18 +304,21 @@ const CONFIG = {
 };
 const LOC_QUERY = /\{lat\}/.test(CONFIG.DATA_URL);   // does the URL want GPS coordinates?
 const RARITY = {
-  common:    { label:"Algemeen",     hex:"#94a3b8", o:0 },
-  uncommon:  { label:"Vrij zeldzaam",hex:"#0ea5e9", o:1 },
-  rare:      { label:"Zeldzaam",     hex:"#f59e0b", o:2 },
-  very_rare: { label:"Zeer zeldzaam",hex:"#ef4444", o:3 }
+  common:    { label:"Algemeen",     hex:"#94a3b8", tint:"#f1f5f9", o:0 },
+  uncommon:  { label:"Vrij zeldzaam",hex:"#0ea5e9", tint:"#e0f2fe", o:1 },
+  rare:      { label:"Zeldzaam",     hex:"#f59e0b", tint:"#fef3c7", o:2 },
+  very_rare: { label:"Zeer zeldzaam",hex:"#ef4444", tint:"#fee2e2", o:3 }
 };
 
 /* ===== STATE ===== */
 const state = {
   active: new Set(["rare","very_rare"]),
-  win: 3, maxDist: 0, sortBy: 'dist',
+  win: 3, maxDist: 0, sortBy: 'dist', wishOnly: false,
   user: { ...CONFIG.DEFAULT_LOC, precise:false },
-  data: [], lastUpdated: null, selected: null
+  data: [], lastUpdated: null, selected: null,
+  // "loading" until the first answer, then "ok" or "error"; a failed load must
+  // never look like "there are no birds".
+  status: "loading"
 };
 
 
@@ -326,7 +358,10 @@ function baseVisible(){
     .filter(timePass).filter(s=>state.maxDist===0||s._d<=state.maxDist);
 }
 function visible(){
-  const items = clusterSightings(baseVisible().filter(s=>state.active.has(s.rarity)));
+  let items = baseVisible();
+  if(state.wishOnly){ const w=getWishlist(); items=items.filter(s=>wishMatch(s,w)); }
+  else items=items.filter(s=>state.active.has(s.rarity));
+  items = clusterSightings(items);
   return state.sortBy==='time'
     ? items.sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time))
     : items.sort((a,b)=>a._d-b._d);
@@ -341,7 +376,24 @@ const _RC={'v':'very_rare','r':'rare','u':'uncommon','c':'common'};
 const _RH={'v':'#ef4444','r':'#f59e0b','u':'#0ea5e9','c':'#94a3b8'};
 
 function getWishlist(){ try{return new Set(JSON.parse(localStorage.getItem(_WK)||'[]'));}catch{return new Set();} }
-function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); updateWensBell(); }
+function saveWishlist(s){ localStorage.setItem(_WK,JSON.stringify([...s])); updateWensBell(); if(map) render(); }
+// Wish-list entries that a reported name satisfies: the name itself, the name
+// without its "ssp" suffix ("Bonte Kraai ssp cornix"), and the parent species of
+// either (4th field in SPECIES: "Dunsnavelnotenkraker" also counts as "Notenkraker").
+// Same rule as species.wish_keys() on the server.
+const _PARENT={};
+(typeof SPECIES!=='undefined'?SPECIES:[]).forEach(e=>{ if(e[3]) _PARENT[e[0]]=e[3]; });
+function wishKeys(nl){
+  const name=String(nl||''), base=name.replace(/\s+ssp\b.*$/,''), keys=[name,base];
+  if(_PARENT[name]) keys.push(_PARENT[name]);
+  if(_PARENT[base]) keys.push(_PARENT[base]);
+  return keys;
+}
+function wishMatch(s,w){
+  return wishKeys(s.nl).some(k=>w.has(k))
+    || (s.rarity==='very_rare' && w.has('__very_rare__'))
+    || ((s.rarity==='rare'||s.rarity==='very_rare') && w.has('__rare__'));
+}
 function getNotified(){ try{return new Set(JSON.parse(localStorage.getItem(_NK)||'[]'));}catch{return new Set();} }
 function saveNotified(s,validIds){ const arr=validIds?[...s].filter(id=>validIds.has(id)):[...s]; localStorage.setItem(_NK,JSON.stringify(arr)); }
 
@@ -377,12 +429,12 @@ function renderWensList(){
   const filtered = allSpecies.filter(s=>!isCovered(s)&&(!q||s[0].toLowerCase().includes(q)||s[1].toLowerCase().includes(q)));
 
   const mkRow = ([nl,sci,rc], on) =>
-    `<div class="wi" data-nl="${nl.replace(/"/g,'&quot;')}">
+    `<div class="wi" data-nl="${esc(nl)}">
       <div class="wcb${on?' on':''}"></div>
-      <span class="wdot" style="background:${_RH[rc]}"></span>
+      <span class="wdot" style="background:${_RH[rc]||_RH.c}"></span>
       <div style="flex:1;min-width:0">
-        <div class="wname">${nl}</div>
-        <div style="font-size:10.5px;color:var(--muted);font-style:italic">${sci}</div>
+        <div class="wname">${esc(nl)}</div>
+        <div style="font-size:10.5px;color:var(--muted);font-style:italic">${esc(sci)}</div>
       </div>
     </div>`;
 
@@ -443,11 +495,7 @@ function checkWensvogels(sightings){
     if(notified.has(s.id)) continue;
     notified.add(s.id);
     const dist=haversine(state.user,s);
-    const match = (!maxDist||dist<=maxDist)
-      && (wish.has(s.nl)
-        || (s.rarity==='very_rare' && wish.has('__very_rare__'))
-        || ((s.rarity==='rare'||s.rarity==='very_rare') && wish.has('__rare__')));
-    if(match) fresh.push({s,dist});
+    if((!maxDist||dist<=maxDist) && wishMatch(s,wish)) fresh.push({s,dist});
   }
   // A big batch of "new" matches means the memory got out of sync, not real spots → stay silent
   if(fresh.length && fresh.length<=8){
@@ -460,30 +508,77 @@ function checkWensvogels(sightings){
 /* ===== CHIPS ===== */
 function renderChips(){
   const c=counts(), box=$("#chips"); box.innerHTML="";
+  const loaded = state.status==="ok" || state.data.length>0;   // no "0" while nothing is known yet
   Object.keys(RARITY).sort((a,b)=>RARITY[b].o-RARITY[a].o).forEach(k=>{
-    const r=RARITY[k], on=state.active.has(k);
+    const r=RARITY[k], on=state.active.has(k) && !state.wishOnly;
     const el=document.createElement("button");
-    el.className="chip"+(on?" on":""); el.style.setProperty("--pc",r.hex);
+    el.className="chip"+(on?" on":"")+(state.wishOnly?" dim":"");
+    el.style.setProperty("--pc",r.hex); el.style.setProperty("--pt",r.tint);
+    el.setAttribute("aria-pressed",on?"true":"false");
     el.innerHTML=`<span class="dot"></span>
-      <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6"><path d="M5 13l4 4L19 7"/></svg>
-      ${r.label} <span class="n">${c[k]}</span>`;
-    el.addEventListener("click",()=>{ on?state.active.delete(k):state.active.add(k); render(); });
+      <svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
+      ${r.label} <span class="n">${loaded?c[k]:""}</span>`;
+    el.addEventListener("click",()=>{
+      if(state.wishOnly){ state.wishOnly=false; state.active.add(k); }
+      else state.active.has(k)?state.active.delete(k):state.active.add(k);
+      render(); });
     box.appendChild(el);
   });
+  // Wish list as a filter: useful on the website too, where alerts only work while the page is open.
+  const w=getWishlist();
+  if(w.size){
+    const wc=clusterSightings(baseVisible().filter(s=>wishMatch(s,w))).length;
+    const el=document.createElement("button");
+    el.className="chip wishchip"+(state.wishOnly?" on":"");
+    el.style.setProperty("--pc","#0d9488"); el.style.setProperty("--pt","#ccfbf1");
+    el.setAttribute("aria-pressed",state.wishOnly?"true":"false");
+    el.innerHTML=`<span class="wstar" aria-hidden="true">★</span> Wensvogels <span class="n">${loaded?wc:""}</span>`;
+    el.addEventListener("click",()=>{ state.wishOnly=!state.wishOnly; render(); });
+    box.appendChild(el);
+  }
 }
 
 /* ===== CARDS ===== */
 function renderCards(){
   const items=visible(), box=$("#cards");
-  $("#sumbig").textContent = items.length+" zeldzame vogel"+(items.length===1?"":"s")+" in Nederland";
-  
-  if(!items.length){
-    box.innerHTML=`<div class="empty"><div class="e">🪹</div>
-      <p><b>Niets gevonden.</b></p>
-      <p>Probeer meer zeldzaamheden, vergroot de afstand, of schakel naar 7 dagen.</p></div>`;
+  // Nothing loaded (yet): say so, instead of "0 zeldzame vogels" and "Niets gevonden".
+  if(!state.data.length && state.status!=="ok"){
+    if(state.status==="loading"){
+      $("#sumbig").textContent="Waarnemingen laden…";
+      box.innerHTML=`<div class="empty compact">
+        <p><b>De nieuwste waarnemingen worden opgehaald…</b></p>
+        <p>Dit duurt meestal maar een paar seconden.</p></div>`;
+    } else {
+      $("#sumbig").textContent="Laden mislukt";
+      box.innerHTML=`<div class="empty compact">
+        <p><b>De waarnemingen konden niet worden geladen.</b></p>
+        <p>Controleer je internetverbinding en probeer het opnieuw.</p>
+        <button id="retry">Opnieuw proberen</button></div>`;
+      $("#retry").addEventListener("click",loadData);
+      revealCards(150);
+    }
     return;
   }
-  box.innerHTML=items.map(s=>{
+  // "zeldzame vogels" is only true while just the two rare classes are shown.
+  const noun = state.wishOnly ? "wensvogel"
+    : (state.active.has("common")||state.active.has("uncommon")) ? "vogel" : "zeldzame vogel";
+  $("#sumbig").textContent = items.length+" "+noun+(items.length===1?"":"s")+" in Nederland";
+
+  // A refresh failed but older data is still on screen: keep it, and say it is stale.
+  const stale = state.status==="error"
+    ? `<div class="notice">Bijwerken is niet gelukt. Je ziet de waarnemingen van de laatste keer.<button id="retry">Opnieuw</button></div>` : "";
+  if(!items.length){
+    box.innerHTML = stale + (state.wishOnly
+      ? `<div class="empty"><div class="e">⭐</div>
+          <p><b>Geen wensvogels gevonden.</b></p>
+          <p>Geen van je wensvogels is de afgelopen dagen gezien. Probeer 7 dagen, of kies meer soorten via 🔔.</p></div>`
+      : `<div class="empty"><div class="e">🪹</div>
+          <p><b>Niets gevonden.</b></p>
+          <p>Probeer meer zeldzaamheden of schakel naar 7 dagen.</p></div>`);
+    if(stale) $("#retry").addEventListener("click",loadData);
+    return;
+  }
+  box.innerHTML=stale+items.map(s=>{
     const r=RARITY[s.rarity];
     const tag = s.rarity==="very_rare"?`<span class="mega">Zeer zeldzaam</span>`
              : s.rarity==="rare"?`<span class="rar">Zeldzaam</span>`:"";
@@ -491,7 +586,7 @@ function renderCards(){
     const xn = s._n>1?`<span class="xn">${s._n}× waargenomen</span>`:"";
     const cnt = s.count>1?`· ×${s.count}`:"";
     const near = s._d<=10?`<span class="near">dichtbij</span>`:"";
-    return `<div class="card${state.selected===s.id?" sel":""}" data-id="${s.id}" style="border-left-color:${r.hex}">
+    return `<div class="card${state.selected===s.id?" sel":""}" data-id="${esc(s.id)}" style="border-left-color:${r.hex}">
       <div class="cbody">
         <div class="cname"><b>${esc(s.nl)}</b> ${tag}${xn}<span class="en">${esc(s.en||s.sci||"")}</span></div>
         <div class="cmeta"><span class="w">📍 ${esc(s.loc)}</span> ${ph} <span>${ago(s)} ${cnt}</span></div>
@@ -499,6 +594,7 @@ function renderCards(){
       <div class="cright"><div class="cdist">${fmtDist(s._d)}<small>van hier</small></div>${near}</div>
     </div>`;
   }).join("");
+  if(stale) $("#retry").addEventListener("click",loadData);
 }
 
 /* ===== STATUS ===== */
@@ -507,6 +603,7 @@ function renderStatus(){
   let txt = "zeldzame vogels bij jou";
   if(state.lastUpdated){ const m=Math.round((Date.now()-state.lastUpdated)/6e4);
     txt = m<1?"zojuist bijgewerkt":m<60?`${m} min geleden bijgewerkt`:`${Math.round(m/60)} uur geleden bijgewerkt`; }
+  else if(state.status==="error") txt = "geen verbinding";
   $("#sub").textContent = txt;
 }
 
@@ -547,7 +644,7 @@ function drawMarkers(){
       ? `<div class="pothers">${s._others.length} eerdere waarneming${s._others.length===1?"":"en"}</div>`
       : "";
     // Clusters: fall back to the newest photo among the older reports.
-    const imgUrl = s.img || (s._others||[]).map(o=>o.img).find(Boolean) || "";
+    const imgUrl = safeUrl(s.img || (s._others||[]).map(o=>o.img).find(Boolean) || "");
     const pimg = imgUrl
       ? `<a href="${esc(imgUrl)}" target="_blank" rel="noopener"><img class="pimg" src="${esc(imgUrl)}?w=496" loading="lazy" referrerpolicy="no-referrer" alt="Foto: ${esc(s.nl)}"></a>`
       : "";
@@ -589,6 +686,15 @@ function measure(){
   midHidden=Math.max(0,sheetH-midPeek);
   if(!started){ curY=midHidden; started=true; }                  // default: sneak preview
   setSheet(curY,false);
+  if(pendingReveal){ const px=pendingReveal; pendingReveal=0; revealCards(px); }
+}
+// Raise the sheet until at least `px` of the list is visible. At rest only the first
+// card shows, so a message with a button (load error) would sit below the fold.
+let pendingReveal=0;
+function revealCards(px){
+  if(!started){ pendingReveal=Math.max(pendingReveal,px); return; }
+  const want=Math.max(0,maxHidden-px);
+  if(curY>want) setSheet(want,true);
 }
 function setSheet(y,anim){ curY=Math.max(0,Math.min(maxHidden,y));
   sheet.style.transition=anim?"transform .28s cubic-bezier(.32,.72,0,1)":"none";
@@ -610,15 +716,20 @@ function buildUrl(){
     .replaceAll("{lng}", state.user.lng.toFixed(5))
     .replaceAll("{radius}", String(CONFIG.FETCH_RADIUS_KM));
 }
+const LOAD_TIMEOUT_MS = 25000;   // a load that hangs must end as an error, not as an endless spinner
 async function loadData(){
-  if(!CONFIG.DATA_URL){ render(); return; }
+  if(!CONFIG.DATA_URL){ state.status="ok"; render(); return; }
   $("#refresh").classList.add("spin");
+  if(!state.data.length){ state.status="loading"; renderCards(); }
+  const ctl=new AbortController(), timer=setTimeout(()=>ctl.abort(),LOAD_TIMEOUT_MS);
   // "no-cache" revalidates with the ETag, so an unchanged feed costs a 304 instead of a full download.
-  try{ const res=await fetch(buildUrl(),{cache:"no-cache"}); if(!res.ok) throw 0;
-    const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
+  try{ const res=await fetch(buildUrl(),{cache:"no-cache",signal:ctl.signal}); if(!res.ok) throw 0;
+    const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date&&RARITY[s.rarity]);
     state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
+    state.status="ok";
     checkWensvogels(state.data);
-  }catch(e){}
+  }catch(e){ state.status="error"; }
+  clearTimeout(timer);
   $("#refresh").classList.remove("spin"); render();
 }
 

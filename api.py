@@ -228,8 +228,30 @@ def privacy():
 
 
 @app.get("/icon.png")
+@app.get("/favicon.ico")
 def icon():
-    return FileResponse(_HERE / "icon.png", media_type="image/png")
+    return FileResponse(_HERE / "icon.png", media_type="image/png",
+                        headers={"Cache-Control": "public, max-age=86400"})
+
+
+@app.get("/manifest.webmanifest")
+def manifest():
+    return Response(
+        json.dumps({
+            "name": "Vogelradar",
+            "short_name": "Vogelradar",
+            "description": "Zeldzame vogels bij jou in de buurt",
+            "lang": "nl",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#0d9488",
+            "theme_color": "#0d9488",
+            "icons": [{"src": "/icon.png", "sizes": "512x512",
+                       "type": "image/png", "purpose": "any"}],
+        }, ensure_ascii=False),
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "public, max-age=86400"},
+    )
 
 
 # Limits for POST /register-token. The wish list holds species names plus
@@ -380,4 +402,6 @@ def forecast_file(name: str):
 
 @app.get("/")
 def index():
-    return FileResponse(_HERE / "vogelradar.html")
+    # "no-cache": always revalidate, so a deploy reaches visitors at once.
+    return FileResponse(_HERE / "vogelradar.html",
+                        headers={"Cache-Control": "no-cache"})
