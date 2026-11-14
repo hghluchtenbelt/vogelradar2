@@ -234,6 +234,23 @@ def icon():
                         headers={"Cache-Control": "public, max-age=86400"})
 
 
+_places_body: bytes = b""
+
+
+@app.get("/places.json")
+def places_json():
+    """Municipalities with a centre point, for the manual location picker."""
+    global _places_body
+    if not _places_body:
+        from gemeente import places
+        _places_body = json.dumps(
+            {"places": [list(p) for p in places()]},
+            ensure_ascii=False, separators=(",", ":"),
+        ).encode("utf-8")
+    return Response(_places_body, media_type="application/json",
+                    headers={"Cache-Control": "public, max-age=86400"})
+
+
 @app.get("/manifest.webmanifest")
 def manifest():
     return Response(

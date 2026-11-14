@@ -57,6 +57,48 @@ def _in_poly(lng: float, lat: float, poly: list) -> bool:
     return True
 
 
+def _ring_centroid(ring: list) -> tuple[float, float, float]:
+    """(lng, lat, area) of a ring, area-weighted (planar; fine at this scale)."""
+    area = cx = cy = 0.0
+    j = len(ring) - 1
+    for i in range(len(ring)):
+        xi, yi = ring[i][0], ring[i][1]
+        xj, yj = ring[j][0], ring[j][1]
+        cross = xj * yi - xi * yj
+        area += cross
+        cx += (xj + xi) * cross
+        cy += (yj + yi) * cross
+        j = i
+    if not area:
+        xs = [p[0] for p in ring]
+        ys = [p[1] for p in ring]
+        return sum(xs) / len(xs), sum(ys) / len(ys), 0.0
+    return cx / (3 * area), cy / (3 * area), abs(area) / 2
+
+
+# Everyday names for municipalities whose official name is rarely typed.
+_ALIASES = {"'s-Gravenhage": "Den Haag", "'s-Hertogenbosch": "Den Bosch"}
+
+
+def places() -> list[tuple[str, float, float]]:
+    """(name, lat, lng) of every municipality: the centre of its largest
+    part. Used by the website to let a visitor pick a location by name,
+    without any external geocoder."""
+    if not _areas:
+        _load()
+    out: list[tuple[str, float, float]] = []
+    for name, _bbox, polys in _areas:
+        lng, lat, _area = max(
+            (_ring_centroid(poly[0]) for poly in polys if poly),
+            key=lambda c: c[2],
+        )
+        out.append((name, round(lat, 4), round(lng, 4)))
+        if name in _ALIASES:
+            out.append((_ALIASES[name], round(lat, 4), round(lng, 4)))
+    out.sort(key=lambda p: p[0].lstrip("'").casefold())
+    return out
+
+
 def gemeente_for(lat: float, lng: float) -> str | None:
     if not _areas:
         _load()

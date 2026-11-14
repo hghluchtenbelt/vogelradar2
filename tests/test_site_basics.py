@@ -86,3 +86,17 @@ def test_website_wish_list_does_not_promise_background_alerts():
     wish = HTML[HTML.index('id="wmod"'):HTML.index('id="amod"')]
     assert "zolang deze pagina open staat" in wish
     assert "Android-app" in wish
+
+
+def test_location_can_be_chosen_by_hand_and_radius_filtered():
+    assert 'id="loc-search"' in HTML and 'id="loc-pick"' in HTML and 'id="loc-gps"' in HTML
+    assert [v for v in re.findall(r'<option value="(\d+)"', HTML[HTML.index('id="radius"'):][:400])] \
+        == ["0", "10", "25", "50", "100"]
+    # No third-party geocoder: places come from our own endpoint.
+    assert 'fetch("/places.json")' in HTML
+    assert "nominatim" not in HTML.lower() and "geocod" not in HTML.lower()
+
+
+def test_fallback_location_is_never_presented_as_the_visitors_position():
+    assert "Geen locatie bekend: afstanden gelden vanaf" in HTML
+    assert 'if(state.user.source!=="default") markers["__user"]' in HTML

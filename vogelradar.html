@@ -93,15 +93,17 @@
   .topbar{position:fixed;top:8px;left:50%;transform:translateX(-50%);width:min(100vw - 16px,600px);z-index:1000;
     background:rgba(255,255,255,.84);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
     border:1px solid rgba(255,255,255,.7);border-radius:16px;box-shadow:0 6px 22px rgba(2,6,23,.12);padding:8px 10px}
-  .brandrow{display:flex;align-items:center;gap:9px}
+  .brandrow{display:flex;align-items:center;gap:8px}
+  /* The brand opens "Over Vogelradar". It never shrinks; the location chip takes what is left. */
+  .brand{display:flex;align-items:center;gap:8px;flex:0 0 auto;border:none;background:none;padding:0;cursor:pointer;
+    font-family:inherit;color:var(--ink)}
   .logo{width:30px;height:30px;border-radius:9px;overflow:hidden;flex:0 0 auto}
   .logo img{width:100%;height:100%;display:block}
-  .bt{min-width:0}
-  .bt b{font-size:16px;font-weight:760;letter-spacing:-.3px;display:block;line-height:1.1}
-  .bt span{font-size:10.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .grow{flex:1}
+  .bt b{font-size:16px;font-weight:760;letter-spacing:-.3px;display:block;line-height:1.1;white-space:nowrap}
+  .grow{flex:1 1 0;min-width:0}
   .loc{display:inline-flex;align-items:center;gap:5px;border:1px solid #cde8e3;background:#e8f3f1;color:var(--brand-d);
-    font-weight:650;font-size:11.5px;padding:6px 9px;border-radius:999px;cursor:pointer;max-width:150px}
+    font-weight:650;font-size:11.5px;padding:6px 9px;border-radius:999px;cursor:pointer;max-width:170px;min-width:0;flex:0 1 auto;
+    font-family:inherit}
   .loc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .rf{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:#fff;font-size:14px;cursor:pointer;color:var(--ink);flex:0 0 auto}
   .rf:active,.loc:active{transform:scale(.94)}
@@ -132,8 +134,12 @@
   .grab{width:40px;height:5px;border-radius:999px;background:#cbd5e1}
   .sheethead{padding:2px 16px 10px;border-bottom:1px solid var(--line);flex:0 0 auto}
   .summary{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .summary .big{font-size:15px;font-weight:740;letter-spacing:-.2px}
-  .summary .sm{font-size:11px;color:var(--muted)}
+  .sumtxt{min-width:0}
+  .summary .big{font-size:15px;font-weight:740;letter-spacing:-.2px;display:block}
+  .summary .sm{font-size:11px;color:var(--muted);display:block;margin-top:1px}
+  .listfoot{text-align:center;font-size:11.5px;color:var(--muted);padding:10px 8px 4px;line-height:1.7}
+  .listfoot a,.listfoot button{color:var(--brand-d);font-weight:650;text-decoration:none;border:none;background:none;padding:0;
+    font-size:inherit;font-family:inherit;cursor:pointer}
   .filters{display:flex;gap:8px;margin-top:9px;align-items:center}
   .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
   .seg button{border:0;background:transparent;padding:6px 12px;font-size:12.5px;font-weight:680;color:var(--muted);cursor:pointer}
@@ -159,7 +165,8 @@
   .ph{font-size:11px}
   .cright{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto}
   .cdist{font-size:15.5px;font-weight:780;letter-spacing:-.3px;white-space:nowrap}
-  .cdist small{display:block;text-align:right;font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:0}
+  .cdist small{display:block;text-align:right;font-size:9.5px;color:var(--muted);font-weight:600;letter-spacing:0;
+    max-width:92px;margin-left:auto;overflow:hidden;text-overflow:ellipsis}
   .near{font-size:9.5px;font-weight:750;color:#166534;background:#dcfce7;border:1px solid #bbf7d0;padding:1px 6px;border-radius:999px;margin-top:3px}
 
   .empty{text-align:center;color:var(--muted);padding:40px 20px}
@@ -222,6 +229,29 @@
   .wqbtn:active{transform:scale(.96)}
   .wmod-hint a{color:var(--brand-d);font-weight:650}
 
+  /* ── Location sheet ── */
+  .loc-actions{display:flex;flex-direction:column;gap:8px;padding:6px 16px 4px;flex:0 0 auto}
+  .loc-actions button{display:flex;align-items:center;gap:8px;text-align:left;border:1.5px solid var(--line);background:#fff;
+    border-radius:11px;padding:11px 12px;font-size:14px;font-weight:650;color:var(--ink);cursor:pointer;font-family:inherit}
+  .loc-actions button:active{background:#f8fafc}
+  #loc-search{display:block;margin:8px 16px 4px;padding:9px 12px;border:1.5px solid var(--line);border-radius:9px;
+    font-size:16px;font-family:inherit;width:calc(100% - 32px);outline:none;flex:0 0 auto}
+  #loc-search:focus{border-color:var(--brand)}
+  #loc-results{overflow-y:auto;padding:0 16px;min-height:0;flex:0 1 auto}
+  #loc-results button{display:block;width:100%;text-align:left;border:none;border-bottom:1px solid var(--line);background:none;
+    padding:11px 0;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;font-family:inherit}
+  #loc-results p{color:var(--muted);font-size:13px;padding:10px 0;margin:0}
+  .loc-msg{margin:6px 16px 0;padding:8px 11px;border-radius:10px;font-size:12.5px;line-height:1.4;background:#f1f5f9;color:var(--ink);flex:0 0 auto}
+  .loc-msg.warn{background:#fffbeb;color:#78350f;border:1px solid #fde68a}
+  #lmod .wmod-distrow{padding:12px 16px 20px;border-top:1px solid var(--line);margin-top:8px}
+  .pickbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(100px + 12px);z-index:1050;display:flex;align-items:center;gap:10px;
+    background:var(--ink);color:#fff;border-radius:999px;padding:8px 8px 8px 14px;font-size:13px;font-weight:650;
+    box-shadow:0 6px 22px rgba(2,6,23,.25);white-space:nowrap}
+  .pickbar button{border:none;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:12px;padding:6px 11px;
+    border-radius:999px;cursor:pointer;font-family:inherit}
+  .picking #map{cursor:crosshair}
+  .picking .leaflet-interactive{cursor:crosshair}
+
   /* ── About sheet and first-visit intro ── */
   .about{overflow-y:auto;padding:4px 16px 22px;font-size:13.5px;line-height:1.55;color:var(--ink)}
   .about p{margin:10px 0}
@@ -248,13 +278,14 @@
 
 <div class="topbar">
   <div class="brandrow">
-    <div class="logo"><img src="/icon.png" alt=""></div>
-    <div class="bt"><b>Vogelradar</b><span id="sub">zeldzame vogels bij jou</span></div>
+    <button class="brand" id="about-btn" title="Over Vogelradar" aria-label="Vogelradar, over deze site">
+      <span class="logo"><img src="/icon.png" alt=""></span>
+      <span class="bt"><b>Vogelradar</b></span>
+    </button>
     <div class="grow"></div>
     <button class="loc" id="loc" aria-label="Locatie">📍 <span id="locname">locatie bepalen…</span></button>
     <button class="rf" id="wens-btn" title="Wensvogels" aria-label="Wensvogels">🔔</button>
     <a class="rf" href="/voorspelling" title="Voorspelling (test)" aria-label="Voorspelling (test)">🍂</a>
-    <button class="rf" id="about-btn" title="Over Vogelradar" aria-label="Over Vogelradar">ℹ️</button>
   </div>
   <div class="chips" id="chips"></div>
 </div>
@@ -263,7 +294,10 @@
   <div class="handle" id="handle"><span class="grab"></span></div>
   <div class="sheethead">
     <div class="summary">
-      <span class="big" id="sumbig" aria-live="polite">Waarnemingen laden…</span>
+      <div class="sumtxt">
+        <span class="big" id="sumbig" aria-live="polite">Waarnemingen laden…</span>
+        <span class="sm" id="sub">zeldzame vogels bij jou</span>
+      </div>
       <button class="rf" id="refresh" title="Verversen" aria-label="Verversen">⟳</button>
     </div>
     <div class="filters">
@@ -314,6 +348,37 @@
   </div>
 </div>
 
+<div class="pickbar" id="pickbar" hidden>
+  <span>Tik op de kaart om je locatie te kiezen</span>
+  <button id="pick-cancel">Annuleren</button>
+</div>
+
+<div class="wmod" id="lmod" hidden>
+  <div class="wmod-box">
+    <div class="wmod-head">
+      <h2>📍 Jouw locatie</h2>
+      <button class="wmod-x" id="lmod-close" aria-label="Sluiten">✕</button>
+    </div>
+    <p class="loc-msg" id="loc-msg" aria-live="polite"></p>
+    <div class="loc-actions">
+      <button id="loc-gps"><span aria-hidden="true">🧭</span> Gebruik mijn huidige locatie</button>
+      <button id="loc-pick"><span aria-hidden="true">🗺️</span> Kies een punt op de kaart</button>
+    </div>
+    <input id="loc-search" type="search" placeholder="Of zoek een gemeente…" autocomplete="off" aria-label="Zoek een gemeente">
+    <div id="loc-results"></div>
+    <div class="wmod-distrow">
+      <label for="radius">Toon vogels binnen</label>
+      <select id="radius">
+        <option value="0" selected>heel Nederland</option>
+        <option value="10">10 km</option>
+        <option value="25">25 km</option>
+        <option value="50">50 km</option>
+        <option value="100">100 km</option>
+      </select>
+    </div>
+  </div>
+</div>
+
 <div class="wmod" id="amod" hidden>
   <div class="wmod-box">
     <div class="wmod-head">
@@ -358,7 +423,8 @@ const RARITY = {
 const state = {
   active: new Set(["rare","very_rare"]),
   win: 3, maxDist: 0, sortBy: 'dist', wishOnly: false,
-  user: { ...CONFIG.DEFAULT_LOC, precise:false },
+  // source: "default" (no location known, distances from DEFAULT_LOC), "gps" or "manual" (chosen by hand)
+  user: { ...CONFIG.DEFAULT_LOC, precise:false, source:"default" },
   data: [], lastUpdated: null, selected: null,
   // "loading" until the first answer, then "ok" or "error"; a failed load must
   // never look like "there are no birds".
@@ -628,23 +694,31 @@ function renderCards(){
   // "zeldzame vogels" is only true while just the two rare classes are shown.
   const noun = state.wishOnly ? "wensvogel"
     : (state.active.has("common")||state.active.has("uncommon")) ? "vogel" : "zeldzame vogel";
-  $("#sumbig").textContent = items.length+" "+noun+(items.length===1?"":"s")+" in Nederland";
+  $("#sumbig").textContent = items.length+" "+noun+(items.length===1?"":"s")
+    +(state.maxDist ? ` binnen ${state.maxDist} km` : " in Nederland");
 
   // A refresh failed but older data is still on screen: keep it, and say it is stale.
   const stale = state.status==="error"
     ? `<div class="notice">Bijwerken is niet gelukt. Je ziet de waarnemingen van de laatste keer.<button id="retry">Opnieuw</button></div>` : "";
+  // No location known: distances are measured from the default place. Say so, and offer the way out.
+  const noLoc = state.user.source==="default"
+    ? `<div class="notice">📍 Geen locatie bekend: afstanden gelden vanaf ${esc(state.user.name)}.<button id="pick-loc">Kies locatie</button></div>` : "";
+  const top = stale+noLoc;
   if(!items.length){
-    box.innerHTML = stale + (state.wishOnly
+    const wider = state.maxDist ? `<button id="widen">Toon heel Nederland</button>` : "";
+    box.innerHTML = top + (state.wishOnly
       ? `<div class="empty"><div class="e">⭐</div>
           <p><b>Geen wensvogels gevonden.</b></p>
-          <p>Geen van je wensvogels is de afgelopen dagen gezien. Probeer 7 dagen, of kies meer soorten via 🔔.</p></div>`
+          <p>Geen van je wensvogels is de afgelopen dagen ${state.maxDist?`binnen ${state.maxDist} km `:""}gezien. Probeer 7 dagen, of kies meer soorten via 🔔.</p>${wider}</div>`
       : `<div class="empty"><div class="e">🪹</div>
           <p><b>Niets gevonden.</b></p>
-          <p>Probeer meer zeldzaamheden of schakel naar 7 dagen.</p></div>`);
-    if(stale) $("#retry").addEventListener("click",loadData);
+          <p>Probeer meer zeldzaamheden${state.maxDist?", een grotere afstand":""} of schakel naar 7 dagen.</p>${wider}</div>`) + LIST_FOOT;
+    wireListButtons();
+    revealCards(250);                       // the message and its button, not just the top edge
     return;
   }
-  box.innerHTML=stale+introHtml()+items.map(s=>{
+  const origin = esc(originLabel());
+  box.innerHTML=top+introHtml()+items.map(s=>{
     const r=RARITY[s.rarity];
     const tag = s.rarity==="very_rare"?`<span class="mega">Zeer zeldzaam</span>`
              : s.rarity==="rare"?`<span class="rar">Zeldzaam</span>`:"";
@@ -657,16 +731,26 @@ function renderCards(){
         <div class="cname"><b>${esc(s.nl)}</b> ${tag}${xn}<span class="en">${esc(s.en||s.sci||"")}</span></div>
         <div class="cmeta"><span class="w">📍 ${esc(s.loc)}</span> ${ph} <span>${ago(s)} ${cnt}</span></div>
       </div>
-      <div class="cright"><div class="cdist">${fmtDist(s._d)}<small>van hier</small></div>${near}</div>
+      <div class="cright"><div class="cdist">${fmtDist(s._d)}<small>${origin}</small></div>${near}</div>
     </div>`;
-  }).join("");
-  if(stale) $("#retry").addEventListener("click",loadData);
+  }).join("")+LIST_FOOT;
+  wireListButtons();
   if($("#intro")) revealCards(250);       // intro plus the first bird, not the intro alone
+}
+// Source credit and onward links under every list (also the empty one).
+const LIST_FOOT = `<div class="listfoot">Gegevens: <a href="https://waarneming.nl" target="_blank" rel="noopener">waarneming.nl</a>, elk uur bijgewerkt<br>
+  <button id="foot-about">Over Vogelradar</button> · <a href="/stats">Statistieken</a> · <a href="/privacy">Privacy</a></div>`;
+function wireListButtons(){
+  const on=(id,fn)=>{ const el=$(id); if(el) el.addEventListener("click",fn); };
+  on("#foot-about",openAbout);
+  on("#retry",loadData);
+  on("#pick-loc",openLoc);
+  on("#widen",()=>setRadius(0));
 }
 
 /* ===== STATUS ===== */
 function renderStatus(){
-  $("#locname").textContent = state.user.precise ? "jij" : state.user.name;
+  $("#locname").textContent = state.user.source==="gps" ? "jij" : state.user.source==="manual" ? state.user.name : "Kies locatie";
   let txt = "zeldzame vogels bij jou";
   if(state.lastUpdated){ const m=Math.round((Date.now()-state.lastUpdated)/6e4);
     txt = m<1?"zojuist bijgewerkt":m<60?`${m} min geleden bijgewerkt`:`${Math.round(m/60)} uur geleden bijgewerkt`; }
@@ -675,7 +759,7 @@ function renderStatus(){
 }
 
 /* ===== MAP ===== */
-let map=null, markers={}, NL_BOUNDS=null, _clusterLayer=null;
+let map=null, markers={}, NL_BOUNDS=null, _clusterLayer=null, _radiusLayer=null;
 function initMap(){
   map=L.map("map",{zoomControl:true,attributionControl:true,minZoom:6,maxZoom:18,
     maxBounds:[[49.5,1.5],[55.0,9.5]],maxBoundsViscosity:0.7}).setView([52.1,5.3],7);
@@ -698,10 +782,15 @@ function drawMarkers(){
   if(!map) return;
   Object.values(markers).forEach(m=>map.removeLayer(m));
   if(_clusterLayer){ map.removeLayer(_clusterLayer); _clusterLayer=null; }
+  if(_radiusLayer){ map.removeLayer(_radiusLayer); _radiusLayer=null; }
   markers={};
-  markers["__user"]=L.marker([state.user.lat,state.user.lng],{
+  // The radius filter as a ring on the map, so it is clear why birds further away are missing.
+  if(state.maxDist) _radiusLayer=L.circle([state.user.lat,state.user.lng],{radius:state.maxDist*1000,
+    color:"#0d9488",weight:1.5,opacity:.7,fillColor:"#0d9488",fillOpacity:.04,interactive:false}).addTo(map);
+  // No pin while the location is only the fallback: it would claim "you are here".
+  if(state.user.source!=="default") markers["__user"]=L.marker([state.user.lat,state.user.lng],{
     icon:L.divIcon({className:"",iconSize:[26,32],iconAnchor:[13,30],html:'<span class="me"></span>'}),
-    zIndexOffset:1000}).addTo(map);
+    zIndexOffset:1000,interactive:false}).addTo(map);
   _clusterLayer=L.markerClusterGroup({maxClusterRadius:50,disableClusteringAtZoom:13,showCoverageOnHover:false,spiderfyOnMaxZoom:false,
     iconCreateFunction:c=>L.divIcon({className:"",iconSize:[28,28],iconAnchor:[14,14],
       html:`<span class="mk-cluster">${c.getChildCount()}</span>`})});
@@ -719,7 +808,7 @@ function drawMarkers(){
       ${pimg}
       <div class="pnl">${esc(s.nl)} ${s.count>1?`<small>×${esc(s.count)}</small>`:""} ${s._n>1?`<small>· ${s._n}× waargenomen</small>`:""}</div>
       <div class="pen">${esc(s.en||s.sci||"")}</div>
-      <div class="pmeta">📍 ${esc(s.loc)}<br>${ago(s)} · ${fmtDist(haversine(state.user,s))} van hier</div>
+      <div class="pmeta">📍 ${esc(s.loc)}<br>${ago(s)} · ${fmtDist(haversine(state.user,s))} ${esc(originLabel())}</div>
       ${others}
       <div style="margin-top:6px"><a href="${esc(mapsUrl(s))}" target="_blank" rel="noopener">Routebeschrijving</a> &nbsp;·&nbsp;
       <a href="${esc(obsUrl(s))}" target="_blank" rel="noopener">waarneming.nl ↗</a></div></div>`);
@@ -800,16 +889,116 @@ async function loadData(){
   $("#refresh").classList.remove("spin"); render();
 }
 
-/* ===== GEOLOCATION ===== */
-function locate(){
-  if(!navigator.geolocation){ render(); return; }
-  navigator.geolocation.getCurrentPosition(
-    p=>{ state.user={lat:p.coords.latitude,lng:p.coords.longitude,name:"you",precise:true};
-      if(map) map.flyTo([state.user.lat,state.user.lng],10,{duration:.8});
-      if(LOC_QUERY) loadData(); else render();         // refetch by GPS if the URL wants coordinates
-    },
-    ()=>render(), {enableHighAccuracy:true,timeout:8000,maximumAge:60000});
+/* ===== LOCATION ===== */
+// GPS when allowed; otherwise the visitor can search a municipality or tap a point on the
+// map. A hand-picked place is remembered on this device only (it is never sent anywhere).
+const _LK='vr_loc', _RK='vr_radius';
+function originLabel(){ return state.user.source==="gps" ? "van hier" : "van "+state.user.name; }
+function savedLoc(){
+  try{ const l=JSON.parse(localStorage.getItem(_LK)||'null');
+    return l && isFinite(l.lat) && isFinite(l.lng) && typeof l.name==='string' ? l : null; }catch{ return null; }
 }
+function setUser(u){
+  state.user=u;
+  if(map) map.flyTo([u.lat,u.lng],10,{duration:.8});
+  if(LOC_QUERY) loadData(); else render();              // refetch by GPS if the URL wants coordinates
+}
+function setManual(lat,lng,name){
+  try{ localStorage.setItem(_LK,JSON.stringify({lat,lng,name})); }catch{}
+  setUser({lat,lng,name,precise:false,source:"manual"});
+}
+function setRadius(km){
+  state.maxDist = [10,25,50,100].includes(km) ? km : 0;
+  try{ localStorage.setItem(_RK,String(state.maxDist)); }catch{}
+  $("#radius").value=String(state.maxDist);
+  render();
+}
+function locMsg(text,warn){ const el=$("#loc-msg"); el.textContent=text; el.classList.toggle("warn",!!warn); }
+function locate(fromUser){
+  if(!navigator.geolocation){
+    if(fromUser) locMsg("Je browser kan je locatie niet bepalen. Kies hieronder een plaats.",true);
+    render(); return;
+  }
+  if(fromUser) locMsg("Locatie bepalen…");
+  navigator.geolocation.getCurrentPosition(
+    p=>{ try{ localStorage.removeItem(_LK); }catch{}
+      setUser({lat:p.coords.latitude,lng:p.coords.longitude,name:"jij",precise:true,source:"gps"});
+      if(fromUser) closeLoc();
+    },
+    ()=>{ if(fromUser) locMsg("Dat lukte niet. Sta locatietoegang toe in je browser, of kies hieronder een plaats.",true);
+      render(); },
+    {enableHighAccuracy:true,timeout:8000,maximumAge:60000});
+}
+
+let _places=null, _placesLoading=null;
+function loadPlaces(){
+  if(_places) return Promise.resolve(_places);
+  if(!_placesLoading) _placesLoading=fetch("/places.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
+    .then(j=>(_places=(j.places||[]).map(([name,lat,lng])=>({name,lat,lng,key:fold(name)}))))
+    .catch(()=>{ _placesLoading=null; return null; });
+  return _placesLoading;
+}
+// "Súdwest" matches "sudwest", "'s-Gravenhage" matches "gravenhage".
+function fold(s){ return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim(); }
+function nearestPlace(lat,lng){
+  if(!_places||!_places.length) return null;
+  return _places.reduce((a,b)=>haversine({lat,lng},b)<haversine({lat,lng},a)?b:a);
+}
+async function renderPlaces(){
+  const q=fold($("#loc-search").value), box=$("#loc-results");
+  if(!q){ box.innerHTML=""; return; }
+  const places=await loadPlaces();
+  if(q!==fold($("#loc-search").value)) return;            // the visitor typed on while loading
+  if(!places){ box.innerHTML=`<p>De plaatsenlijst kon niet worden geladen. Kies een punt op de kaart.</p>`; return; }
+  const hits=places.filter(p=>p.key.includes(q))
+    .sort((a,b)=>(b.key.startsWith(q)-a.key.startsWith(q))||a.name.localeCompare(b.name,"nl")).slice(0,8);
+  box.innerHTML = hits.length
+    ? hits.map(p=>`<button data-lat="${p.lat}" data-lng="${p.lng}" data-name="${esc(p.name)}">${esc(p.name)}</button>`).join("")
+    : `<p>Geen gemeente gevonden. Kies anders een punt op de kaart.</p>`;
+}
+function openLoc(){
+  $("#lmod").hidden=false;
+  $("#radius").value=String(state.maxDist);
+  $("#loc-search").value=""; $("#loc-results").innerHTML="";
+  const u=state.user;
+  locMsg(u.source==="gps" ? "Afstanden gelden vanaf je huidige locatie."
+       : u.source==="manual" ? `Afstanden gelden vanaf ${u.name}.`
+       : `Er is geen locatie bekend. Afstanden gelden nu vanaf ${u.name}.`, u.source==="default");
+  loadPlaces();
+}
+function closeLoc(){ $("#lmod").hidden=true; }
+
+// Pick a point: the sheet steps aside and the next tap on the map becomes the location.
+let _pickHandler=null;
+function startPick(){
+  closeLoc();
+  document.body.classList.add("picking"); $("#pickbar").hidden=false;
+  if(started) snapSheet(maxHidden,true);
+  map.closePopup();
+  _pickHandler=async e=>{
+    const {lat,lng}=e.latlng; stopPick();
+    await loadPlaces();
+    const near=nearestPlace(lat,lng);
+    setManual(lat,lng,near?near.name:"gekozen punt");
+    if(started) snapSheet(midHidden,true);
+  };
+  map.once("click",_pickHandler);
+}
+function stopPick(){
+  if(_pickHandler){ map.off("click",_pickHandler); _pickHandler=null; }
+  document.body.classList.remove("picking"); $("#pickbar").hidden=true;
+}
+$("#loc-gps").addEventListener("click",()=>locate(true));
+$("#loc-pick").addEventListener("click",startPick);
+$("#pick-cancel").addEventListener("click",()=>{ stopPick(); if(started) snapSheet(midHidden,true); });
+$("#loc-search").addEventListener("input",renderPlaces);
+$("#loc-results").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  setManual(+b.dataset.lat,+b.dataset.lng,b.dataset.name); closeLoc();
+});
+$("#radius").addEventListener("change",e=>setRadius(+e.target.value));
+$("#lmod-close").addEventListener("click",closeLoc);
+$("#lmod").addEventListener("click",e=>{ if(e.target===$("#lmod")) closeLoc(); });
 
 /* ===== WIRE UP ===== */
 $("#win").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
@@ -817,7 +1006,7 @@ $("#win").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
 $("#sort-seg").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
   state.sortBy=b.dataset.s; $("#sort-seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); render(); }));
 $("#refresh").addEventListener("click",loadData);
-$("#loc").addEventListener("click",locate);
+$("#loc").addEventListener("click",openLoc);
 $("#cards").addEventListener("click",e=>{
   if(e.target.closest("#intro-x")){ dismissIntro(); return; }
   if(e.target.closest("#intro-more")){ dismissIntro(); openAbout(); return; }
@@ -827,9 +1016,15 @@ $("#cards").addEventListener("click",e=>{
 setTimeout(()=>{ const sp=$('#splash'); if(sp){sp.classList.add('out');setTimeout(()=>sp.remove(),450);} },1400);
 updateWensBell();
 initMap();
+try{ state.maxDist = [10,25,50,100].includes(+localStorage.getItem(_RK)) ? +localStorage.getItem(_RK) : 0; }catch{}
+const _saved=savedLoc();
+if(_saved) state.user={lat:_saved.lat,lng:_saved.lng,name:_saved.name,precise:false,source:"manual"};
 loadData();
-locate();
-setTimeout(()=>{ map.invalidateSize(); if(NL_BOUNDS && !state.user.precise) map.fitBounds(NL_BOUNDS,{padding:[16,16]}); measure(); },120);
+if(!_saved) locate(false);                      // a place chosen by hand wins over asking for GPS again
+setTimeout(()=>{ map.invalidateSize();
+  if(state.user.source==="manual") map.setView([state.user.lat,state.user.lng],10);
+  else if(NL_BOUNDS && state.user.source==="default") map.fitBounds(NL_BOUNDS,{padding:[16,16]});
+  measure(); },120);
 window.addEventListener("resize",()=>{ map.invalidateSize(); measure(); });
 if(CONFIG.DATA_URL && CONFIG.AUTO_REFRESH_MIN>0) setInterval(loadData, CONFIG.AUTO_REFRESH_MIN*60000);
 </script>
