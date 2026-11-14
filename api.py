@@ -19,13 +19,40 @@ from pydantic import BaseModel, Field, StringConstraints, ValidationError
 _rate_limit: dict[str, list[float]] = defaultdict(list)
 _RATE_WINDOW = 3600
 _RATE_MAX = 120
+_RATE_MAX_KEYS = 20_000   # memory bound on the number of tracked addresses
+
+
+def _client_ip(request: Request) -> str:
+    """The visitor's address, for rate limiting only (never stored).
+
+    Production runs behind Cloudflare and Traefik, so the socket peer is
+    the proxy and every visitor would share one bucket. Cloudflare sets
+    CF-Connecting-IP itself (a client cannot forge it through the edge)
+    and the origin is only reachable through the tunnel. Without the
+    header (local runs) the socket peer is used.
+    """
+    forwarded = request.headers.get("cf-connecting-ip", "").strip()
+    if forwarded:
+        return forwarded[:64]
+    return request.client.host if request.client else "unknown"
+
 
 def _allow_rate(ip: str) -> bool:
     now = time.time()
-    _rate_limit[ip] = [t for t in _rate_limit[ip] if now - t < _RATE_WINDOW]
-    if len(_rate_limit[ip]) >= _RATE_MAX:
+    recent = [t for t in _rate_limit[ip] if now - t < _RATE_WINDOW]
+    if len(recent) >= _RATE_MAX:
+        _rate_limit[ip] = recent
         return False
-    _rate_limit[ip].append(now)
+    recent.append(now)
+    _rate_limit[ip] = recent
+    if len(_rate_limit) > _RATE_MAX_KEYS:
+        # Drop addresses whose window has passed; if that is not enough
+        # (a flood of distinct addresses), start over rather than grow.
+        for key in [k for k, v in _rate_limit.items()
+                    if not v or now - v[-1] >= _RATE_WINDOW]:
+            del _rate_limit[key]
+        if len(_rate_limit) > _RATE_MAX_KEYS:
+            _rate_limit.clear()
     return True
 
 from database import (
@@ -184,8 +211,7 @@ async def _read_body(request: Request, limit: int) -> bytes:
 @app.post("/register-token")
 async def register_token(request: Request):
     import json
-    ip = request.client.host if request.client else "unknown"
-    if not _allow_rate(ip):
+    if not _allow_rate(_client_ip(request)):
         raise HTTPException(status_code=429, detail="Too many requests")
     raw = await _read_body(request, _MAX_REGISTER_BODY)
     try:
@@ -205,7 +231,9 @@ async def register_token(request: Request):
 
 
 @app.delete("/register-token/{token}")
-def unregister_token(token: str):
+def unregister_token(token: str, request: Request):
+    if not _allow_rate(_client_ip(request)):
+        raise HTTPException(status_code=429, detail="Too many requests")
     delete_push_subscriber(token)
     return {"ok": True}
 
