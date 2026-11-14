@@ -110,7 +110,7 @@ def _background_updater() -> None:
         # were never announced; send those now instead of an interval later.
         handled = send_pending_pushes()
         if handled:
-            print(f"[updater] {handled} pending sightings announced", flush=True)
+            print(f"[updater] {handled} pending sightings handled", flush=True)
     except Exception as exc:
         print(f"[updater] pending push error: {exc}", flush=True)
     while True:
