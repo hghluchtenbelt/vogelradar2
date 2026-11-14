@@ -1,6 +1,8 @@
 """FastAPI backend — serves /birds.json for the Vogelradar frontend."""
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import re
 import threading
@@ -13,7 +15,7 @@ from typing import Annotated
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field, StringConstraints, ValidationError
 
 _rate_limit: dict[str, list[float]] = defaultdict(list)
@@ -117,6 +119,7 @@ def _background_updater() -> None:
             print(f"[updater] {new} new / {total} scraped", flush=True)
         except Exception as exc:
             print(f"[updater] error: {exc}", flush=True)
+        _invalidate_feed()
         if FORECAST_ENABLED:
             try:
                 _run_forecast()
@@ -157,15 +160,59 @@ def _to_sighting(row: dict) -> dict:
     }
 
 
+# The feed is about 1.6 MB of JSON built from three queries, and it only
+# changes when a scrape finishes or a sighting ages out of its window. It
+# is built at most once per _FEED_TTL and served from memory in between.
+_FEED_TTL = 60
+_feed_cache: dict = {"t": 0.0, "body": b"", "etag": ""}
+_feed_lock = threading.Lock()
+
+
+def _invalidate_feed() -> None:
+    _feed_cache["t"] = 0.0
+
+
+def _feed() -> tuple[bytes, str]:
+    with _feed_lock:
+        now = time.time()
+        if not _feed_cache["body"] or now - _feed_cache["t"] > _FEED_TTL:
+            rows = get_sightings()
+            last = get_latest_update()
+            payload = {
+                "lastUpdated": (last + "Z") if last and not last.endswith("Z")
+                else (last or ""),
+                "sightings": [_to_sighting(r) for r in rows],
+            }
+            body = json.dumps(payload, ensure_ascii=False, allow_nan=False,
+                              separators=(",", ":")).encode("utf-8")
+            _feed_cache.update(
+                t=now, body=body,
+                etag='"' + hashlib.sha256(body).hexdigest()[:20] + '"',
+            )
+        return _feed_cache["body"], _feed_cache["etag"]
+
+
+def _etag_matches(header: str, etag: str) -> bool:
+    # A proxy that compresses the response turns the tag into a weak one.
+    tags = {t.strip().removeprefix("W/") for t in header.split(",")}
+    return etag in tags or "*" in tags
+
+
 @app.get("/birds.json")
-def birds_json():
-    rows = get_sightings()
-    last = get_latest_update()
-    return {
-        "lastUpdated": (last + "Z") if last and not last.endswith("Z")
-        else (last or ""),
-        "sightings": [_to_sighting(r) for r in rows],
-    }
+def birds_json(request: Request):
+    body, etag = _feed()
+    headers = {"Cache-Control": f"public, max-age={_FEED_TTL}", "ETag": etag}
+    if _etag_matches(request.headers.get("if-none-match", ""), etag):
+        return Response(status_code=304, headers=headers)
+    return Response(body, media_type="application/json", headers=headers)
+
+
+@app.get("/healthz")
+def healthz():
+    """Container healthcheck: proves the process answers and the database
+    opens, without building the feed every 30 seconds."""
+    get_meta("last_revalidation")
+    return {"ok": True}
 
 
 @app.get("/species_data.js")
@@ -218,7 +265,6 @@ async def _read_body(request: Request, limit: int) -> bytes:
 
 @app.post("/register-token")
 async def register_token(request: Request):
-    import json
     if not _allow_rate(_client_ip(request)):
         raise HTTPException(status_code=429, detail="Too many requests")
     raw = await _read_body(request, _MAX_REGISTER_BODY)
@@ -285,7 +331,6 @@ def gemeente_detail(name: str):
 @app.get("/scrape-stats.json")
 def scrape_stats(hours: int = 12):
     """Aggregate scrape activity for the status bot (no PII)."""
-    import json
     hours = max(1, min(hours, 168))
     runs = get_scrape_runs_since(hours)
     reval = get_meta("last_revalidation_result")

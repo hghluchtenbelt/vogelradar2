@@ -613,7 +613,8 @@ function buildUrl(){
 async function loadData(){
   if(!CONFIG.DATA_URL){ render(); return; }
   $("#refresh").classList.add("spin");
-  try{ const res=await fetch(buildUrl(),{cache:"no-store"}); if(!res.ok) throw 0;
+  // "no-cache" revalidates with the ETag, so an unchanged feed costs a 304 instead of a full download.
+  try{ const res=await fetch(buildUrl(),{cache:"no-cache"}); if(!res.ok) throw 0;
     const j=await res.json(); state.data=(j.sightings||[]).filter(s=>s.lat&&s.lng&&s.rarity&&s.date);
     state.lastUpdated=j.lastUpdated?Date.parse(j.lastUpdated):Date.now(); state.isDemo=false;
     checkWensvogels(state.data);

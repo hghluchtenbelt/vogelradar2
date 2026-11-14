@@ -51,6 +51,7 @@ def client(db):
     import api
 
     api._rate_limit.clear()
+    api._feed_cache.update(t=0.0, body=b"", etag="")
     return TestClient(api.app)
 
 
